@@ -26,6 +26,9 @@ object EqEngine {
     private var cutoffs = FloatArray(BANDS) { i -> (20.0 * Math.pow(1000.0, (i + 1.0) / BANDS)).toFloat() }
     private var gains = FloatArray(BANDS)
     private var post = 0f
+    private var limCeil = -1f
+    private var limRel = 80f
+    private var limOn = true
 
     @Volatile var enabled = false
         private set
@@ -118,6 +121,11 @@ object EqEngine {
             gains[i] = g.getDouble(i).toFloat().coerceIn(-30f, 24f)
         }
         post = o.optDouble("post", 0.0).toFloat().coerceIn(-24f, 24f)
+        o.optJSONObject("lim")?.let { l ->
+            limOn = l.optBoolean("on", true)
+            limCeil = l.optDouble("ceil", -1.0).toFloat().coerceIn(-24f, 0f)
+            limRel = l.optDouble("rel", 80.0).toFloat().coerceIn(5f, 1000f)
+        }
     }
 
     private fun applyTo(dp: DynamicsProcessing) {
@@ -125,7 +133,9 @@ object EqEngine {
             dp.setPreEqBandAllChannelsTo(i, DynamicsProcessing.EqBand(true, cutoffs[i], gains[i]))
         }
         dp.setInputGainAllChannelsTo(post)
-        // attack ms, release ms, ratio, threshold dB, post-gain dB
-        dp.setLimiterAllChannelsTo(DynamicsProcessing.Limiter(true, true, 0, 1f, 80f, 10f, -1f, 0f))
+        // attack ms, release ms, ratio, threshold dB, post-gain dB.
+        // With the limiter switched off in the app, a safety limit just under 0 dBFS stays in place.
+        val thr = if (limOn) limCeil else -0.1f
+        dp.setLimiterAllChannelsTo(DynamicsProcessing.Limiter(true, true, 0, 1f, limRel, 20f, thr, 0f))
     }
 }

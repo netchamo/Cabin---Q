@@ -152,7 +152,8 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .knob{display:flex; flex-direction:column; align-items:center; gap:2px; width:70px; user-select:none; -webkit-user-select:none; border-radius:8px}
 .knob svg{touch-action:none; cursor:ns-resize; border-radius:50%}
 .knob svg{width:58px; height:58px; overflow:visible}
-.k-lab{font-size:10px; letter-spacing:.2em; color:var(--ink-2); font-weight:600}
+.k-lab{font-size:10px; letter-spacing:.2em; color:var(--ink-2); font-weight:600; white-space:nowrap}
+.knob .k-lab.long{font-size:9px; letter-spacing:.06em}
 .k-val{font-family:var(--f-mono); font-size:11px; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap}
 .k-track{fill:none; stroke:var(--knob-track); stroke-width:4.5; stroke-linecap:round}
 .k-arc{fill:none; stroke:var(--c); stroke-width:4.5; stroke-linecap:round; filter:drop-shadow(0 0 3px var(--c))}
@@ -163,7 +164,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .g-dyn{flex-basis:100%; order:2}
 .g-out{order:4}
 .g-comp{flex-basis:100%; order:3}
-.gt .gr-read{margin-left:auto; font-family:var(--f-mono); font-size:11px; letter-spacing:.02em; color:var(--led); font-variant-numeric:tabular-nums}
+.gt .gr-read{margin-left:auto; white-space:nowrap; font-family:var(--f-mono); font-size:11px; letter-spacing:.02em; color:var(--led); font-variant-numeric:tabular-nums}
 .comp-body{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
 .vu{flex:1 1 230px; max-width:380px; height:128px; padding:6px; border-radius:10px; background:linear-gradient(180deg,#151719,#0b0c0e);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.07)}
@@ -225,7 +226,7 @@ input[type=range]::-moz-range-thumb{width:12px; height:12px; border-radius:50%; 
 input[type=range]:disabled{opacity:.3}
 
 /* library sheet */
-.sheet{position:absolute; left:10px; right:10px; bottom:10px; max-height:72%; z-index:20; display:flex; flex-direction:column; gap:10px;
+.sheet{position:fixed; left:max(10px, env(safe-area-inset-left,0px)); right:max(10px, env(safe-area-inset-right,0px)); bottom:calc(env(safe-area-inset-bottom,0px) + 10px); max-width:720px; margin:0 auto; max-height:82vh; z-index:45; display:flex; flex-direction:column; gap:10px;
   padding:14px; border-radius:14px; background:linear-gradient(180deg,#2c3035,#1d2024); border:1px solid var(--plate-edge);
   box-shadow:0 -10px 40px rgba(0,0,0,.6)}
 .sheet-h{display:flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.2em; font-weight:700; color:var(--silk)}
@@ -239,6 +240,26 @@ input[type=range]:disabled{opacity:.3}
 .tracks button.cur{color:var(--ink); background:rgba(255,154,60,.08)}
 .tracks .led{flex:none}
 .tracks small{margin-left:auto; color:var(--ink-3); flex:none}
+.src-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px}
+.src{position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:12px 14px; border-radius:11px; cursor:pointer; text-align:right;
+  border:1px solid #121416; background:linear-gradient(180deg,#363b41,#272b30); box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 2px 6px rgba(0,0,0,.4)}
+.src:active{transform:translateY(1px)}
+.src b{font-family:var(--f-he); font-size:15px; font-weight:500; color:var(--ink)}
+.src span{font-family:var(--f-he); font-size:12px; color:var(--ink-3)}
+.src svg{width:22px; height:22px; fill:none; stroke:var(--led); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; margin-bottom:4px}
+.lib-search{height:36px; border-radius:9px; border:1px solid #121416; background:var(--well); color:var(--ink); padding:0 12px; font-family:var(--f-he); font-size:14px; box-shadow:inset 0 1px 3px rgba(0,0,0,.7)}
+.tracks .grp{display:flex; align-items:center; gap:8px; padding:10px 10px 4px; font-family:var(--f-he); font-size:12px; color:var(--ink-3)}
+.tracks .grp button{width:auto; padding:2px 8px; margin-inline-start:auto; font-family:var(--f-he); font-size:11.5px; color:var(--ink-3); border:1px solid #2c3035; border-radius:6px}
+.lib-empty{padding:18px 12px; font-family:var(--f-he); font-size:13px; color:var(--ink-3); text-align:center}
+.update{display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; background:rgba(255,154,60,.12); border:1px solid rgba(255,154,60,.45); font-family:var(--f-he); font-size:13.5px; color:var(--ink)}
+.update a{margin-inline-start:auto; text-decoration:none}
+/* limiter */
+.g-lim{flex-basis:100%; order:3}
+.lim-body{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.lim-disp{flex:1 1 230px; max-width:380px; height:128px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.07)}
+#lc{display:block; width:100%; height:100%; border-radius:6px}
+.lim-body .knobs{flex:1 1 280px}
+.gt .seg button{height:22px; font-size:10px; padding:0 8px}
 .note{margin:0; font-family:var(--f-he); font-size:12.5px; line-height:1.55; color:var(--ink-3); max-width:65ch}
 .vh{position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none}
 .toast{position:fixed; left:50%; top:calc(env(safe-area-inset-top,0px) + 70px); transform:translateX(-50%); z-index:60; padding:8px 14px; border-radius:8px;
@@ -273,6 +294,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 <div class="unit" id="unit">
   <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
 
+  <div class="update" id="updBar" dir="rtl" hidden><span id="updTxt">גרסה חדשה זמינה</span><a class="pill" id="updLink" href="https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk">עדכן</a></div>
   <header class="head">
     <div class="brand"><b>CABIN<i>·</i>Q</b><small>Parametric · Dynamic · Linear phase</small></div>
     <select class="pill" id="preset" aria-label="Preset"></select>
@@ -347,6 +369,17 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <p class="dyn-help" id="compNote" dir="rtl" hidden>הדפדפן הזה לא תומך במנוע הקומפרסור המלא, אז הפילטר על הסייד-צ'יין כבוי. שאר הכפתורים עובדים.</p>
         <p class="dyn-help" dir="rtl"><b>SC HPF</b> קובע מאיזה תדר הקומפרסור מתחיל להגיב: בהגדרה גבוהה הבס כבר לא "מושך" את כל המיקס למטה. <b>Mix</b> מערבב בין האות המקורי לאות הדחוס, לקומפרסיה מקבילית.</p>
       </div>
+      <div class="group g-lim">
+        <div class="gt"><button class="pill on" id="limIn" aria-pressed="true"><span class="led"></span>Limiter</button>
+          <div class="seg" id="limMode" role="group" aria-label="Limiter type"><button data-m="modern" aria-pressed="true">MODERN</button><button data-m="simple" aria-pressed="false">SIMPLE</button></div>
+          <span class="gr-read" id="limGr">GR 0.0 dB</span></div>
+        <div class="lim-body">
+          <div class="lim-disp"><canvas id="lc" aria-label="Limiter level and gain reduction"></canvas></div>
+          <div class="knobs wrap" id="kLim"></div>
+        </div>
+        <div class="seg" id="limStyle" role="group" aria-label="Limiter style"><button data-s="0" aria-pressed="true">TRANSPARENT</button><button data-s="1" aria-pressed="false">PUNCHY</button><button data-s="2" aria-pressed="false">AGGRESSIVE</button></div>
+        <p class="dyn-help" dir="rtl" id="limHelp"></p>
+      </div>
       <div class="group g-out"><div class="gt">OUTPUT</div><div class="knobs" id="kOut"></div></div>
     </div>
   </section>
@@ -366,14 +399,19 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <div class="sheet" id="sheet" hidden>
     <div class="sheet-h">LIBRARY <button class="pill" id="sheetClose">Close</button></div>
-    <div class="sheet-a">
-      <label class="pill" for="fileIn">Open files</label>
-      <label class="pill" for="dirIn">Open folder</label>
+    <div class="src-cards" dir="rtl">
+      <label class="src" id="srcFiles" for="fileIn" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+        <b>בחירת שירים</b><span>מכל אפליקציית קבצים או Drive</span></label>
+      <label class="src" id="srcFolder" for="dirIn" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <b>תיקיית מוזיקה</b><span id="srcFolderSub">כל השירים בתיקייה</span></label>
       <input class="vh" type="file" id="fileIn" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.aiff">
       <input class="vh" type="file" id="dirIn" multiple webkitdirectory>
     </div>
+    <input class="lib-search" id="libSearch" type="search" dir="rtl" placeholder="חיפוש שיר" hidden>
     <ul class="tracks" id="tracks"></ul>
-    <p class="note" dir="rtl">באב-טיפוס הזה השמע עובר דרך ה-EQ מקבצים מהזיכרון של הטלפון ומרעש ורוד לכיול. באפליקציית האנדרואיד אותו מנוע יעבד את כל השמע של המכשיר: ספוטיפיי, יוטיוב, VLC והדפדפן. באייפון זה יישאר נגן קבצים מקומי.</p>
+    <p class="note" dir="rtl" id="libNote">אפשר גם לפתוח שיר מאפליקציית הקבצים עם "פתח באמצעות" או "שתף", ולבחור ב-Cabin Q.</p>
   </div>
 
   <div class="toast" id="toast" dir="rtl"></div>
@@ -436,14 +474,15 @@ mpOut.connect(compIn); lpOut.connect(compIn);
 compIn.connect(out); // replaced by the compressor once it is ready
 detMp.connect(detBus); detLp.connect(detBus);
 const mon=G(), soloF=ctx.createBiquadFilter(), soloG=G(), sink=G();
-out.connect(mon); mon.connect(ctx.destination);
-out.connect(soloF); soloF.connect(soloG); soloG.connect(ctx.destination); soloG.gain.value=0;
+const fin=G(); out.connect(fin); // the limiter is inserted between trim (out) and fin once ready
+fin.connect(mon); mon.connect(ctx.destination);
+fin.connect(soloF); soloF.connect(soloG); soloG.connect(ctx.destination); soloG.gain.value=0;
 sink.gain.value=0; sink.connect(ctx.destination); // keeps analysers pulled on every browser
 lpOut.gain.value=0; byp.gain.value=0; detLp.gain.value=0;
 const preAn=ctx.createAnalyser(), postAn=ctx.createAnalyser();
 [preAn,postAn].forEach(a=>{a.fftSize=8192; a.smoothingTimeConstant=.78; a.minDecibels=-120; a.maxDecibels=0;});
-input.connect(preAn); out.connect(postAn); preAn.connect(sink); postAn.connect(sink);
-const split=ctx.createChannelSplitter(2); out.connect(split);
+input.connect(preAn); fin.connect(postAn); preAn.connect(sink); postAn.connect(sink);
+const split=ctx.createChannelSplitter(2); fin.connect(split);
 const anL=ctx.createAnalyser(), anR=ctx.createAnalyser(); anL.fftSize=anR.fftSize=2048;
 split.connect(anL,0); split.connect(anR,1); anL.connect(sink); anR.connect(sink);
 let convOn=false;
@@ -826,7 +865,7 @@ function activity(){
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
 }
 function loop(now){
-  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); activity(); meters(now); updateTime();
+  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); activity(); meters(now); updateTime();
   requestAnimationFrame(loop);
 }
 
@@ -892,7 +931,8 @@ function knob(parent,spec){
   parent.appendChild(el);
   const lab=el.querySelector('.k-lab'), arc=el.querySelector('.k-arc'), ptr=el.querySelector('.k-ptr'), val=el.querySelector('.k-val');
   const k={el,spec,refresh(){
-    const ok=spec.enabled(); el.classList.toggle('dis',!ok); lab.textContent=spec.label();
+    if(spec.hide) el.hidden=!!spec.hide();
+    const ok=spec.enabled(); el.classList.toggle('dis',!ok); lab.textContent=spec.label(); lab.classList.toggle('long',lab.textContent.length>7);
     el.setAttribute('aria-label',spec.label());
     if(!ok){ val.textContent='—'; arc.setAttribute('d',''); ptr.setAttribute('transform','rotate(-135 32 32)'); return; }
     const n=spec.get(), a=-135+270*n, from=spec.bip?0:-135;
@@ -962,7 +1002,57 @@ class BusComp extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('bus-comp',BusComp);`;
+registerProcessor('bus-comp',BusComp);
+
+/* Look-ahead brickwall limiter: sliding minimum of the needed gain, then a moving average over the
+   same window, with the audio delayed so the gain is fully down when the peak arrives. Never overshoots. */
+class CabinLimiter extends AudioWorkletProcessor{
+  constructor(){ super(); this.p={on:true,mode:'modern',gain:0,ceil:-1,rel:100,look:2,style:0};
+    this.cnt=0; this.mxGr=0; this.mxIn=0; this.mxOut=0; this.env=1; this.sus=0; this.t=0; this.alloc(); 
+    this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.alloc(); }; }
+  alloc(){ const p=this.p, ms= p.mode==='simple'? 1.5 : p.style===1? Math.min(p.look,1) : p.style===2? .3 : p.look;
+    const N=Math.max(2,Math.round(ms*sampleRate/1000)); if(N===this.N) return;
+    this.N=N; this.tr=new Float32Array(N).fill(1); this.dq=new Int32Array(N+1); this.h=0; this.tl=0; this.c=0;
+    this.ga=new Float32Array(N).fill(1); this.sum=N; this.dl=[new Float32Array(N),new Float32Array(N)]; this.t=0; }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const n=inp[0].length, chs=out.length, p=this.p, sr=sampleRate;
+    if(!p.on){ for(let c=0;c<chs;c++) out[c].set(inp[c]||inp[0]); if(++this.cnt>=6){ this.port.postMessage({gr:0,inp:-120,out:-120}); this.cnt=0; } return true; }
+    const N=this.N, M=N+1, gin=Math.pow(10,p.gain/20), cl=Math.pow(10,p.ceil/20), tr=this.tr, dq=this.dq, ga=this.ga;
+    const relBase=Math.max(1,p.rel)/1000, sat=p.mode==='modern'&&p.style===2, auto=p.mode==='modern'&&p.style===0;
+    for(let i=0;i<n;i++){
+      const t=this.t; let pk=0; const xs=[0,0];
+      for(let c=0;c<chs&&c<2;c++){ let v=(inp[c]||inp[0])[i]*gin;
+        if(sat){ const a=Math.abs(v), k=.6*cl; if(a>k){ const r=(a-k)/((1-.6)*cl); v=Math.sign(v)*(k+(1-.6)*cl*Math.tanh(r)); } }
+        xs[c]=v; const a=v<0?-v:v; if(a>pk) pk=a; }
+      if(pk>this.mxIn) this.mxIn=pk;
+      const target= pk>cl? cl/pk : 1;
+      // sliding minimum (monotonic deque) over the last N targets
+      while(this.c>0 && tr[dq[(this.tl-1+M)%M]%N]>=target){ this.tl=(this.tl-1+M)%M; this.c--; }
+      tr[t%N]=target; dq[this.tl]=t; this.tl=(this.tl+1)%M; this.c++;
+      while(dq[this.h]<=t-N){ this.h=(this.h+1)%M; this.c--; }
+      const gmin=tr[dq[this.h]%N];
+      // moving average of the minimum = smooth attack across the look-ahead window
+      this.sum+=gmin-ga[t%N]; ga[t%N]=gmin; const avg=this.sum/N;
+      // release
+      let relT=relBase; if(auto) relT=relBase*(1+3*this.sus);
+      if(avg<this.env) this.env=avg; else this.env+= (avg-this.env)*(1-Math.exp(-1/(relT*sr)));
+      const g=Math.min(this.env,avg);
+      this.sus+=((1-g)*4-this.sus)/(sr*.4); if(this.sus<0) this.sus=0; if(this.sus>1) this.sus=1;
+      // delayed audio (N-1 samples) times gain
+      const di=(t+1)%N; let opk=0;
+      for(let c=0;c<chs;c++){ const d=this.dl[c<2?c:1]; const y=d[di]*g; out[c][i]=y; const a=y<0?-y:y; if(a>opk) opk=a; }
+      for(let c=0;c<2;c++) this.dl[c][t%N]= c<chs? xs[c] : xs[0];
+      if(opk>this.mxOut) this.mxOut=opk;
+      const grDb=g<1? -20*Math.log10(g) : 0; if(grDb>this.mxGr) this.mxGr=grDb;
+      this.t=t+1; if(this.t>1e9){ this.t=0; this.alloc(); }
+    }
+    if(++this.cnt>=6){ const db=v=>v>1e-6?20*Math.log10(v):-120;
+      this.port.postMessage({gr:this.mxGr,inp:db(this.mxIn),out:db(this.mxOut)}); this.cnt=0; this.mxGr=0; this.mxIn=0; this.mxOut=0; }
+    return true;
+  }
+}
+registerProcessor('cabin-limiter',CabinLimiter);`;
 function compParams(){ const r=REL[C.rli]; return {on:C.on,thr:C.thr,ratio:RATIOS[C.ri],att:ATT[C.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:C.makeup,mix:C.mix/100,hpf:C.hpf}; }
 function sendComp(){
   const p=compParams();
@@ -976,6 +1066,9 @@ function fallbackComp(){
   dcomp=ctx.createDynamicsCompressor(); dDry=G(); dWet=G();
   compIn.disconnect(); compIn.connect(dDry); compIn.connect(dcomp); dcomp.connect(dWet); dDry.connect(out); dWet.connect(out);
   $('compNote').hidden=false; sendComp(); refreshDeck();
+  // no worklet: a fast compressor stands in for the limiter
+  limFallback=ctx.createDynamicsCompressor(); limFallback.knee.value=0; limFallback.ratio.value=20; limFallback.attack.value=.001;
+  out.disconnect(); out.connect(limFallback); limFallback.connect(fin); sendLim();
 }
 (async()=>{
   try{
@@ -986,6 +1079,10 @@ function fallbackComp(){
     compNode.port.onmessage=e=>{ compGR=e.data; };
     compIn.disconnect(); compIn.connect(compNode); compNode.connect(out);
     sendComp();
+    limNode=new AudioWorkletNode(ctx,'cabin-limiter',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    limNode.port.onmessage=e=>{ limMsg(e.data); };
+    out.disconnect(); out.connect(limNode); limNode.connect(fin);
+    sendLim();
   }catch(err){ console.warn("bus comp worklet unavailable",err); fallbackComp(); }
 })();
 $('compIn').onclick=()=>{ C.on=!C.on; const b=$('compIn'); b.classList.toggle('on',C.on); b.setAttribute('aria-pressed',C.on); sendComp(); };
@@ -998,6 +1095,76 @@ knob(kc,cSpec({label:()=>'RELEASE', color:'#5aa9ff', ticks:5, get:()=>C.rli/4, s
 knob(kc,cSpec({label:()=>'MAKEUP', color:'#c9ced3', get:()=>lin(C.makeup,0,15), set:n=>{C.makeup=Math.round(unlin(n,0,15)*2)/2; sendComp();}, text:()=>'+'+C.makeup.toFixed(1)+' dB', reset:()=>{C.makeup=0; sendComp();} }));
 knob(kc,cSpec({label:()=>'MIX', color:'#ffb347', get:()=>C.mix/100, set:n=>{C.mix=Math.round(n*100); sendComp();}, text:()=>C.mix===100?'WET':C.mix===0?'DRY':C.mix+'%', reset:()=>{C.mix=100; sendComp();} }));
 knob(kc,cSpec({label:()=>'SC HPF', color:'#7fe0a8', enabled:()=>!dcomp, get:()=>C.hpf<=0?0:.06+.94*lg(C.hpf,20,300), set:n=>{C.hpf= n<.04?0:Math.round(unlg(clamp((n-.06)/.94,0,1),20,300)); sendComp();}, text:()=>C.hpf<=0?'OFF':C.hpf+' Hz', reset:()=>{C.hpf=0; sendComp();} }));
+
+/* ---------- limiter ---------- */
+const L={on:true,mode:'modern',gain:0,ceil:-1,rel:100,look:2,style:0};
+let limNode=null, limFallback=null, limGR=0;
+const LH=300, limH={gr:new Float32Array(LH),inp:new Float32Array(LH).fill(-120),out:new Float32Array(LH).fill(-120),i:0};
+function sendLim(){
+  if(limNode) limNode.port.postMessage({...L});
+  else if(limFallback){ const t=ctx.currentTime; limFallback.threshold.setTargetAtTime(L.on?L.ceil-L.gain:0,t,.01); limFallback.release.setTargetAtTime(L.rel/1000,t,.01); }
+  pushSystem();
+}
+function limMsg(m){ limGR=m.gr; limH.gr[limH.i]=m.gr; limH.inp[limH.i]=m.inp; limH.out[limH.i]=m.out; limH.i=(limH.i+1)%LH; }
+const kl=$('kLim');
+function lSpec(o){ return Object.assign({enabled:()=>true,bip:false},o); }
+knob(kl,lSpec({label:()=>'GAIN', color:'#ff8a5a', get:()=>lin(L.gain,0,18), set:n=>{L.gain=Math.round(unlin(n,0,18)*10)/10; sendLim();}, text:()=>'+'+L.gain.toFixed(1)+' dB', reset:()=>{L.gain=0; sendLim();} }));
+knob(kl,lSpec({label:()=>L.mode==='simple'?'LIMIT':'CEILING', color:'#e9eef2', get:()=>lin(L.ceil,-12,0), set:n=>{L.ceil=Math.round(unlin(n,-12,0)*10)/10; sendLim();}, text:()=>sgn(L.ceil)+' dB', reset:()=>{L.ceil=-1; sendLim();} }));
+knob(kl,lSpec({label:()=>'RELEASE', color:'#5aa9ff', get:()=>lg(L.rel,5,1000), set:n=>{L.rel=Math.round(unlg(n,5,1000)); sendLim();}, text:()=>L.rel+' ms', reset:()=>{L.rel=100; sendLim();} }));
+knob(kl,lSpec({label:()=>'LOOKAHEAD', color:'#b38cff', hide:()=>L.mode!=='modern', enabled:()=>L.style===0, get:()=>lin(L.look,.5,5), set:n=>{L.look=Math.round(unlin(n,.5,5)*10)/10; sendLim();}, text:()=>L.look.toFixed(1)+' ms', reset:()=>{L.look=2; sendLim();} }));
+const LIM_HELP={
+  modern:'<b>MODERN</b>: לימיטר שקוף עם Lookahead שמוריד את העוצמה רגע לפני שהפיק מגיע, כך שאין עיוות. <b>TRANSPARENT</b> הכי נקי, <b>PUNCHY</b> משאיר יותר מכה לתופים, <b>AGGRESSIVE</b> מוסיף רוויה עדינה בשביל עוצמה.',
+  simple:'<b>SIMPLE</b>: שלושה כפתורים בלבד. Gain מעלה את העוצמה, Limit קובע את התקרה, Release קובע כמה מהר הוא משחרר.'
+};
+function renderLim(){
+  $('limIn').classList.toggle('on',L.on); $('limIn').setAttribute('aria-pressed',L.on);
+  $('limMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===L.mode));
+  $('limStyle').hidden=L.mode!=='modern';
+  $('limStyle').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===L.style));
+  $('limHelp').innerHTML=LIM_HELP[L.mode];
+  knobs.forEach(k=>k.refresh());
+}
+$('limIn').onclick=()=>{ L.on=!L.on; renderLim(); sendLim(); };
+$('limMode').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; L.mode=b.dataset.m; renderLim(); sendLim(); };
+$('limStyle').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; L.style=+b.dataset.s; renderLim(); sendLim(); };
+const lc=$('lc'), lg2c=lc.getContext('2d'); let LW=200,LHh=110,LD=1;
+new ResizeObserver(()=>{ LD=Math.min(2,window.devicePixelRatio||1); LW=Math.max(10,lc.clientWidth); LHh=Math.max(10,lc.clientHeight); lc.width=Math.round(LW*LD); lc.height=Math.round(LHh*LD); }).observe(lc);
+let limShown=0;
+function drawLim(){
+  const c=lg2c, w=LW, h=LHh; c.setTransform(LD,0,0,LD,0,0);
+  const gr=S.playing&&L.on?limGR:0; limShown+= (gr-limShown)*(gr>limShown?.6:.12);
+  $('limGr').textContent='GR '+(limShown>.05?'−'+limShown.toFixed(1):'0.0')+' dB';
+  if(L.mode==='modern'){
+    const bg=c.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#0b171c'); bg.addColorStop(1,'#060d11'); c.fillStyle=bg; c.fillRect(0,0,w,h);
+    const yv=db=>clamp(-db/36,0,1)*h; // 0 dB at top, -36 at bottom
+    c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.font='9px "IBM Plex Mono", monospace'; c.fillStyle='rgba(160,200,215,.4)'; c.textAlign='left'; c.textBaseline='middle';
+    for(const d of [-6,-12,-18,-24,-30]){ const y=Math.round(yv(d))+.5; c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); c.fillText(d,3,y-5); }
+    const xi=i=>i/(LH-1)*w, idx=i=>(limH.i+i)%LH;
+    // input level (what it would have been)
+    c.beginPath(); c.moveTo(0,h); for(let i=0;i<LH;i++) c.lineTo(xi(i),yv(limH.inp[idx(i)])); c.lineTo(w,h); c.closePath(); c.fillStyle='rgba(120,170,200,.18)'; c.fill();
+    // output level
+    c.beginPath(); c.moveTo(0,h); for(let i=0;i<LH;i++) c.lineTo(xi(i),yv(limH.out[idx(i)])); c.lineTo(w,h); c.closePath();
+    const og=c.createLinearGradient(0,0,0,h); og.addColorStop(0,'rgba(170,220,240,.75)'); og.addColorStop(1,'rgba(90,150,180,.15)'); c.fillStyle=og; c.fill();
+    // gain reduction hanging from the top, in red
+    c.beginPath(); c.moveTo(0,0); for(let i=0;i<LH;i++) c.lineTo(xi(i),Math.min(h,limH.gr[idx(i)]/12*h*.5)); c.lineTo(w,0); c.closePath(); c.fillStyle='rgba(255,74,46,.55)'; c.fill();
+    c.strokeStyle='#ff6a4a'; c.lineWidth=1.2; c.beginPath(); for(let i=0;i<LH;i++){ const y=Math.min(h,limH.gr[idx(i)]/12*h*.5); i?c.lineTo(xi(i),y):c.moveTo(xi(i),y); } c.stroke();
+    // ceiling
+    const cy=yv(L.ceil); c.setLineDash([5,4]); c.strokeStyle='#ffd1a6'; c.lineWidth=1.2; c.beginPath(); c.moveTo(0,cy); c.lineTo(w,cy); c.stroke(); c.setLineDash([]);
+    c.fillStyle='#ffd1a6'; c.textAlign='right'; c.fillText('CEILING '+sgn(L.ceil),w-6,cy+9);
+  } else {
+    // simple: flat panel with IN, GR and OUT bars
+    c.fillStyle='#1d2126'; c.fillRect(0,0,w,h);
+    const last=(limH.i-1+LH)%LH, bars=[['IN',limH.inp[last],'#8fb3c2',false],['GR',-limShown,'#ff6a4a',true],['OUT',limH.out[last],'#9fe0b0',false]];
+    const bw=Math.min(46,(w-40)/3), gap=(w-bw*3)/4;
+    c.font='600 10px "Chakra Petch", sans-serif'; c.textAlign='center'; c.textBaseline='alphabetic';
+    bars.forEach(([lab,v,col,isGr],k)=>{ const x=gap+k*(bw+gap), top=8, hh=h-28;
+      c.fillStyle='#121519'; c.beginPath(); c.roundRect(x,top,bw,hh,6); c.fill();
+      const f= isGr? clamp(-v/12,0,1) : clamp((v+48)/48,0,1);
+      c.fillStyle=col; c.beginPath(); if(isGr) c.roundRect(x,top,bw,hh*f,6); else c.roundRect(x,top+hh*(1-f),bw,hh*f,6); c.fill();
+      if(!isGr){ const cy=top+hh*(1-clamp((L.ceil+48)/48,0,1)); c.fillStyle='#ffd1a6'; c.fillRect(x-3,cy-1,bw+6,2); }
+      c.fillStyle='#c9ced3'; c.fillText(lab,x+bw/2,h-8); });
+  }
+}
 
 /* VU-style gain reduction meter */
 const vu=$('vu'), vg=vu.getContext('2d'); let VW=200,VH=110,VD=1;
@@ -1229,7 +1396,13 @@ function play(){
 function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
 function select(i,autoplay){
   const was=S.playing||autoplay; pause(); cur=i;
-  if(i>=0){ aud.src=tracks[i].url; $('npTitle').textContent=tracks[i].name; $('seek').disabled=false; }
+  if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('seek').disabled=false;
+    if(t.native&&!t.blob){ $('npTitle').textContent='טוען… '+t.name;
+      fetch(t.url).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{ tracks.forEach(x=>{ if(x.blob&&x!==t){ URL.revokeObjectURL(x.blob); x.blob=null; } });
+        t.blob=URL.createObjectURL(b); if(tracks[cur]===t){ aud.src=t.blob; $('npTitle').textContent=t.name; if(was) play(); } })
+        .catch(()=>{ toast('לא הצלחתי לפתוח את הקובץ'); $('npTitle').textContent=t.name; });
+      renderTracks(); return; }
+    aud.src=t.blob||t.url; }
   else { aud.removeAttribute('src'); $('npTitle').textContent='Pink noise · −18 dBFS reference'; $('seek').disabled=true; $('tDur').textContent='LOOP'; $('tCur').textContent='0:00'; }
   renderTracks(); if(was) play();
 }
@@ -1250,14 +1423,49 @@ function addFiles(list){
   renderTracks(); if(cur<0&&!S.playing) select(start,false); toast(fs.length+' קבצים נוספו');
 }
 $('fileIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
+/* tracks coming from the Android app: {folder, folderUri, tracks:[{name,url,size}], replace} */
+window.cabinAddTracks=function(d){
+  try{
+    if(d.replace&&d.folderUri) tracks=tracks.filter(t=>t.folderUri!==d.folderUri||t===tracks[cur]);
+    const start=tracks.length;
+    (d.tracks||[]).forEach(t=>tracks.push({name:t.name.replace(/\.[^.]+$/,''),url:t.url,size:t.size||0,native:true,folder:d.folder||'',folderUri:d.folderUri||''}));
+    renderTracks();
+    const added=tracks.length-start;
+    if(d.play&&added) { select(start,true); $('sheet').hidden=true; }
+    else if(cur<0&&!S.playing&&added) select(start,false);
+    if(added&&!d.quiet) toast(added+' שירים נוספו');
+    if(!added&&!d.quiet) toast('לא נמצאו קבצי שמע');
+  }catch(e){ console.warn(e); }
+};
+if(NATIVE){
+  $('srcFiles').removeAttribute('for'); $('srcFolder').removeAttribute('for');
+  $('srcFiles').onclick=e=>{ e.preventDefault(); try{ NATIVE.pickFiles(); }catch(_){} };
+  $('srcFolder').onclick=e=>{ e.preventDefault(); try{ NATIVE.pickFolder(); }catch(_){} };
+  $('srcFolderSub').textContent='נשמרת ונטענת בכל פתיחה';
+} else if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
+  $('srcFolder').hidden=true; $('srcFiles').querySelector('span').textContent='מאפליקציית הקבצים או iCloud';
+  $('libNote').textContent='באייפון בוחרים שירים מאפליקציית הקבצים. אפשר לבחור כמה שירים יחד.';
+}
+$('libSearch').oninput=()=>renderTracks();
 $('dirIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
 function renderTracks(){
   const ul=$('tracks'); ul.textContent='';
+  const q=($('libSearch').value||'').trim().toLowerCase();
+  $('libSearch').hidden=tracks.length<8;
   const row=(i,name,meta)=>{ const li=document.createElement('li'), b=document.createElement('button'); b.className=i===cur?'cur':'';
     b.innerHTML=`<span class="led${i===cur?' lit':''}"></span><span></span><small>${meta}</small>`; b.children[1].textContent=name;
-    b.onclick=()=>select(i,true); li.appendChild(b); ul.appendChild(li); };
-  row(-1,'Pink noise · reference','CAL');
-  tracks.forEach((t,i)=>row(i,t.name,(t.size/1048576).toFixed(1)+' MB'));
+    b.onclick=()=>{ select(i,true); if(i>=0) $('sheet').hidden=true; }; li.appendChild(b); ul.appendChild(li); };
+  if(!q) row(-1,'Pink noise · reference','CAL');
+  let lastF=null, shown=0;
+  tracks.forEach((t,i)=>{ if(q&&!t.name.toLowerCase().includes(q)) return;
+    const f=t.folder||'';
+    if(f!==lastF){ lastF=f; const li=document.createElement('li'); li.className='grp'; li.dir='rtl';
+      li.textContent=f? 'תיקייה: '+f : 'שירים שנבחרו';
+      if(f&&t.folderUri&&NATIVE){ const rm=document.createElement('button'); rm.textContent='הסר'; rm.onclick=()=>{ try{ NATIVE.removeFolder(t.folderUri); }catch(_){} tracks=tracks.filter(x=>x.folderUri!==t.folderUri||x===tracks[cur]); renderTracks(); }; li.appendChild(rm); }
+      ul.appendChild(li); }
+    row(i,t.name,t.size?(t.size/1048576).toFixed(1)+' MB':''); shown++; });
+  if(!tracks.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='עוד אין שירים. בחר שירים או תיקייה למעלה.'; ul.appendChild(e); }
+  else if(q&&!shown){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצא שיר בשם הזה'; ul.appendChild(e); }
 }
 $('libBtn').onclick=()=>{ $('sheet').hidden=false; };
 $('sheetClose').onclick=()=>{ $('sheet').hidden=true; };
@@ -1268,7 +1476,7 @@ function systemCurve(){
   const n=SYS_BANDS.length, fr=new Float32Array(SYS_BANDS), m=new Float32Array(n), ph=new Float32Array(n), db=new Float32Array(n);
   if(!S.bypass) for(const b of S.bands){ if(!b.on) continue; for(const nd of A.get(b.id).disp){ nd.getFrequencyResponse(fr,m,ph); for(let i=0;i<n;i++) if(m[i]>0&&isFinite(m[i])) db[i]+=20*Math.log10(m[i]); } }
   const cutoffs=SYS_BANDS.map((f,i)=> i<n-1? Math.round(Math.sqrt(f*SYS_BANDS[i+1])) : 20000);
-  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:S.bypass?0:S.trim};
+  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:S.bypass?0:S.trim+(L.on?L.gain:0), lim:{on:L.on&&!S.bypass,ceil:L.ceil,rel:L.rel}};
 }
 function pushSystem(){ if(!NATIVE||!SYS.on) return; clearTimeout(SYS.t); SYS.t=setTimeout(()=>{ try{ NATIVE.setCurve(JSON.stringify(systemCurve())); }catch(_){} },40); }
 function setSystem(on){
@@ -1289,13 +1497,13 @@ if(NATIVE){
   setInterval(pollSys,2000);
 }
 /* remember the setup between launches */
-function saveState(){ try{ localStorage.setItem('cabinq.v1',JSON.stringify({bands:S.bands,trim:S.trim,C,preset:presetSel.value,mode:S.mode,res:S.res})); }catch(_){} }
+function saveState(){ try{ localStorage.setItem('cabinq.v1',JSON.stringify({bands:S.bands,trim:S.trim,C,L,preset:presetSel.value,mode:S.mode,res:S.res})); }catch(_){} }
 function loadState(){
   try{
     const st=JSON.parse(localStorage.getItem('cabinq.v1')||'null'); if(!st||!Array.isArray(st.bands)) return false;
     A.forEach(destroy); A.clear();
     S.bands=st.bands.map(o=>{ const b=mk(o.type,o.freq,o.gain,o.q,{slope:o.slope||24,on:o.on!==false,dyn:o.dyn}); b.slot=o.slot|0; return b; });
-    S.bands.forEach(build); S.trim=+st.trim||0; Object.assign(C,st.C||{}); presetSel.value=st.preset||'';
+    S.bands.forEach(build); S.trim=+st.trim||0; Object.assign(C,st.C||{}); Object.assign(L,st.L||{}); presetSel.value=st.preset||'';
     const d=S.bands.find(b=>b.dyn.on); S.sel=d?d.id:(S.bands.length?S.bands[0].id:null);
     const cb=$('compIn'); cb.classList.toggle('on',C.on); cb.setAttribute('aria-pressed',C.on);
     structural(); sendComp(); return true;
@@ -1305,7 +1513,15 @@ setInterval(saveState,1500);
 
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
-if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true); }
+renderLim(); sendLim();
+if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
+  try{ NATIVE.ready(); }catch(_){}
+  // update check: the build number in the latest release notes vs this install
+  try{ const mine=+NATIVE.getVersion();
+    fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest').then(r=>r.json()).then(r=>{
+      const m=/Build #(\d+)/.exec(r.body||''); const latest=m?+m[1]:0;
+      if(latest>mine){ $('updTxt').textContent='גרסה חדשה זמינה (#'+latest+')'; $('updBar').hidden=false; } }).catch(()=>{}); }catch(_){}
+}
 renderTracks(); resize(); updateRouting();
 requestAnimationFrame(loop);
 })();
