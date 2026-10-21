@@ -30,7 +30,8 @@
   --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --f-he:"Heebo", "Arial Hebrew", system-ui, sans-serif;
 }
-html,body{height:100%}
+html{height:100%}
+body{min-height:100%}
 [hidden]{display:none!important}
 body{
   background:radial-gradient(120% 80% at 50% 0%, #17191c 0%, var(--room) 60%);
@@ -64,7 +65,7 @@ button{cursor:pointer}
 /* header */
 .head{display:flex; flex-direction:column; gap:10px; padding:2px 4px 0}
 .brand{display:flex; align-items:center; justify-content:center; gap:12px}
-.logo{width:48px; height:48px; flex:none; filter:drop-shadow(0 2px 8px rgba(255,154,60,.25))}
+.logo{width:62px; height:62px; flex:none; filter:drop-shadow(0 3px 10px rgba(201,164,102,.28))}
 .brand-t{display:flex; flex-direction:column; align-items:center; gap:3px; line-height:1.05}
 .brand-t b{font-weight:700; font-size:25px; letter-spacing:.16em; color:var(--silk); white-space:nowrap}
 .brand-t b i{font-style:normal; color:var(--led); text-shadow:0 0 12px var(--led-glow)}
@@ -104,8 +105,12 @@ select.pill option{background:#1f2226; color:var(--ink)}
 
 /* screen */
 .screen{position:sticky; top:env(safe-area-inset-top,0px); z-index:15; flex:none; height:clamp(240px,46vh,520px); display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:6px;
-  padding:8px; border-radius:14px; background:var(--bezel);
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.07)}
+  padding:8px; border-radius:16px; border:7px solid transparent;
+  background:
+    linear-gradient(var(--bezel),var(--bezel)) padding-box,
+    linear-gradient(180deg,rgba(255,225,180,.16),rgba(0,0,0,0) 30%,rgba(0,0,0,.25)) border-box,
+    repeating-linear-gradient(91deg,#5b391f 0 2px,#6e4527 2px 5px,#4f311b 5px 6px,#7a4d2b 6px 11px,#603c21 11px 13px,#734829 13px 19px) border-box;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.9), inset 0 0 0 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.07)}
 .glass{position:relative; min-width:0; border-radius:8px; overflow:hidden;
   background:radial-gradient(120% 90% at 50% 10%, var(--glass-2), var(--glass) 70%)}
 .glass::after{content:""; position:absolute; inset:0; pointer-events:none; border-radius:8px;
@@ -199,7 +204,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .dyn-help b{color:var(--ink-2); font-weight:500}
 .chip.lit{color:#1a0f05; background:var(--led); border-color:var(--led)}
 /* fullscreen analyzer */
-.unit.fs .screen{position:fixed; inset:0; z-index:40; border-radius:0; height:auto;
+.unit.fs .screen{position:fixed; inset:0; z-index:40; border-radius:0; height:auto; border-width:0; background:var(--bezel);
   padding:calc(env(safe-area-inset-top,0px) + 8px) max(8px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(8px, env(safe-area-inset-left,0px))}
 .fsbar{position:absolute; left:8px; right:8px; bottom:8px; z-index:3; display:flex; align-items:center; gap:6px; flex-wrap:nowrap}
 .fsbar .chip{flex:none}
@@ -227,17 +232,32 @@ body.noscroll{overflow:hidden}
 .tb.play.big svg{width:22px; height:22px}
 .tb.play.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 0 0 1px var(--led), 0 0 16px var(--led-glow)}
 /* player: always docked at the bottom, opens to half the screen */
-body{padding-bottom:calc(var(--plh,78px) + env(safe-area-inset-bottom,0px) + 14px)}
+.unit{margin-bottom:calc(var(--plh,92px) + env(safe-area-inset-bottom,0px) + 16px)}
+/* modern skin for the player, on top of the hardware look */
+.player{background:linear-gradient(180deg,rgba(38,42,48,.86),rgba(18,20,23,.94)) !important; -webkit-backdrop-filter:blur(18px) saturate(1.3); backdrop-filter:blur(18px) saturate(1.3);
+  border:0 !important; border-top:1px solid rgba(255,255,255,.09) !important; border-radius:22px 22px 0 0 !important; box-shadow:0 -14px 44px rgba(0,0,0,.55) !important}
+.player .tb{background:rgba(255,255,255,.07); border:0; box-shadow:none}
+.player .tb svg{fill:var(--ink)}
+.player .tb.ghost{background:transparent}
+.player .tb.play{background:linear-gradient(180deg,#ffb27a,#ff8a3d); box-shadow:0 6px 18px rgba(255,138,61,.32)}
+.player .tb.play svg{fill:#1d1006}
+.player .tb.play.on{box-shadow:0 6px 22px rgba(255,138,61,.5)}
+.player .art{border-radius:12px}
+.mini-seek{position:relative; height:20px; flex:none; display:flex; align-items:center; touch-action:none; cursor:pointer}
+.mini-seek .ms-track{position:relative; flex:1; height:4px; border-radius:2px; background:rgba(255,255,255,.12)}
+.mini-seek .ms-track i{position:absolute; inset:0 auto 0 0; width:0; border-radius:2px; background:linear-gradient(90deg,#ff9a3c,#ffb070)}
+.mini-seek .ms-track b{position:absolute; top:50%; left:0; width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.6); transition:transform .12s}
+.mini-seek.drag .ms-track b{transform:scale(1.5)}
+.mini-seek.dis{opacity:.3; pointer-events:none}
+.player.open .mini-seek{display:none}
+.ms-tip{position:absolute; top:-24px; transform:translateX(-50%); padding:2px 7px; border-radius:6px; background:#0b0d0f; border:1px solid var(--led); font-family:var(--f-mono); font-size:11px; color:var(--ink); pointer-events:none}
 .player{position:fixed; left:0; right:0; bottom:0; z-index:30; max-width:1060px; margin:0 auto; display:flex; flex-direction:column;
   padding:0 max(12px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(12px, env(safe-area-inset-left,0px));
   border-radius:18px 18px 0 0; background:linear-gradient(180deg,#30353b,#1d2024 60%); border:1px solid var(--plate-edge); border-bottom:0;
-  box-shadow:0 -12px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08); transition:height .28s cubic-bezier(.2,.8,.2,1); height:calc(var(--plh,78px) + env(safe-area-inset-bottom,0px))}
+  box-shadow:0 -12px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08); transition:height .28s cubic-bezier(.2,.8,.2,1); height:calc(var(--plh,92px) + env(safe-area-inset-bottom,0px))}
 .pl-grab{display:grid; place-items:center; height:14px; cursor:grab; touch-action:none; flex:none}
 .pl-grab span{width:38px; height:4px; border-radius:2px; background:#4a5057}
 .mini{position:relative; display:flex; align-items:center; gap:10px; min-height:56px; cursor:pointer; flex:none; touch-action:pan-x}
-.mini-prog{position:absolute; left:0; right:0; top:-3px; height:2px; background:#2a2e33; border-radius:1px; overflow:hidden}
-.mini-prog i{display:block; height:100%; width:0; background:var(--led); box-shadow:0 0 6px var(--led-glow)}
-.player.open .mini-prog{display:none}
 .art{width:44px; height:44px; border-radius:9px; flex:none; display:grid; place-items:center; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .art svg{width:26px; height:26px; fill:none; stroke:rgba(255,255,255,.85); stroke-width:2; stroke-linecap:round}
 .mini-t{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; text-align:left}
@@ -247,9 +267,9 @@ body{padding-bottom:calc(var(--plh,78px) + env(safe-area-inset-bottom,0px) + 14p
 .pl-full{flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; padding-top:6px}
 .player:not(.open) .pl-full{visibility:hidden}
 .scrub{position:relative; height:34px; touch-action:none; cursor:pointer; display:flex; align-items:center}
-.scrub-track{position:relative; flex:1; height:6px; border-radius:3px; background:#121518; box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
-.scrub-track i{position:absolute; inset:0 auto 0 0; width:0; border-radius:3px; background:linear-gradient(90deg,#ff9a3c,#ffb070)}
-.scrub-track b{position:absolute; top:50%; left:0; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%; background:var(--silk); box-shadow:0 2px 6px rgba(0,0,0,.6), 0 0 0 3px rgba(255,154,60,.35)}
+.scrub-track{position:relative; flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,.1)}
+.scrub-track i{position:absolute; inset:0 auto 0 0; width:0; border-radius:4px; background:linear-gradient(90deg,#ff9a3c,#ffb070)}
+.scrub-track b{position:absolute; top:50%; left:0; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.6), 0 0 0 4px rgba(255,154,60,.3)}
 .scrub.dis{opacity:.35; pointer-events:none}
 .scrub-tip{position:absolute; top:-22px; transform:translateX(-50%); padding:2px 7px; border-radius:5px; background:#0b0d0f; border:1px solid var(--led); font-family:var(--f-mono); font-size:11px; color:var(--ink); pointer-events:none}
 .times{display:flex; justify-content:space-between; margin-top:-8px; font-family:var(--f-mono); font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums}
@@ -345,15 +365,17 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
   <div class="update" id="updBar" dir="rtl" hidden><span id="updTxt">גרסה חדשה זמינה</span><a class="pill" id="updLink" href="https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk">עדכן</a></div>
   <header class="head">
     <div class="brand">
-      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
         <defs>
-          <linearGradient id="lgCups" gradientUnits="userSpaceOnUse" x1="4" y1="0" x2="44" y2="0"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#ffb347"/><stop offset="1" stop-color="#4fd6c4"/></linearGradient>
-          <linearGradient id="lgWave" gradientUnits="userSpaceOnUse" x1="15" y1="0" x2="33" y2="0"><stop offset="0" stop-color="#5aa9ff"/><stop offset=".5" stop-color="#b38cff"/><stop offset="1" stop-color="#ff6fb5"/></linearGradient>
+          <linearGradient id="lgGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd3a0"/><stop offset=".55" stop-color="#c9a466"/><stop offset="1" stop-color="#9c7a45"/></linearGradient>
         </defs>
-        <path d="M8.5 30V24a15.5 15.5 0 0 1 31 0v6" fill="none" stroke="url(#lgCups)" stroke-width="3.2" stroke-linecap="round"/>
-        <rect x="4" y="26.5" width="9.5" height="16" rx="4.5" fill="url(#lgCups)"/>
-        <rect x="34.5" y="26.5" width="9.5" height="16" rx="4.5" fill="url(#lgCups)"/>
-        <path d="M16 35.5c2.2 0 2.8-6.5 4.6-6.5s2.3 10 4.4 10 2.4-5.5 4.2-5.5H32" fill="none" stroke="url(#lgWave)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 38V31a21 21 0 0 1 42 0v7" fill="none" stroke="url(#lgGold)" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M14.5 35.5V31a17.5 17.5 0 0 1 35 0v4.5" fill="none" stroke="#7d6138" stroke-width="1" stroke-linecap="round" opacity=".55"/>
+        <rect x="5" y="34" width="13" height="22" rx="6.5" fill="url(#lgGold)"/>
+        <rect x="46" y="34" width="13" height="22" rx="6.5" fill="url(#lgGold)"/>
+        <rect x="8.5" y="38" width="6" height="14" rx="3" fill="#7d6138" opacity=".45"/>
+        <rect x="49.5" y="38" width="6" height="14" rx="3" fill="#7d6138" opacity=".45"/>
+        <path d="M21.5 46c2.6 0 3.3-7.5 5.4-7.5S29.6 51 32 51s2.8-6.5 5-6.5 2.4 1.5 5 1.5" fill="none" stroke="url(#lgGold)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <div class="brand-t"><b>CABIN <i>-</i> Q</b><span dir="rtl">ממשק שמע אולפני</span><small id="verTag"></small></div>
     </div>
@@ -448,8 +470,8 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <section class="player" id="player" aria-label="נגן">
     <div class="pl-grab" id="plGrab" title="פתיחה / סגירה"><span></span></div>
+    <div class="mini-seek dis" id="miniSeek" aria-label="מיקום בשיר"><div class="ms-track"><i id="miniProg"></i><b id="miniThumb"></b></div><span class="ms-tip" id="miniTip" hidden></span></div>
     <div class="mini" id="mini" role="button" tabindex="0" aria-label="פתיחת הנגן">
-      <div class="mini-prog"><i id="miniProg"></i></div>
       <div class="art" id="art"><svg viewBox="0 0 24 24"><path d="M3 13c2 0 2.5-5 4.5-5S10 17 12 17s2.5-7 4.5-7 2 3 4.5 3"/></svg></div>
       <div class="mini-t"><b id="npTitle" dir="auto">רעש ורוד לכיול</b><span id="npSub" dir="auto">Pink noise · ‎−18 dBFS</span></div>
       <button class="tb play" id="miniPlay" aria-label="נגן"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg></button>
@@ -828,8 +850,8 @@ function draw(){
       g.textAlign='left'; g.fillStyle=sb.dyn.on?'#ff9a3c':'rgba(255,154,60,.55)'; g.fillText(lbl,clamp(x+bw/2-tw/2,4,W-tw-4),top-7);
     }
   }
-  // full screen pinch zones
-  if(S.fs){ g.font='600 10px "Chakra Petch", sans-serif'; g.textAlign='right'; g.textBaseline='alphabetic'; g.fillStyle='rgba(160,200,215,.38)';
+  // pinch zones: shown while pinching and briefly after launch
+  if(ptrs.size>=2||performance.now()<6000){ g.font='600 10px "Chakra Petch", sans-serif'; g.textAlign='right'; g.textBaseline='alphabetic'; g.fillStyle='rgba(160,200,215,.38)';
     g.fillText('▲ PINCH · ZOOM',W-10,mid()-6); g.textBaseline='top'; g.fillText('▼ PINCH · Q',W-10,mid()+6); }
   // dynamic drag readout
   if(gest&&(gest.k==='thr'||gest.k==='range')&&sb){
@@ -1402,8 +1424,7 @@ cv.addEventListener('pointerdown',e=>{
   } else if(ptrs.size===2){
     const pi=pinchInfo();
     let b;
-    if(S.fs){ b= pi.my>mid()? sel() : null; }  // full screen: above centre line = zoom, below = Q of the selected band
-    else b=gest&&gest.k==='drag'? S.bands.find(x=>x.id===gest.id) : hit(pi.mx,pi.my,90);
+    b= pi.my>mid()? sel() : null;  // above the centre line = zoom, below = Q of the selected band
     if(b){ S.sel=b.id; tip=b.id; gest={k:'q',id:b.id,d0:pi.d,q0:b.q,si:SLOPES.indexOf(b.slope)}; renderChips(); renderDeck(); }
     else gest={k:'zoom',d0:pi.d,lo:S.lo,hi:S.hi,fm:S.lo+(pi.mx/W)*(S.hi-S.lo)};
   }
@@ -1473,14 +1494,14 @@ function play(){
 function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
 function select(i,autoplay){
   const was=S.playing||autoplay; pause(); cur=i;
-  if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=t.folder||'שיר מהטלפון'; $('scrub').classList.remove('dis'); paintArt(t.name);
+  if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=t.folder||'שיר מהטלפון'; $('scrub').classList.remove('dis'); $('miniSeek').classList.remove('dis'); paintArt(t.name);
     if(t.native&&!t.blob){ $('npTitle').textContent='טוען… '+t.name;
       fetch(t.url).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{ tracks.forEach(x=>{ if(x.blob&&x!==t){ URL.revokeObjectURL(x.blob); x.blob=null; } });
         t.blob=URL.createObjectURL(b); if(tracks[cur]===t){ aud.src=t.blob; $('npTitle').textContent=t.name; if(was) play(); } })
         .catch(()=>{ toast('לא הצלחתי לפתוח את הקובץ'); $('npTitle').textContent=t.name; });
       renderTracks(); return; }
     aud.src=t.blob||t.url; }
-  else { aud.removeAttribute('src'); $('npTitle').textContent='רעש ורוד לכיול'; $('npSub').textContent='Pink noise · ‎−18 dBFS'; $('scrub').classList.add('dis'); $('tDur').textContent='LOOP'; $('tCur').textContent='0:00'; paintArt(''); setScrub(0); }
+  else { aud.removeAttribute('src'); $('npTitle').textContent='רעש ורוד לכיול'; $('npSub').textContent='Pink noise · ‎−18 dBFS'; $('scrub').classList.add('dis'); $('miniSeek').classList.add('dis'); $('tDur').textContent='LOOP'; $('tCur').textContent='0:00'; paintArt(''); setScrub(0); }
   renderTracks(); if(was) play();
 }
 const PL={rep:0,shuf:false};   // rep: 0 off, 1 all, 2 one
@@ -1509,7 +1530,7 @@ function paintArt(name){ let h=0; for(const ch of name) h=(h*31+ch.charCodeAt(0)
 paintArt('');
 /* open / close the player (half screen) */
 const player=$('player');
-function setOpen(o){ player.classList.toggle('open',o); document.documentElement.style.setProperty('--plh',o?'min(56vh,560px)':'78px'); $('mini').setAttribute('aria-expanded',o); if(o) renderQueue(true); }
+function setOpen(o){ player.classList.toggle('open',o); document.documentElement.style.setProperty('--plh',o?'min(58vh,580px)':'92px'); $('mini').setAttribute('aria-expanded',o); if(o) renderQueue(true); }
 $('mini').onclick=()=>setOpen(!player.classList.contains('open'));
 setOpen(false);
 $('mini').onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setOpen(!player.classList.contains('open')); } };
@@ -1537,15 +1558,17 @@ function renderQueue(scrollToCur){
 }
 const fmtT=s=>{ if(!isFinite(s)) return '0:00'; s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
 let seeking=false;
-function setScrub(f){ f=clamp(f,0,1); $('scrubFill').style.width=(f*100)+'%'; $('scrubThumb').style.left=(f*100)+'%'; $('miniProg').style.width=(f*100)+'%'; }
-{ const sc=$('scrub'); let fr=0;
-  const at=e=>{ const r=sc.getBoundingClientRect(); return clamp((e.clientX-r.left)/r.width,0,1); };
-  const show=e=>{ fr=at(e); setScrub(fr); const tip=$('scrubTip'); tip.hidden=false; tip.style.left=(fr*100)+'%'; if(isFinite(aud.duration)) { tip.textContent=fmtT(fr*aud.duration); $('tCur').textContent=tip.textContent; } };
-  sc.addEventListener('pointerdown',e=>{ if(cur<0) return; seeking=true; sc.setPointerCapture(e.pointerId); show(e); });
-  sc.addEventListener('pointermove',e=>{ if(seeking) show(e); });
-  const end=()=>{ if(!seeking) return; seeking=false; $('scrubTip').hidden=true; if(isFinite(aud.duration)) aud.currentTime=fr*aud.duration; };
+function setScrub(f){ f=clamp(f,0,1); const pc=(f*100)+'%'; $('scrubFill').style.width=pc; $('scrubThumb').style.left=pc; $('miniProg').style.width=pc; $('miniThumb').style.left=pc; }
+function makeScrub(sc,tip){ let fr=0, on=false;
+  const at=e=>{ const r=sc.querySelector('div').getBoundingClientRect(); return clamp((e.clientX-r.left)/r.width,0,1); };
+  const show=e=>{ fr=at(e); setScrub(fr); tip.hidden=false; tip.style.left=(fr*100)+'%'; if(isFinite(aud.duration)) { tip.textContent=fmtT(fr*aud.duration); $('tCur').textContent=tip.textContent; } };
+  sc.addEventListener('pointerdown',e=>{ if(cur<0) return; e.stopPropagation(); on=seeking=true; sc.classList.add('drag'); sc.setPointerCapture(e.pointerId); show(e); });
+  sc.addEventListener('pointermove',e=>{ if(on) show(e); });
+  const end=()=>{ if(!on) return; on=seeking=false; sc.classList.remove('drag'); tip.hidden=true; if(isFinite(aud.duration)) aud.currentTime=fr*aud.duration; };
   sc.addEventListener('pointerup',end); sc.addEventListener('pointercancel',end);
+  sc.addEventListener('click',e=>e.stopPropagation());
 }
+makeScrub($('scrub'),$('scrubTip')); makeScrub($('miniSeek'),$('miniTip'));
 function updateTime(){ if(cur<0||seeking) return; $('tCur').textContent=fmtT(aud.currentTime); $('tDur').textContent=fmtT(aud.duration); if(isFinite(aud.duration)&&aud.duration>0) setScrub(aud.currentTime/aud.duration); }
 const AUDIO_EXT=/\.(mp3|m4a|aac|wav|flac|ogg|opus|aiff?|alac|webm)$/i;
 function addFiles(list){
