@@ -21,6 +21,12 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import android.os.Environment
+import android.provider.Settings
 import androidx.webkit.WebViewAssetLoader
 import org.json.JSONArray
 import org.json.JSONObject
@@ -325,6 +331,39 @@ class MainActivity : Activity() {
             loadLibrary()
         }
 
+        /** Downloads the latest APK inside the app and opens the installer. Returns "ok" or "perm". */
+        @JavascriptInterface
+        fun downloadUpdate(): String {
+            if (Build.VERSION.SDK_INT >= 26 && !packageManager.canRequestPackageInstalls()) {
+                runOnUiThread {
+                    runCatching {
+                        startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                    }
+                }
+                return "perm"
+            }
+            runOnUiThread { startUpdateDownload() }
+            return "ok"
+        }
+
+        /** 0–100 while downloading, 100 when done, -1 if it failed or nothing is running. */
+        @JavascriptInterface
+        fun updateProgress(): Int {
+            val id = updateId
+            if (id < 0) return -1
+            val dm = getSystemService(DownloadManager::class.java)
+            dm.query(DownloadManager.Query().setFilterById(id))?.use { c ->
+                if (!c.moveToFirst()) return -1
+                val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                if (status == DownloadManager.STATUS_FAILED) return -1
+                if (status == DownloadManager.STATUS_SUCCESSFUL) return 100
+                val done = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                val total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+                return if (total > 0) ((done * 99) / total).toInt() else 0
+            }
+            return -1
+        }
+
         @JavascriptInterface
         fun getVersion(): Int = runCatching {
             if (Build.VERSION.SDK_INT >= 28) packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
@@ -377,7 +416,53 @@ class MainActivity : Activity() {
         fun setFullscreen(on: Boolean) = runOnUiThread { this@MainActivity.setFullscreen(on) }
     }
 
+    // ---------------------------------------------------------------- updates
+
+    private var updateId = -1L
+    private var updateReceiver: BroadcastReceiver? = null
+
+    private fun startUpdateDownload() {
+        val dm = getSystemService(DownloadManager::class.java)
+        if (updateId >= 0) runCatching { dm.remove(updateId) }
+        val req = DownloadManager.Request(Uri.parse(UPDATE_URL))
+            .setTitle("Cabin Q")
+            .setDescription("מוריד עדכון")
+            .setMimeType(APK_MIME)
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            .setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, "cabin-q-${System.currentTimeMillis()}.apk")
+        updateId = dm.enqueue(req)
+        if (updateReceiver == null) {
+            val r = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
+                    if (id == updateId) installDownloaded(id)
+                }
+            }
+            val f = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+            if (Build.VERSION.SDK_INT >= 33) registerReceiver(r, f, Context.RECEIVER_EXPORTED) else registerReceiver(r, f)
+            updateReceiver = r
+        }
+    }
+
+    private fun installDownloaded(id: Long) {
+        val dm = getSystemService(DownloadManager::class.java)
+        val uri = dm.getUriForDownloadedFile(id) ?: return
+        runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, APK_MIME)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+        }
+    }
+
+    override fun onDestroy() {
+        updateReceiver?.let { runCatching { unregisterReceiver(it) } }
+        super.onDestroy()
+    }
+
     companion object {
+        private const val UPDATE_URL = "https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk"
+        private const val APK_MIME = "application/vnd.android.package-archive"
         private const val HOST = "appassets.androidplatform.net"
         private const val PREFS = "library"
         private const val REQ_INPUT = 41

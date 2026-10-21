@@ -1654,6 +1654,16 @@ if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st
     fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest').then(r=>r.json()).then(r=>{
       const m=/Build #(\d+)/.exec(r.body||''); const latest=m?+m[1]:0;
       if(latest>mine){ $('updTxt').textContent='גרסה חדשה זמינה (#'+latest+')'; $('updBar').hidden=false; } }).catch(()=>{}); }catch(_){}
+  // download inside the app and open the installer directly (no browser in between)
+  if(NATIVE.downloadUpdate){ $('updLink').onclick=e=>{ e.preventDefault();
+    let r='ok'; try{ r=NATIVE.downloadUpdate(); }catch(_){ location.href=$('updLink').href; return; }
+    if(r==='perm'){ $('updTxt').textContent='אשר "התקנת אפליקציות" ל-Cabin Q, חזור ולחץ שוב על עדכן'; return; }
+    $('updLink').hidden=true; $('updTxt').textContent='מוריד עדכון… 0%';
+    const tm=setInterval(()=>{ let p=-1; try{ p=NATIVE.updateProgress(); }catch(_){}
+      if(p>=100){ clearInterval(tm); $('updTxt').textContent='ההורדה הסתיימה · אשר את ההתקנה'; $('updLink').hidden=false; $('updLink').textContent='שוב'; }
+      else if(p<0){ clearInterval(tm); $('updTxt').textContent='ההורדה נכשלה'; $('updLink').hidden=false; $('updLink').textContent='נסה שוב'; }
+      else $('updTxt').textContent='מוריד עדכון… '+p+'%'; },500); };
+  }
 }
 renderTracks(); resize(); updateRouting();
 requestAnimationFrame(loop);
