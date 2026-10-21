@@ -88,6 +88,10 @@ class MainActivity : Activity() {
                 }
             }
         }
+        // A new install must never show an interface cached by the previous one.
+        val ver = runCatching { packageManager.getPackageInfo(packageName, 0).longVersionCode }.getOrDefault(0L)
+        val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
+        if (prefs.getLong("webVersion", -1L) != ver) { web.clearCache(true); prefs.edit().putLong("webVersion", ver).apply() }
         web.addJavascriptInterface(Bridge(), "CabinNative")
         setContentView(web)
         web.loadUrl("https://$HOST/index.html")

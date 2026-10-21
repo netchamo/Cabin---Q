@@ -271,7 +271,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 @media (max-width:640px){
   body{padding-block:6px}
   .unit{padding:12px 10px 10px; border-radius:16px; gap:8px}
-  .brand small{display:none}
+  .brand small:not(#verTag){display:none}
   .hint{display:none}
   .lat{margin-left:0}
   .screen{height:clamp(220px,40vh,420px)}
@@ -296,7 +296,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <div class="update" id="updBar" dir="rtl" hidden><span id="updTxt">גרסה חדשה זמינה</span><a class="pill" id="updLink" href="https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk">עדכן</a></div>
   <header class="head">
-    <div class="brand"><b>CABIN<i>·</i>Q</b><small>Parametric · Dynamic · Linear phase</small></div>
+    <div class="brand"><b>CABIN<i>·</i>Q</b><small>Parametric · Dynamic · Linear phase</small><small id="verTag"></small></div>
     <select class="pill" id="preset" aria-label="Preset"></select>
     <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button>
     <button class="pill" id="bypass" aria-pressed="false"><span class="led"></span>Bypass</button>
@@ -1517,7 +1517,7 @@ renderLim(); sendLim();
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
-  try{ const mine=+NATIVE.getVersion();
+  try{ const mine=+NATIVE.getVersion(); $('verTag').textContent='BUILD '+mine;
     fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest').then(r=>r.json()).then(r=>{
       const m=/Build #(\d+)/.exec(r.body||''); const latest=m?+m[1]:0;
       if(latest>mine){ $('updTxt').textContent='גרסה חדשה זמינה (#'+latest+')'; $('updBar').hidden=false; } }).catch(()=>{}); }catch(_){}
