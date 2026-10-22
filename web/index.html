@@ -1480,10 +1480,18 @@ function makePink(){
     const k=10**(-18/20)/Math.sqrt(s/len); for(let i=0;i<len;i++) d[i]*=k; }
   return buf;
 }
-function unlock(){ if(ctx.state!=='running') ctx.resume(); }
+function unlock(){ try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(_){} if(ctx.state!=='running') ctx.resume(); }
 function stopPink(){ if(pinkNode){ try{pinkNode.stop();}catch(_){} pinkNode.disconnect(); pinkNode=null; } }
 const ICO_PLAY='<path d="M4 2l10 6-10 6z"/>', ICO_PAUSE='<path d="M3 2h4v12H3zM9 2h4v12H9z"/>';
-function setPlaying(v){ S.playing=v;
+function mediaInfo(){ if(!('mediaSession' in navigator)) return; try{
+  const t=tracks[cur]; navigator.mediaSession.metadata=new MediaMetadata({title:t?t.name:'רעש ורוד לכיול',artist:t?(t.folder||'Cabin Q'):'Cabin Q',album:'Cabin Q',
+    artwork:[{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'}]}); }catch(_){} }
+if('mediaSession' in navigator){ try{ const ms=navigator.mediaSession;
+  ms.setActionHandler('play',()=>play()); ms.setActionHandler('pause',()=>pause());
+  ms.setActionHandler('nexttrack',()=>{ const n=stepIdx(1,false); if(n>=0) select(n,true); });
+  ms.setActionHandler('previoustrack',()=>{ const n=stepIdx(-1,false); if(n>=0) select(n,true); });
+  ms.setActionHandler('seekto',d=>{ if(cur>=0&&d.seekTime!=null) aud.currentTime=d.seekTime; }); }catch(_){} }
+function setPlaying(v){ S.playing=v; mediaInfo(); try{ navigator.mediaSession.playbackState=v?'playing':'paused'; }catch(_){}
   for(const id of ['playBtn','miniPlay']){ const b=$(id); b.classList.toggle('on',v); b.setAttribute('aria-label',v?'השהה':'נגן'); b.querySelector('svg').innerHTML=v?ICO_PAUSE:ICO_PLAY; }
   document.querySelectorAll('.eqbars').forEach(e=>e.classList.toggle('paused',!v)); }
 function play(){
@@ -1571,12 +1579,30 @@ function makeScrub(sc,tip){ let fr=0, on=false;
 makeScrub($('scrub'),$('scrubTip')); makeScrub($('miniSeek'),$('miniTip'));
 function updateTime(){ if(cur<0||seeking) return; $('tCur').textContent=fmtT(aud.currentTime); $('tDur').textContent=fmtT(aud.duration); if(isFinite(aud.duration)&&aud.duration>0) setScrub(aud.currentTime/aud.duration); }
 const AUDIO_EXT=/\.(mp3|m4a|aac|wav|flac|ogg|opus|aiff?|alac|webm)$/i;
-function addFiles(list){
-  const fs=[...list].filter(f=>f.type.startsWith('audio/')||AUDIO_EXT.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name));
-  if(!fs.length){ toast('לא נמצאו קבצי שמע'); return; }
-  const start=tracks.length; fs.forEach(f=>tracks.push({name:f.name.replace(/\.[^.]+$/,''),url:URL.createObjectURL(f),size:f.size}));
-  renderTracks(); if(cur<0&&!S.playing) select(start,false); toast(fs.length+' קבצים נוספו');
+const LIB={db:null};
+function libDb(){ return new Promise(res=>{ if(LIB.db) return res(LIB.db); try{
+  const rq=indexedDB.open('cabinq-lib',1); rq.onupgradeneeded=()=>rq.result.createObjectStore('songs',{keyPath:'id'});
+  rq.onsuccess=()=>{ LIB.db=rq.result; res(LIB.db); }; rq.onerror=()=>res(null); }catch(_){ res(null); } }); }
+async function libSave(items){ const db=await libDb(); if(!db) return false;
+  return new Promise(res=>{ try{ const tx=db.transaction('songs','readwrite'); items.forEach(it=>tx.objectStore('songs').put(it)); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); tx.onabort=()=>res(false); }catch(_){ res(false); } }); }
+async function libLoad(){ const db=await libDb(); if(!db) return [];
+  return new Promise(res=>{ try{ const rq=db.transaction('songs').objectStore('songs').getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>res([]); }catch(_){ res([]); } }); }
+async function libClear(){ const db=await libDb(); if(!db) return; try{ db.transaction('songs','readwrite').objectStore('songs').clear(); }catch(_){} }
+function addFiles(list,fromStore){
+  const fs=[...list].filter(f=>fromStore||f.type.startsWith('audio/')||AUDIO_EXT.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!fs.length){ if(!fromStore) toast('לא נמצאו קבצי שמע'); return; }
+  const start=tracks.length;
+  fs.forEach(f=>tracks.push({name:(f.name||'Track').replace(/\.[^.]+$/,''),url:URL.createObjectURL(f.blob||f),size:f.size||(f.blob&&f.blob.size)||0,saved:!NATIVE}));
+  renderTracks(); if(cur<0&&!S.playing) select(start,false);
+  if(fromStore) return;
+  toast(fs.length+' קבצים נוספו');
+  if(!NATIVE){ // keep a copy on the phone so the songs are here next time
+    try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(_){}
+    libSave(fs.map(f=>({id:f.name+'|'+f.size+'|'+(f.lastModified||0),name:f.name,size:f.size,blob:f,added:Date.now()})))
+      .then(ok=>{ if(!ok) toast('אין מספיק מקום לשמור את השירים לפעם הבאה'); });
+  }
 }
+if(!NATIVE) libLoad().then(items=>{ if(items.length) addFiles(items.sort((a,b)=>a.added-b.added||a.name.localeCompare(b.name)).map(it=>({name:it.name,size:it.size,blob:it.blob})),true); });
 $('fileIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
 /* tracks coming from the Android app: {folder, folderUri, tracks:[{name,url,size}], replace} */
 window.cabinAddTracks=function(d){
@@ -1599,7 +1625,7 @@ if(NATIVE){
   $('srcFolderSub').textContent='נשמרת ונטענת בכל פתיחה';
 } else if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
   $('srcFolder').hidden=true; $('srcFiles').querySelector('span').textContent='מאפליקציית הקבצים או iCloud';
-  $('libNote').textContent='באייפון בוחרים שירים מאפליקציית הקבצים. אפשר לבחור כמה שירים יחד.';
+  $('libNote').textContent='באייפון בוחרים שירים מאפליקציית הקבצים או מ-iCloud, כמה יחד. השירים נשמרים באפליקציה לפעם הבאה.';
 }
 $('libSearch').oninput=()=>renderTracks();
 $('dirIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
@@ -1617,6 +1643,7 @@ function renderTracks(){
     const f=t.folder||'';
     if(f!==lastF){ lastF=f; const li=document.createElement('li'); li.className='grp'; li.dir='rtl';
       li.textContent=f? 'תיקייה: '+f : 'שירים שנבחרו';
+      if(!f&&t.saved){ const rm=document.createElement('button'); rm.textContent='נקה'; rm.onclick=()=>{ libClear(); tracks=tracks.filter(x=>!x.saved||x===tracks[cur]); renderTracks(); toast('הרשימה נוקתה'); }; li.appendChild(rm); }
       if(f&&t.folderUri&&NATIVE){ const rm=document.createElement('button'); rm.textContent='הסר'; rm.onclick=()=>{ try{ NATIVE.removeFolder(t.folderUri); }catch(_){} tracks=tracks.filter(x=>x.folderUri!==t.folderUri||x===tracks[cur]); renderTracks(); }; li.appendChild(rm); }
       ul.appendChild(li); }
     row(i,t.name,t.size?(t.size/1048576).toFixed(1)+' MB':''); shown++; });
