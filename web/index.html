@@ -74,6 +74,9 @@ button{cursor:pointer}
 .head-ctl{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px; border-radius:12px; background:var(--well);
   box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
 .head-ctl select.pill{flex:1 1 170px; max-width:none}
+.pill.he-pill{font-family:var(--f-he); letter-spacing:0; text-transform:none; font-size:13px; font-weight:500}
+.preset-row{flex-basis:100%; display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.preset-row input{flex:1 1 180px; min-width:0}
 .chip.he{font-family:var(--f-he); font-size:12px}
 .led{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--led-off); box-shadow:inset 0 1px 1px rgba(0,0,0,.6); flex:none}
 .on > .led, .led.lit{background:var(--led); box-shadow:0 0 8px var(--led-glow), inset 0 -1px 1px rgba(0,0,0,.3)}
@@ -174,7 +177,36 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .knob.dis{opacity:.28; cursor:default}
 .knob.dis .k-arc{stroke:transparent}
 .g-dyn{flex-basis:100%; order:2}
-.g-out{order:4}
+.g-out{order:5; flex:1 1 100% !important}
+.g-fx{flex-basis:100%; order:3; gap:8px; min-width:0}
+.g-fx .gt{flex-wrap:wrap}
+.fx,.fx-h,.fx-b,.fx-row,.fx-segs,.g-lim,.g-comp,.g-dyn,.g-out{min-width:0}
+.g-lim{order:4 !important}
+.fx{border-radius:11px; background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.1)); border:1px solid rgba(0,0,0,.4); --fxc:#ffb347}
+.fx-h{display:flex; align-items:center; gap:10px; min-height:48px; padding:6px 8px 6px 10px; cursor:pointer; user-select:none; -webkit-user-select:none}
+.fx-ic{width:32px; height:32px; flex:none; border-radius:9px; display:grid; place-items:center; background:var(--well); box-shadow:inset 0 1px 2px rgba(0,0,0,.7)}
+.fx-ic svg{width:19px; height:19px; fill:none; stroke:var(--fxc); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.fx.off .fx-ic svg{stroke:var(--ink-3)}
+.fx-h b{font-size:12px; letter-spacing:.16em; color:var(--silk); font-weight:700; white-space:nowrap}
+.fx-sub{flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.fx-h .pill{height:30px; padding:0 11px; flex:none}
+.fx-chev{width:30px; height:30px; flex:none; border:0; background:transparent; display:grid; place-items:center}
+.fx-chev svg{width:14px; height:14px; stroke:var(--ink-2); fill:none; stroke-width:2.2; stroke-linecap:round; transition:transform .2s}
+.fx.open .fx-chev svg{transform:rotate(180deg)}
+.fx-b{display:flex; flex-direction:column; gap:10px; padding:0 10px 12px}
+.fx-row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.fx-disp{flex:1 1 230px; max-width:380px; height:124px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
+.fx-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
+.fx-row .knobs{flex:1 1 260px}
+.fx-segs{display:flex; gap:8px; flex-wrap:wrap}
+.fx-segs .seg button{height:26px; font-size:10px}
+.out-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+.render{flex:1 1 220px; display:flex; flex-direction:column; gap:7px; align-items:flex-start}
+.render-row{display:flex; gap:8px; flex-wrap:wrap}
+.render-txt{font-family:var(--f-he); font-size:12.5px; color:var(--ink-3); line-height:1.5}
+.render-bar{width:100%; max-width:320px; height:6px; border-radius:3px; background:#121518; overflow:hidden}
+.render-bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,#ff5a4a,#ff9a3c)}
+.pill.rec .led{background:#ff4a2e; box-shadow:0 0 8px #ff4a2e}
 .g-comp{flex-basis:100%; order:3}
 .gt .gr-read{margin-left:auto; white-space:nowrap; font-family:var(--f-mono); font-size:11px; letter-spacing:.02em; color:var(--led); font-variant-numeric:tabular-nums}
 .comp-body{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
@@ -381,8 +413,14 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     </div>
     <div class="head-ctl">
       <select class="pill" id="preset" aria-label="Preset"></select>
+      <button class="pill he-pill" id="presetSave">שמור</button>
+      <div class="preset-row" id="presetRow" dir="rtl" hidden>
+        <input class="lib-search" id="presetName" maxlength="40" placeholder="שם הפריסט, למשל: מאזדה 3 בלילה">
+        <button class="pill he-pill" id="presetOk">שמירה</button>
+        <button class="pill he-pill" id="presetDel" hidden>מחיקה</button>
+        <button class="pill he-pill" id="presetCancel">ביטול</button>
+      </div>
       <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button>
-      <button class="pill" id="bypass" aria-pressed="false"><span class="led"></span>Bypass</button>
     </div>
   </header>
 
@@ -405,6 +443,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
       <div class="ov tl"><button class="chip" id="rangeBtn" title="Display range">±12 dB</button></div>
       <div class="ov tr">
         <button class="chip" id="fitBtn" hidden>FIT</button>
+        <button class="chip" id="bypass" aria-pressed="false" title="עקיפת ה-EQ">BYPASS</button>
         <button class="chip" id="preBtn" aria-pressed="true" title="Show input spectrum">PRE</button>
         <button class="chip he" id="fsBtn" title="מסך מלא">⤢ מסך מלא</button>
       </div>
@@ -412,6 +451,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <span class="fs-read" id="fsRead"><span class="dot"></span><span id="fsTxt">—</span></span>
         <button class="chip" id="fsListen">LISTEN</button>
         <button class="chip" id="fsDyn">DYN</button>
+        <button class="chip" id="fsByp">BYPASS</button>
         <button class="chip he" id="fsExit">יציאה</button>
       </div>
     </div>
@@ -453,6 +493,42 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <p class="dyn-help" id="compNote" dir="rtl" hidden>הדפדפן הזה לא תומך במנוע הקומפרסור המלא, אז הפילטר על הסייד-צ'יין כבוי. שאר הכפתורים עובדים.</p>
         <p class="dyn-help" dir="rtl"><b>SC HPF</b> קובע מאיזה תדר הקומפרסור מתחיל להגיב: בהגדרה גבוהה הבס כבר לא "מושך" את כל המיקס למטה. <b>Mix</b> מערבב בין האות המקורי לאות הדחוס, לקומפרסיה מקבילית.</p>
       </div>
+      <div class="group g-fx">
+        <div class="gt">FX <span class="dyn-note" dir="rtl">לפני הלימיטר · לחיצה על פס פותחת אותו</span></div>
+        <div class="fx off" id="fx_sat" style="--fxc:#ff8a5a">
+          <div class="fx-h" data-fx="sat"><span class="fx-ic"><svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="4"/><circle cx="17" cy="12" r="4"/><path d="M7 16h10"/><circle cx="7" cy="12" r="1"/><circle cx="17" cy="12" r="1"/></svg></span><b>SATURATION</b><span class="fx-sub" id="satSub"></span>
+            <button class="pill" id="satOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="fx-segs">
+              <div class="seg" id="satMode"><button data-v="tape" aria-pressed="true">TAPE</button><button data-v="ssl" aria-pressed="false">SATURATOR</button></div>
+              <div class="seg" id="satMach"><button data-v="atr" aria-pressed="false">ATR-102</button><button data-v="a800" aria-pressed="true">A800</button></div>
+              <div class="seg" id="satSpeed"><button data-v="15" aria-pressed="true">15 IPS</button><button data-v="30" aria-pressed="false">30 IPS</button></div>
+            </div>
+            <div class="fx-row"><div class="fx-disp"><canvas id="satCv"></canvas></div><div class="knobs wrap" id="kSat"></div></div>
+            <p class="dyn-help" dir="rtl" id="satHelp"></p>
+          </div>
+        </div>
+        <div class="fx off" id="fx_wid" style="--fxc:#5aa9ff">
+          <div class="fx-h" data-fx="wid"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 12h20"/><path d="M6 8l-4 4 4 4"/><path d="M18 8l4 4-4 4"/><circle cx="12" cy="12" r="2.2"/></svg></span><b>STEREO</b><span class="fx-sub" id="widSub"></span>
+            <button class="pill" id="widOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="fx-row"><div class="fx-disp"><canvas id="widCv"></canvas></div><div class="knobs wrap" id="kWid"></div></div>
+            <p class="dyn-help" dir="rtl"><b>Width</b> מרחיב או מצמצם את הצדדים בלי לגעת במרכז, כלומר בשירה ובבס. <b>Bass Mono</b> משאיר את התדרים הנמוכים במרכז, כדי שהבס יישאר מלא. ברכב כדאי להישאר בין 100% ל-130%: יושבים קרוב לרמקול אחד, והרחבה גדולה מחלישה את המרכז. המד מראה את ההתאמה בין הערוצים, ושמאלה מ-0 זה סימן לבעיית פאזה.</p>
+          </div>
+        </div>
+        <div class="fx off" id="fx_rev" style="--fxc:#b38cff">
+          <div class="fx-h" data-fx="rev"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M3 18V6"/><path d="M7 18c0-5 1-9 2-12"/><path d="M11 18c0-4 2-7 4-9"/><path d="M15 18c1-3 3-5 6-6"/></svg></span><b>REVERB</b><span class="fx-sub" id="revSub"></span>
+            <button class="pill" id="revOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="fx-segs"><div class="seg" id="revType"><button data-v="room" aria-pressed="false">ROOM</button><button data-v="hall" aria-pressed="true">HALL</button><button data-v="plate" aria-pressed="false">PLATE</button></div></div>
+            <div class="fx-row"><div class="fx-disp"><canvas id="revCv"></canvas></div><div class="knobs wrap" id="kRev"></div></div>
+            <p class="dyn-help" dir="rtl"><b>Decay</b> הוא אורך הזנב. <b>Pre-delay</b> מרחיק את הריוורב מהצליל המקורי, כך שהשירה נשארת ברורה. <b>Tone</b> קובע אם הזנב כהה או בהיר, ו-<b>Low cut</b> מנקה את הבס מהריוורב, כדי שלא יתערבב. ברכב, Mix של 8%–15% מספיק כדי לפתוח את החלל.</p>
+          </div>
+        </div>
+      </div>
       <div class="group g-lim">
         <div class="gt"><button class="pill on" id="limIn" aria-pressed="true"><span class="led"></span>Limiter</button>
           <div class="seg" id="limMode" role="group" aria-label="Limiter type"><button data-m="modern" aria-pressed="true">MODERN</button><button data-m="simple" aria-pressed="false">SIMPLE</button></div>
@@ -464,7 +540,15 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <div class="seg" id="limStyle" role="group" aria-label="Limiter style"><button data-s="0" aria-pressed="true">TRANSPARENT</button><button data-s="1" aria-pressed="false">PUNCHY</button><button data-s="2" aria-pressed="false">AGGRESSIVE</button></div>
         <p class="dyn-help" dir="rtl" id="limHelp"></p>
       </div>
-      <div class="group g-out"><div class="gt">OUTPUT</div><div class="knobs" id="kOut"></div></div>
+      <div class="group g-out"><div class="gt">OUTPUT</div>
+        <div class="out-row"><div class="knobs" id="kOut"></div>
+          <div class="render" dir="rtl">
+            <div class="render-row"><button class="pill he-pill" id="renderBtn"><span class="led"></span>רינדור השיר</button><button class="pill he-pill" id="renderCancel" hidden>ביטול</button></div>
+            <div class="render-bar" id="renderBar" hidden><i id="renderFill"></i></div>
+            <span class="render-txt" id="renderTxt">שומר את השיר שמתנגן עם כל העיבוד, כקובץ WAV באיכות 24 ביט.</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -566,6 +650,7 @@ const bypDelay=ctx.createDelay(1.0);
 const conv=ctx.createConvolver(); conv.normalize=false;
 input.connect(mpIn); input.connect(byp); input.connect(detMp);
 const compIn=G();
+const fxIn=G(), fxOut=G(); fxIn.connect(fxOut); fxOut.connect(out);
 byp.connect(bypDelay); bypDelay.connect(compIn);
 mpOut.connect(compIn); lpOut.connect(compIn);
 compIn.connect(out); // replaced by the compressor once it is ready
@@ -719,6 +804,8 @@ function colGeom(b){ const [hx]=handlePos(b); const bot=H-PB-2, hgt=(H-PB-PT)*(S
   return {x:clamp(x,4,W-bw-4), bw, top:bot-hgt, bot, hgt, hx}; }
 const colY=(cg,v)=>cg.bot-clamp((v+72)/72,0,1)*cg.hgt;
 const colV=(cg,y)=>clamp((cg.bot-y)/cg.hgt*72-72,-72,0);
+function rangeGrip(b){ const [x,y]=handlePos(b); const ye=clamp(yDb(b.gain+b.dyn.range),PT,H-PB), near=Math.abs(ye-y)<24;
+  return {x, y: near? clamp(y+(b.dyn.range>0?-28:28),PT+6,H-PB-6) : ye, near}; }
 function handlePos(b){ const x=xF(b.freq); const y=(isCut(b.type)||b.type==='notch')? yDb(0) : yDb(b.gain); return [x,clamp(y,PT,H-PB)]; }
 
 function drawGrid(){
@@ -815,7 +902,10 @@ function draw(){
       const ye=clamp(yDb(b.gain+b.dyn.range),PT,H-PB);
       g.strokeStyle=c+'88'; g.lineWidth=2; g.beginPath(); g.moveTo(x,y); g.lineTo(x,ye); g.stroke();
       g.beginPath(); g.moveTo(x-6,ye); g.lineTo(x+6,ye); g.stroke();
-      if(b.id===S.sel){ g.save(); g.translate(x,ye); g.rotate(Math.PI/4); g.fillStyle=gest&&gest.k==='range'?'#ffffff':c; g.fillRect(-4.5,-4.5,9,9); g.restore(); }
+      if(b.id===S.sel){ const rg=rangeGrip(b), act=gest&&gest.k==='range';
+        if(rg.near){ g.setLineDash([2,3]); g.strokeStyle=c+'aa'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x,y); g.lineTo(x,rg.y); g.stroke(); g.setLineDash([]); }
+        g.save(); g.translate(x,rg.y); g.rotate(Math.PI/4); g.fillStyle=act?'#ffffff':c; const sz=S.fs?6:5; g.fillRect(-sz,-sz,sz*2,sz*2); g.restore();
+        g.font='600 9px "Chakra Petch", sans-serif'; g.fillStyle=c; g.textAlign='left'; g.textBaseline='middle'; g.fillText('RANGE',x+10,rg.y); }
       if(!S.bypass&&Math.abs(a.d)>.05){ const yd=clamp(yDb(b.gain+a.d),PT,H-PB);
         g.strokeStyle='#ffb070'; g.lineWidth=3; g.beginPath(); g.moveTo(x,y); g.lineTo(x,yd); g.stroke();
         g.beginPath(); g.arc(x,yd,5,0,7); g.fillStyle='#ffb070'; g.shadowColor='#ff9a3c'; g.shadowBlur=12; g.fill(); g.shadowBlur=0;
@@ -962,7 +1052,7 @@ function activity(){
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
 }
 function loop(now){
-  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); activity(); meters(now); updateTime();
+  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); drawFx(now); activity(); meters(now); updateTime(); renderProgress();
   requestAnimationFrame(loop);
 }
 
@@ -1149,7 +1239,74 @@ class CabinLimiter extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('cabin-limiter',CabinLimiter);`;
+registerProcessor('cabin-limiter',CabinLimiter);
+
+/* Tape machine / saturator. Tape: biased tanh saturation + wow & flutter (modulated delay).
+   Saturator: odd/even harmonic blend with dry/wet mix. EQ colour (head bump, HF) is done with filters after this node. */
+class CabinSat extends AudioWorkletProcessor{
+  constructor(){ super(); this.p={mode:'tape',drive:4,machine:'a800',wow:.3,char:0,mix:1,out:0}; this.N=4096;
+    this.buf=[new Float32Array(4096),new Float32Array(4096)]; this.w=0; this.t=0; this.dr=0; this.cnt=0; this.acc=0; this.n=0;
+    this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const p=this.p, n=inp[0].length, chs=out.length, sr=sampleRate, g=Math.pow(10,p.drive/20), og=Math.pow(10,p.out/20), N=this.N;
+    const tape=p.mode==='tape', bias=p.machine==='a800'?.14:.06, tb=Math.tanh(bias), sb=1/Math.cosh(bias), comp=1/(Math.pow(g,.6)*sb*sb);
+    const c=p.char, wO=(1+c)/2, wE=(1-c)/2, eb=.5, teb=Math.tanh(eb), se=1/Math.cosh(eb), compS=1/(Math.pow(g,.6)*(wO+wE*se*se));
+    const flut=p.machine==='a800'?1.4:.8, base=.002*sr, wowA=p.wow*.0003*sr, flA=p.wow*.00012*sr*flut;
+    for(let i=0;i<n;i++){
+      let mod=0;
+      if(tape){ const t=this.t/sr; this.dr+=(Math.random()*2-1)*.02-this.dr*.001; mod=wowA*Math.sin(6.2832*.55*t)+flA*Math.sin(6.2832*6.3*t+1)+p.wow*this.dr*.0001*sr; }
+      for(let ch=0;ch<chs;ch++){
+        const x=(inp[ch]||inp[0])[i]; let y;
+        if(tape){ y=(Math.tanh(g*x+bias)-tb)*comp;
+          const b=this.buf[ch<2?ch:1]; b[this.w]=y; let r=this.w-(base+mod); while(r<0) r+=N; const r0=Math.floor(r)%N, fr=r-Math.floor(r); y=b[r0]*(1-fr)+b[(r0+1)%N]*fr; }
+        else { const v=g*x; y=(wO*Math.tanh(v)+wE*(Math.tanh(v+eb)-teb))*compS; y=x*(1-p.mix)+y*p.mix; }
+        y*=og; out[ch][i]=y; this.acc+=y*y; this.n++;
+      }
+      this.w=(this.w+1)%N; this.t++;
+    }
+    if(++this.cnt>=8){ this.port.postMessage(this.n?10*Math.log10(this.acc/this.n+1e-12):-120); this.acc=0; this.n=0; this.cnt=0; }
+    return true;
+  }
+}
+registerProcessor('cabin-sat',CabinSat);
+
+/* Mid/side stereo width with mono bass, plus a correlation reading. */
+class CabinWidth extends AudioWorkletProcessor{
+  constructor(){ super(); this.p={width:1.2,mono:120}; this.z=[0,0,0,0]; this.cnt=0; this.lr=0; this.ll=0; this.rr=0; this.setH();
+    this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.setH(); }; }
+  setH(){ const f=this.p.mono; if(f>0){ const w=2*Math.PI*f/sampleRate, c=Math.cos(w), s=Math.sin(w), al=s/1.41421, a0=1+al;
+    this.b=[(1+c)/2/a0,-(1+c)/a0,(1+c)/2/a0]; this.a=[-2*c/a0,(1-al)/a0]; } else this.b=null; }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const L=inp[0], R=inp[1]||inp[0], n=L.length, w=this.p.width, z=this.z;
+    for(let i=0;i<n;i++){
+      const m=(L[i]+R[i])*.5; let sd=(L[i]-R[i])*.5;
+      if(this.b){ const y=this.b[0]*sd+this.b[1]*z[0]+this.b[2]*z[1]-this.a[0]*z[2]-this.a[1]*z[3]; z[1]=z[0]; z[0]=sd; z[3]=z[2]; z[2]=y; sd=y; }
+      sd*=w; const l=m+sd, r=m-sd; out[0][i]=l; if(out[1]) out[1][i]=r;
+      this.lr+=l*r; this.ll+=l*l; this.rr+=r*r;
+    }
+    if(++this.cnt>=8){ const d=Math.sqrt(this.ll*this.rr); this.port.postMessage(d>1e-9?this.lr/d:1); this.lr=this.ll=this.rr=0; this.cnt=0; }
+    return true;
+  }
+}
+registerProcessor('cabin-width',CabinWidth);
+
+/* Records the final output for rendering. */
+class CabinRec extends AudioWorkletProcessor{
+  constructor(){ super(); this.on=false; this.S=16384; this.alloc(); this.port.onmessage=e=>{
+    if(e.data==='start'){ this.on=true; this.alloc(); }
+    if(e.data==='stop'){ if(this.on){ this.flush(); this.on=false; this.port.postMessage({done:true}); } } }; }
+  alloc(){ this.l=new Float32Array(this.S); this.r=new Float32Array(this.S); this.i=0; }
+  flush(){ if(this.i>0) this.port.postMessage({l:this.l,r:this.r,n:this.i},[this.l.buffer,this.r.buffer]); this.alloc(); }
+  process(inputs,outputs){
+    const inp=inputs[0]; if(!this.on||!inp||!inp.length) return true;
+    const L=inp[0], R=inp[1]||inp[0];
+    for(let k=0;k<L.length;k++){ this.l[this.i]=L[k]; this.r[this.i]=R[k]; if(++this.i>=this.S) this.flush(); }
+    return true;
+  }
+}
+registerProcessor('cabin-rec',CabinRec);`;
 function compParams(){ const r=REL[C.rli]; return {on:C.on,thr:C.thr,ratio:RATIOS[C.ri],att:ATT[C.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:C.makeup,mix:C.mix/100,hpf:C.hpf}; }
 function sendComp(){
   const p=compParams();
@@ -1161,11 +1318,12 @@ function sendComp(){
 }
 function fallbackComp(){
   dcomp=ctx.createDynamicsCompressor(); dDry=G(); dWet=G();
-  compIn.disconnect(); compIn.connect(dDry); compIn.connect(dcomp); dcomp.connect(dWet); dDry.connect(out); dWet.connect(out);
+  compIn.disconnect(); compIn.connect(dDry); compIn.connect(dcomp); dcomp.connect(dWet); dDry.connect(fxIn); dWet.connect(fxIn);
   $('compNote').hidden=false; sendComp(); refreshDeck();
   // no worklet: a fast compressor stands in for the limiter
   limFallback=ctx.createDynamicsCompressor(); limFallback.knee.value=0; limFallback.ratio.value=20; limFallback.attack.value=.001;
   out.disconnect(); out.connect(limFallback); limFallback.connect(fin); sendLim();
+  fxInit(false);
 }
 (async()=>{
   try{
@@ -1174,12 +1332,15 @@ function fallbackComp(){
     await ctx.audioWorklet.addModule(url);
     compNode=new AudioWorkletNode(ctx,'bus-comp',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     compNode.port.onmessage=e=>{ compGR=e.data; };
-    compIn.disconnect(); compIn.connect(compNode); compNode.connect(out);
+    compIn.disconnect(); compIn.connect(compNode); compNode.connect(fxIn);
     sendComp();
     limNode=new AudioWorkletNode(ctx,'cabin-limiter',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     limNode.port.onmessage=e=>{ limMsg(e.data); };
     out.disconnect(); out.connect(limNode); limNode.connect(fin);
     sendLim();
+    fxInit(true);
+    recNode=new AudioWorkletNode(ctx,'cabin-rec',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    recNode.port.onmessage=e=>recMsg(e.data); fin.connect(recNode); recNode.connect(sink);
   }catch(err){ console.warn("bus comp worklet unavailable",err); fallbackComp(); }
 })();
 $('compIn').onclick=()=>{ C.on=!C.on; const b=$('compIn'); b.classList.toggle('on',C.on); b.setAttribute('aria-pressed',C.on); sendComp(); };
@@ -1261,6 +1422,228 @@ function drawLim(){
       if(!isGr){ const cy=top+hh*(1-clamp((L.ceil+48)/48,0,1)); c.fillStyle='#ffd1a6'; c.fillRect(x-3,cy-1,bw+6,2); }
       c.fillStyle='#c9ced3'; c.fillText(lab,x+bw/2,h-8); });
   }
+}
+
+/* ---------- FX: saturation / tape, stereo width, reverb ---------- */
+const FX={
+  sat:{on:false,mode:'tape',machine:'a800',speed:15,drive:4,wow:.3,char:0,tone:0,mix:100,out:0},
+  wid:{on:false,width:120,mono:120},
+  rev:{on:false,type:'hall',decay:2.2,pre:20,tone:.5,lowcut:250,mix:12},
+  open:{sat:false,wid:false,rev:false}
+};
+let satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
+const fxBlocks={};
+function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.connect(o); wet.connect(o); wet.gain.value=0;
+  return {i,o,dry,wet,set(on){ const t=ctx.currentTime; dry.gain.setTargetAtTime(on?0:1,t,.015); wet.gain.setTargetAtTime(on?1:0,t,.015); }}; }
+function fxInit(worklet){
+  fxIn.disconnect();
+  const sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
+  fxIn.connect(sat.i); sat.o.connect(rev.i); rev.o.connect(wid.i); wid.o.connect(fxOut);
+  // saturation: worklet core + tape colour filters
+  const f1=ctx.createBiquadFilter(), f2=ctx.createBiquadFilter(), f3=ctx.createBiquadFilter(), f4=ctx.createBiquadFilter();
+  f1.type='peaking'; f2.type='peaking'; f3.type='highshelf'; f4.type='lowpass';
+  if(worklet){ satNode=new AudioWorkletNode(ctx,'cabin-sat',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); satNode.port.onmessage=e=>{ satLvl=e.data; };
+    sat.i.connect(satNode); satNode.connect(f1); }
+  else sat.i.connect(f1);
+  f1.connect(f2); f2.connect(f3); f3.connect(f4); f4.connect(sat.wet);
+  sat.f=[f1,f2,f3,f4];
+  // reverb: the dry signal always passes; the wet path is added on top
+  rev.dry.gain.value=1; rev.set=on=>{ rev.wet.gain.setTargetAtTime(on?FX.rev.mix/100:0,ctx.currentTime,.03); };
+  rev.pre=ctx.createDelay(.5); rev.hp=ctx.createBiquadFilter(); rev.hp.type='highpass'; rev.conv=ctx.createConvolver(); rev.conv.normalize=false;
+  rev.i.connect(rev.pre); rev.pre.connect(rev.hp); rev.hp.connect(rev.conv); rev.conv.connect(rev.wet);
+  // width
+  if(worklet){ widNode=new AudioWorkletNode(ctx,'cabin-width',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); widNode.port.onmessage=e=>{ widCorr=e.data; };
+    wid.i.connect(widNode); widNode.connect(wid.wet); }
+  Object.assign(fxBlocks,{sat,rev,wid}); fxReady=true; fxWorklet=worklet;
+  fxSend(); buildIR();
+}
+let fxWorklet=false;
+const TAPE={ // head bump, low-mid dip, high shelf, HF limit per machine and speed
+  atr15:{b:[62,2.0,1.0],d:[140,-.8,1.2],h:[12000,-.5],lp:20000},
+  atr30:{b:[42,1.2,1.0],d:[95,-.6,1.2],h:[10000,.3],lp:21000},
+  a80015:{b:[78,3.0,.9],d:[170,-1.2,1.1],h:[8000,-1.5],lp:16500},
+  a80030:{b:[52,2.0,.9],d:[110,-.8,1.1],h:[10000,-.8],lp:19000}
+};
+function fxSend(){
+  if(!fxReady) return; const t=ctx.currentTime, B=fxBlocks, sv=FX.sat;
+  B.sat.set(sv.on&&(fxWorklet||sv.mode==='tape'));
+  const [f1,f2,f3,f4]=B.sat.f;
+  if(sv.mode==='tape'){ const c=TAPE[sv.machine+sv.speed];
+    f1.type='peaking'; f1.frequency.setTargetAtTime(c.b[0],t,.02); f1.gain.setTargetAtTime(c.b[1],t,.02); f1.Q.value=c.b[2];
+    f2.frequency.setTargetAtTime(c.d[0],t,.02); f2.gain.setTargetAtTime(c.d[1],t,.02); f2.Q.value=c.d[2];
+    f3.frequency.setTargetAtTime(c.h[0],t,.02); f3.gain.setTargetAtTime(c.h[1],t,.02); f4.frequency.setTargetAtTime(c.lp,t,.02); }
+  else { f1.type='lowshelf'; f1.frequency.setTargetAtTime(250,t,.02); f1.gain.setTargetAtTime(-sv.tone*3,t,.02);
+    f2.gain.setTargetAtTime(0,t,.02); f3.frequency.setTargetAtTime(3500,t,.02); f3.gain.setTargetAtTime(sv.tone*4,t,.02); f4.frequency.setTargetAtTime(22000,t,.02); }
+  if(satNode) satNode.port.postMessage({mode:sv.mode,drive:sv.mode==='tape'?sv.drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out});
+  if(widNode) widNode.port.postMessage({width:FX.wid.width/100,mono:FX.wid.mono});
+  B.wid.set(FX.wid.on&&!!widNode);
+  B.rev.pre.delayTime.setTargetAtTime(FX.rev.pre/1000,t,.02); B.rev.hp.frequency.setTargetAtTime(FX.rev.lowcut,t,.02);
+  B.rev.set(FX.rev.on);
+  fxUI();
+}
+/* Reverb impulse response: decaying stereo noise, darkening over time, with early reflections per type */
+const REVT={room:{er:[[.006,.5],[.011,.4],[.017,.35],[.023,.3],[.031,.22]],att:.004,bright:.55},
+            hall:{er:[[.013,.35],[.024,.3],[.037,.25],[.049,.2],[.062,.16]],att:.018,bright:.45},
+            plate:{er:[],att:.001,bright:.85}};
+let irT=0, irEnv=new Float32Array(200);
+function buildIR(){ clearTimeout(irT); irT=setTimeout(()=>{
+  if(!fxReady) return; const R=FX.rev, T=REVT[R.type], sr=ctx.sampleRate, len=Math.min(7,R.decay*1.35+.05), N=Math.floor(sr*len);
+  const buf=ctx.createBuffer(2,N,sr); let energy=0; irEnv=new Float32Array(200);
+  const k0=T.bright*(.35+.65*R.tone), rate=(1-R.tone)*3.2/R.decay;
+  for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); let y=0;
+    for(let i=0;i<N;i++){ const t=i/sr; const env=Math.exp(-6.91*t/R.decay)*(1-Math.exp(-t/T.att));
+      const k=k0*Math.exp(-t*rate)+.02; y+=k*((Math.random()*2-1)-y); d[i]=y*env; }
+    for(const [et,eg] of T.er){ const i=Math.floor((et+(ch?.0017:0))*sr); if(i<N) d[i]+=eg*(ch?-1:1)*.9; }
+    for(let i=0;i<N;i++){ energy+=d[i]*d[i]; const b=Math.floor(i/N*200); const a=Math.abs(d[i]); if(a>irEnv[b]) irEnv[b]=a; } }
+  const sc=.5/Math.sqrt(energy/2+1e-9);
+  for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<N;i++) d[i]*=sc; }
+  let mx=0; for(const v of irEnv) if(v>mx) mx=v; for(let i=0;i<200;i++) irEnv[i]/=(mx||1);
+  fxBlocks.rev.conv.buffer=buf; },120); }
+function fxApply(st){ for(const k of ['sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],st[k]); fxSend(); buildIR(); fxOpenUI(); }
+
+/* strips */
+function fxOpenUI(){ for(const k of ['sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
+document.querySelectorAll('.fx-h').forEach(h=>h.addEventListener('click',e=>{ if(e.target.closest('.pill')) return; const k=h.dataset.fx; FX.open[k]=!FX.open[k]; fxOpenUI(); knobs.forEach(x=>x.refresh()); }));
+for(const k of ['sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
+function segBind(id,get,set){ const el=$(id); el.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; set(b.dataset.v); fxSend(); }; return ()=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(get())===b.dataset.v)); }
+const segUI=[
+  segBind('satMode',()=>FX.sat.mode,v=>FX.sat.mode=v),
+  segBind('satMach',()=>FX.sat.machine,v=>FX.sat.machine=v),
+  segBind('satSpeed',()=>FX.sat.speed,v=>FX.sat.speed=+v),
+  segBind('revType',()=>FX.rev.type,v=>{ FX.rev.type=v; const d={room:.8,hall:2.2,plate:1.6}[v]; FX.rev.decay=d; buildIR(); })
+];
+const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A800</b> שמן וחם יותר עם בס מודגש, <b>ATR-102</b> נקי ומדויק יותר. ב-<b>15 IPS</b> הבס מתנפח והגבוהים מתרככים, ב-<b>30 IPS</b> הצליל הדוק ופתוח. <b>Drive</b> מוסיף רוויה, <b>Wow</b> מוסיף את התנודה העדינה של הסליל.',
+  ssl:'<b>SATURATOR</b>: רוויה הרמונית. <b>Character</b> שמאלה מוסיף הרמוניות זוגיות, חמות ועגולות, וימינה הרמוניות אי-זוגיות, חדות ונוכחות. <b>Tone</b> מטה את הצבע לכהה או בהיר, ו-<b>Mix</b> מאפשר רוויה מקבילית.'};
+function fxUI(){
+  for(const k of ['sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
+  const sv=FX.sat; $('satMach').hidden=$('satSpeed').hidden=sv.mode!=='tape';
+  $('satSub').textContent= sv.mode==='tape'? 'TAPE · '+(sv.machine==='a800'?'A800':'ATR-102')+' · '+sv.speed+' IPS · DRIVE '+sgn(sv.drive) : 'SATURATOR · DRIVE +'+sv.drive.toFixed(1)+' · MIX '+sv.mix+'%';
+  $('satHelp').innerHTML=SAT_HELP[sv.mode];
+  $('widSub').textContent='WIDTH '+FX.wid.width+'% · '+(FX.wid.mono>0?'MONO < '+FX.wid.mono+' Hz':'FULL STEREO');
+  $('revSub').textContent=FX.rev.type.toUpperCase()+' · '+FX.rev.decay.toFixed(1)+' s · MIX '+FX.rev.mix+'%';
+  segUI.forEach(f=>f());
+  if(!fxWorklet&&fxReady){ $('satSub').textContent='לא נתמך בדפדפן הזה'; $('widSub').textContent='לא נתמך בדפדפן הזה'; }
+  knobs.forEach(k=>k.refresh());
+}
+function fSpec(o){ return Object.assign({enabled:()=>true,bip:false},o); }
+const isTape=()=>FX.sat.mode==='tape';
+knob($('kSat'),fSpec({label:()=>'DRIVE', color:'#ff8a5a', get:()=>isTape()?lin(FX.sat.drive,-6,18):lin(FX.sat.drive,0,24), set:n=>{ FX.sat.drive=Math.round((isTape()?unlin(n,-6,18):unlin(n,0,24))*2)/2; fxSend(); }, text:()=>sgn(FX.sat.drive)+' dB', reset:()=>{ FX.sat.drive=isTape()?4:6; fxSend(); } }));
+knob($('kSat'),fSpec({label:()=>'WOW', color:'#ffb347', hide:()=>!isTape(), get:()=>FX.sat.wow, set:n=>{ FX.sat.wow=Math.round(n*100)/100; fxSend(); }, text:()=>Math.round(FX.sat.wow*100)+'%', reset:()=>{ FX.sat.wow=.3; fxSend(); } }));
+knob($('kSat'),fSpec({label:()=>'CHARACTER', color:'#ffb347', bip:true, hide:()=>isTape(), get:()=>(FX.sat.char+1)/2, set:n=>{ FX.sat.char=Math.round((n*2-1)*20)/20; fxSend(); }, text:()=>FX.sat.char<-.05?'EVEN '+Math.round(-FX.sat.char*100):FX.sat.char>.05?'ODD '+Math.round(FX.sat.char*100):'BLEND', reset:()=>{ FX.sat.char=0; fxSend(); } }));
+knob($('kSat'),fSpec({label:()=>'TONE', color:'#7fe0a8', bip:true, hide:()=>isTape(), get:()=>(FX.sat.tone+1)/2, set:n=>{ FX.sat.tone=Math.round((n*2-1)*20)/20; fxSend(); }, text:()=>FX.sat.tone<-.05?'DARK':FX.sat.tone>.05?'BRIGHT':'FLAT', reset:()=>{ FX.sat.tone=0; fxSend(); } }));
+knob($('kSat'),fSpec({label:()=>'MIX', color:'#ffb347', hide:()=>isTape(), get:()=>FX.sat.mix/100, set:n=>{ FX.sat.mix=Math.round(n*100); fxSend(); }, text:()=>FX.sat.mix+'%', reset:()=>{ FX.sat.mix=100; fxSend(); } }));
+knob($('kSat'),fSpec({label:()=>'OUTPUT', color:'#e9eef2', bip:true, get:()=>lin(FX.sat.out,-12,12), set:n=>{ FX.sat.out=Math.round(unlin(n,-12,12)*2)/2; fxSend(); }, text:()=>sgn(FX.sat.out)+' dB', reset:()=>{ FX.sat.out=0; fxSend(); } }));
+knob($('kWid'),fSpec({label:()=>'WIDTH', color:'#5aa9ff', bip:true, get:()=>FX.wid.width/200, set:n=>{ FX.wid.width=Math.round(n*200/5)*5; fxSend(); }, text:()=>FX.wid.width===0?'MONO':FX.wid.width+'%', reset:()=>{ FX.wid.width=100; fxSend(); } }));
+knob($('kWid'),fSpec({label:()=>'BASS MONO', color:'#7fe0a8', get:()=>FX.wid.mono<=0?0:.06+.94*lg(FX.wid.mono,40,400), set:n=>{ FX.wid.mono=n<.04?0:Math.round(unlg(clamp((n-.06)/.94,0,1),40,400)/5)*5; fxSend(); }, text:()=>FX.wid.mono<=0?'OFF':'< '+FX.wid.mono+' Hz', reset:()=>{ FX.wid.mono=120; fxSend(); } }));
+knob($('kRev'),fSpec({label:()=>'DECAY', color:'#b38cff', get:()=>lg(FX.rev.decay,.3,6), set:n=>{ FX.rev.decay=Math.round(unlg(n,.3,6)*10)/10; buildIR(); fxSend(); }, text:()=>FX.rev.decay.toFixed(1)+' s', reset:()=>{ FX.rev.decay=2.2; buildIR(); fxSend(); } }));
+knob($('kRev'),fSpec({label:()=>'PRE-DELAY', color:'#5aa9ff', get:()=>FX.rev.pre/150, set:n=>{ FX.rev.pre=Math.round(n*150); fxSend(); }, text:()=>FX.rev.pre+' ms', reset:()=>{ FX.rev.pre=20; fxSend(); } }));
+knob($('kRev'),fSpec({label:()=>'TONE', color:'#7fe0a8', bip:true, get:()=>FX.rev.tone, set:n=>{ FX.rev.tone=Math.round(n*20)/20; buildIR(); fxSend(); }, text:()=>FX.rev.tone<.4?'DARK':FX.rev.tone>.6?'BRIGHT':'NATURAL', reset:()=>{ FX.rev.tone=.5; buildIR(); fxSend(); } }));
+knob($('kRev'),fSpec({label:()=>'LOW CUT', color:'#ff8a5a', get:()=>lg(FX.rev.lowcut,40,1000), set:n=>{ FX.rev.lowcut=Math.round(unlg(n,40,1000)/5)*5; fxSend(); }, text:()=>FX.rev.lowcut+' Hz', reset:()=>{ FX.rev.lowcut=250; fxSend(); } }));
+knob($('kRev'),fSpec({label:()=>'MIX', color:'#ffb347', get:()=>FX.rev.mix/50, set:n=>{ FX.rev.mix=Math.round(n*50); fxSend(); }, text:()=>FX.rev.mix+'%', reset:()=>{ FX.rev.mix=12; fxSend(); } }));
+
+/* FX displays (drawn only while a strip is open) */
+function fxCanvas(id){ const c=$(id), o={c,g:c.getContext('2d'),w:200,h:110,d:1};
+  new ResizeObserver(()=>{ o.d=Math.min(2,window.devicePixelRatio||1); o.w=Math.max(10,c.clientWidth); o.h=Math.max(10,c.clientHeight); c.width=Math.round(o.w*o.d); c.height=Math.round(o.h*o.d); }).observe(c); return o; }
+const satC=fxCanvas('satCv'), widC=fxCanvas('widCv'), revC=fxCanvas('revCv');
+let reelA=0, reelT=performance.now(), satShown=-60;
+const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
+function drawFx(now){
+  const dt=Math.min(.1,(now-reelT)/1000); reelT=now;
+  if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
+    if(isTape()){ // tape deck with two spinning reels and a level needle
+      c.fillStyle='#d9d4c7'; c.fillRect(0,0,w,h);
+      const rr=Math.min(h*.31,w*.17), y=h*.5, x1=w*.25, x2=w*.75, on=FX.sat.on&&S.playing;
+      if(on) reelA+=dt*(FX.sat.speed===30?6:3.2);
+      c.strokeStyle='#3a3530'; c.lineWidth=2; c.beginPath(); c.moveTo(x1,y+rr*.92); c.lineTo(w*.43,h*.86); c.lineTo(w*.57,h*.86); c.lineTo(x2,y+rr*.92); c.stroke();
+      for(const [x,dir] of [[x1,1],[x2,1]]){ c.save(); c.translate(x,y); c.rotate(reelA*dir);
+        c.fillStyle='#2b2724'; c.beginPath(); c.arc(0,0,rr*.92,0,7); c.fill();
+        c.fillStyle='#b7b2a6'; c.beginPath(); c.arc(0,0,rr,0,7); c.lineWidth=2; c.strokeStyle='#8f897c'; c.stroke();
+        c.fillStyle='#c9c4b8'; for(let k=0;k<3;k++){ c.rotate(Math.PI*2/3); c.beginPath(); c.moveTo(rr*.25,-rr*.14); c.lineTo(rr*.85,-rr*.32); c.lineTo(rr*.85,rr*.32); c.lineTo(rr*.25,rr*.14); c.fill(); }
+        c.fillStyle='#4a4540'; c.beginPath(); c.arc(0,0,rr*.16,0,7); c.fill(); c.restore(); }
+      c.fillStyle='#3a3530'; c.fillRect(w*.43,h*.82,w*.14,h*.1);
+      const lvl=FX.sat.on&&S.playing?satLvl:-60; satShown+=(lvl-satShown)*(lvl>satShown?.4:.08);
+      const f=clamp((satShown+40)/40,0,1); c.fillStyle='#2b2724'; c.fillRect(w*.44,h*.9-2,w*.12*f,3);
+      c.fillStyle='#3a3530'; c.font='600 '+Math.round(h*.085)+'px "Chakra Petch", sans-serif'; c.textAlign='left'; c.textBaseline='top';
+      c.fillText((FX.sat.machine==='a800'?'A800':'ATR-102')+' · '+FX.sat.speed+' IPS',8,6);
+      c.textAlign='right'; c.fillStyle=FX.sat.on?'#c0392b':'#8f897c'; c.beginPath(); c.arc(w-12,12,4,0,7); c.fill();
+    } else { // harmonic spectrum of the saturator for a sine at -6 dBFS
+      c.fillStyle='#0b171c'; c.fillRect(0,0,w,h);
+      const g0=10**(FX.sat.drive/20), ch=FX.sat.char, wO=(1+ch)/2, wE=(1-ch)/2, M=256, H=[0,0,0,0,0,0,0];
+      for(let k=1;k<=6;k++){ let re=0,im=0; for(let i=0;i<M;i++){ const ph=2*Math.PI*i/M, x=.5*Math.sin(ph), v=g0*x;
+          const y=wO*Math.tanh(v)+wE*(Math.tanh(v+.5)-Math.tanh(.5)); re+=y*Math.cos(k*ph); im+=y*Math.sin(k*ph); } H[k]=Math.hypot(re,im)*2/M; }
+      const bw=w/7, base=h-18; c.font='10px "IBM Plex Mono", monospace'; c.textAlign='center'; c.textBaseline='alphabetic';
+      for(let k=1;k<=6;k++){ const db=20*Math.log10(H[k]/(H[1]||1)+1e-9), f=k===1?1:clamp((db+60)/60,0,1), x=bw*(k-.5)+bw*.5;
+        c.fillStyle=k===1?'#8fb3c2':(k%2?'#ffb347':'#ff8a5a'); c.fillRect(x-bw*.28,base-f*(base-10),bw*.56,f*(base-10));
+        c.fillStyle='rgba(200,215,225,.7)'; c.fillText(k===1?'F':'H'+k,x,h-5); }
+    } }
+  if(FX.open.wid){ const {g:c,w,h,d}=widC; c.setTransform(d,0,0,d,0,0);
+    c.fillStyle='rgba(6,13,17,.35)'; c.fillRect(0,0,w,h);
+    const cx=w/2, cy=h*.46, R=Math.min(w*.42,h*.42);
+    c.strokeStyle='rgba(150,200,220,.12)'; c.lineWidth=1; c.beginPath(); c.moveTo(cx,cy-R); c.lineTo(cx,cy+R); c.moveTo(cx-R,cy); c.lineTo(cx+R,cy); c.stroke();
+    if(S.playing){ anL.getFloatTimeDomainData(vsL); anR.getFloatTimeDomainData(vsR); c.fillStyle='rgba(120,190,255,.55)';
+      for(let i=0;i<1024;i+=2){ const m=(vsL[i]+vsR[i])*.7071, sd=(vsL[i]-vsR[i])*.7071; c.fillRect(cx+clamp(sd,-1,1)*R*1.6,cy-clamp(m,-1,1)*R*1.6,1.5,1.5); } }
+    const corr=FX.wid.on?widCorr:1, by=h-10, bx0=10, bx1=w-10;
+    c.fillStyle='#060d11'; c.fillRect(0,by-20,w,30);
+    c.fillStyle='#121518'; c.fillRect(bx0,by-3,bx1-bx0,6);
+    const px=bx0+(clamp(corr,-1,1)+1)/2*(bx1-bx0); c.fillStyle=corr<0?'#ff4a2e':corr<.3?'#ffb347':'#7fe0a8'; c.fillRect(px-3,by-6,6,12);
+    c.font='9px "IBM Plex Mono", monospace'; c.fillStyle='rgba(200,215,225,.6)'; c.textBaseline='alphabetic'; c.textAlign='left'; c.fillText('−1',bx0,by-8); c.textAlign='right'; c.fillText('+1',bx1,by-8); c.textAlign='center'; c.fillText('0',(bx0+bx1)/2,by-8);
+    c.textAlign='left'; c.fillText('L',6,12); c.textAlign='right'; c.fillText('R',w-6,12); }
+  if(FX.open.rev){ const {g:c,w,h,d}=revC; c.setTransform(d,0,0,d,0,0);
+    c.fillStyle='#0b171c'; c.fillRect(0,0,w,h);
+    const total=Math.min(7,FX.rev.decay*1.35+.05)+FX.rev.pre/1000, span=Math.max(1,Math.ceil(total)), xs=t=>8+(t/span)*(w-16), base=h-16;
+    c.strokeStyle='rgba(150,200,220,.08)'; c.font='9px "IBM Plex Mono", monospace'; c.fillStyle='rgba(160,200,215,.45)'; c.textAlign='center';
+    for(let t=0;t<=span;t+=span>4?1:.5){ const x=xs(t); c.beginPath(); c.moveTo(x,6); c.lineTo(x,base); c.stroke(); c.fillText(t+'s',x,h-4); }
+    const pre=FX.rev.pre/1000, irLen=total-pre;
+    c.fillStyle='rgba(255,255,255,.85)'; c.fillRect(xs(0),10,2,base-10);
+    c.beginPath(); c.moveTo(xs(pre),base);
+    for(let i=0;i<200;i++){ c.lineTo(xs(pre+irLen*i/199),base-irEnv[i]*(base-14)); } c.lineTo(xs(total),base); c.closePath();
+    const gr=c.createLinearGradient(0,10,0,base); gr.addColorStop(0,'rgba(179,140,255,.8)'); gr.addColorStop(1,'rgba(179,140,255,.08)'); c.fillStyle=gr; c.fill();
+    c.fillStyle='#ffd1a6'; c.textAlign='left'; c.fillText('PRE '+FX.rev.pre+' ms',xs(pre)+4,14); }
+}
+
+/* ---------- render: record the processed song in real time and save it as WAV ---------- */
+const RENDER={active:false,ch:[],frames:0,startT:0,stopping:false};
+function recMsg(m){ if(m.done){ finishRender(); return; } if(!RENDER.active) return; RENDER.ch.push(m); RENDER.frames+=m.n; }
+function renderUI(){ const a=RENDER.active; $('renderBtn').classList.toggle('rec',a); $('renderBtn').disabled=a; $('renderCancel').hidden=!a; $('renderBar').hidden=!a;
+  $('scrub').classList.toggle('dis',a||cur<0); $('miniSeek').classList.toggle('dis',a||cur<0); }
+function keepAwake(on){ try{ if(NATIVE&&NATIVE.keepAwake) NATIVE.keepAwake(on); }catch(_){} try{ if(on&&navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>RENDER.wl=w).catch(()=>{}); else if(RENDER.wl){ RENDER.wl.release(); RENDER.wl=null; } }catch(_){} }
+$('renderBtn').onclick=()=>{
+  if(cur<0){ toast('בחר שיר מהספרייה כדי לרנדר אותו'); return; }
+  if(!recNode){ toast('הרינדור לא נתמך בדפדפן הזה'); return; }
+  pause(); aud.currentTime=0; RENDER.active=true; RENDER.ch=[]; RENDER.frames=0; RENDER.stopping=false; RENDER.name=tracks[cur].name;
+  recNode.port.postMessage('start'); keepAwake(true); renderUI(); play();
+  $('renderTxt').textContent='מרנדר בזמן אמת. השאר את המסך דולק עד הסוף.';
+};
+$('renderCancel').onclick=()=>cancelRender();
+function cancelRender(){ if(!RENDER.active) return; RENDER.active=false; RENDER.ch=[]; try{ recNode.port.postMessage('stop'); }catch(_){} keepAwake(false); pause(); renderUI(); $('renderTxt').textContent='הרינדור בוטל.'; }
+function renderTail(){ if(RENDER.stopping) return; RENDER.stopping=true; setPlaying(false); $('renderTxt').textContent='מסיים את הזנב של העיבוד…';
+  setTimeout(()=>{ if(RENDER.active) recNode.port.postMessage('stop'); }, FX.rev.on? Math.min(7000,FX.rev.decay*1200)+300 : 400); }
+function renderProgress(){ if(!RENDER.active||RENDER.stopping) return; const d=aud.duration; if(!isFinite(d)||d<=0) return;
+  $('renderFill').style.width=(aud.currentTime/d*100)+'%'; $('renderTxt').textContent='מרנדר '+fmtT(aud.currentTime)+' / '+fmtT(d)+' · השאר את המסך דולק'; }
+function wav24(chunks,frames,sr){ const bytes=frames*6, buf=new Uint8Array(44+bytes), v=new DataView(buf.buffer);
+  const wr=(o,str)=>{ for(let i=0;i<str.length;i++) buf[o+i]=str.charCodeAt(i); };
+  wr(0,'RIFF'); v.setUint32(4,36+bytes,true); wr(8,'WAVE'); wr(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,2,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*6,true); v.setUint16(32,6,true); v.setUint16(34,24,true); wr(36,'data'); v.setUint32(40,bytes,true);
+  let o=44; for(const c of chunks){ for(let i=0;i<c.n;i++){ for(const x of [c.l[i],c.r[i]]){ let q=Math.round(clamp(x,-1,1)*8388607); if(q<0) q+=16777216; buf[o]=q&255; buf[o+1]=(q>>8)&255; buf[o+2]=(q>>16)&255; o+=3; } } }
+  return buf; }
+function b64(u8){ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); }
+async function finishRender(){
+  if(!RENDER.active) return; RENDER.active=false; keepAwake(false); renderUI();
+  if(!RENDER.frames){ $('renderTxt').textContent='לא נקלט שמע. נסה שוב.'; return; }
+  $('renderTxt').textContent='שומר את הקובץ…';
+  await new Promise(r=>setTimeout(r,30));
+  const data=wav24(RENDER.ch,RENDER.frames,ctx.sampleRate); RENDER.ch=[];
+  const name=(RENDER.name||'Cabin Q').replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q).wav';
+  const mb=(data.length/1048576).toFixed(1);
+  try{
+    if(NATIVE&&NATIVE.saveBegin){ const tok=NATIVE.saveBegin(name); const CH=3*512*1024;
+      for(let i=0;i<data.length;i+=CH){ NATIVE.saveChunk(tok,b64(data.subarray(i,i+CH))); $('renderTxt').textContent='שומר… '+Math.round(i/data.length*100)+'%'; await new Promise(r=>setTimeout(r,0)); }
+      const where=NATIVE.saveEnd(tok); $('renderTxt').textContent=where? 'נשמר ('+mb+' MB) בתיקייה '+where : 'השמירה נכשלה'; toast(where?'הקובץ נשמר':'השמירה נכשלה'); return; }
+    const file=new File([data],name,{type:'audio/wav'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ $('renderTxt').textContent='הקובץ מוכן ('+mb+' MB). בחר "שמור בקבצים".'; await navigator.share({files:[file],title:name}); return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    $('renderTxt').textContent='הקובץ ירד ('+mb+' MB): '+name;
+  }catch(e){ $('renderTxt').textContent='השמירה לא הושלמה. אפשר לרנדר שוב.'; }
 }
 
 /* VU-style gain reduction meter */
@@ -1380,9 +1763,31 @@ $('dynBtn').onclick=()=>{ const b=sel(); if(!b||!dynOk(b.type)) return; b.dyn.on
 
 /* ---------- header controls ---------- */
 const presetSel=$('preset');
-presetSel.innerHTML='<option value="" disabled>Custom</option>'+Object.keys(PRESETS).map(k=>`<option>${k}</option>`).join('');
-presetSel.onchange=()=>{ if(presetSel.value) loadPreset(presetSel.value); };
-$('bypass').onclick=()=>{ S.bypass=!S.bypass; const b=$('bypass'); b.setAttribute('aria-pressed',S.bypass); b.classList.toggle('on',S.bypass); updateRouting(); pushSystem(); };
+let USERP={}; try{ USERP=JSON.parse(localStorage.getItem('cabinq.presets')||'{}')||{}; }catch(_){ USERP={}; }
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderPresets(){ const v=presetSel.value; const names=Object.keys(USERP).sort((a,b)=>a.localeCompare(b));
+  presetSel.innerHTML='<option value="" disabled>Custom</option>'+
+    (names.length?'<optgroup label="שלי">'+names.map(n=>`<option value="u:${escH(n)}">${escH(n)}</option>`).join('')+'</optgroup>':'')+
+    '<optgroup label="מובנים">'+Object.keys(PRESETS).map(k=>`<option value="${escH(k)}">${escH(k)}</option>`).join('')+'</optgroup>';
+  presetSel.value=v; if(presetSel.selectedIndex<0) presetSel.value=''; }
+renderPresets();
+presetSel.onchange=()=>{ const v=presetSel.value; if(!v) return;
+  if(v.startsWith('u:')){ const st=USERP[v.slice(2)]; if(st){ applyState(st); presetSel.value=v; toast('נטען: '+v.slice(2)); } }
+  else loadPreset(v); };
+function openPresetRow(o){ $('presetRow').hidden=!o; if(!o) return; const v=presetSel.value||'';
+  $('presetName').value=v.startsWith('u:')?v.slice(2):''; $('presetDel').hidden=!v.startsWith('u:'); $('presetName').focus(); }
+$('presetSave').onclick=()=>openPresetRow($('presetRow').hidden);
+$('presetCancel').onclick=()=>openPresetRow(false);
+$('presetOk').onclick=()=>{ const n=$('presetName').value.trim(); if(!n){ toast('צריך לתת שם לפריסט'); return; }
+  USERP[n]=getState(); try{ localStorage.setItem('cabinq.presets',JSON.stringify(USERP)); }catch(_){ toast('לא הצלחתי לשמור'); return; }
+  renderPresets(); presetSel.value='u:'+n; openPresetRow(false); toast('נשמר: '+n); };
+$('presetName').onkeydown=e=>{ if(e.key==='Enter') $('presetOk').click(); if(e.key==='Escape') openPresetRow(false); };
+$('presetDel').onclick=()=>{ const v=presetSel.value; if(!v.startsWith('u:')) return; const n=v.slice(2);
+  if($('presetDel').dataset.armed!=='1'){ $('presetDel').dataset.armed='1'; $('presetDel').textContent='בטוח?'; setTimeout(()=>{ $('presetDel').dataset.armed=''; $('presetDel').textContent='מחיקה'; },2500); return; }
+  delete USERP[n]; try{ localStorage.setItem('cabinq.presets',JSON.stringify(USERP)); }catch(_){}
+  presetSel.value=''; renderPresets(); openPresetRow(false); toast('נמחק: '+n); };
+function setBypass(v){ S.bypass=v; for(const id of ['bypass','fsByp']){ const b=$(id); b.setAttribute('aria-pressed',v); b.classList.toggle('lit',v); } updateRouting(); pushSystem(); }
+$('bypass').onclick=$('fsByp').onclick=()=>setBypass(!S.bypass);
 function setMode(m){
   S.mode=m; $('modeSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
   $('resSeg').classList.toggle('dim',m!=='lp');
@@ -1411,7 +1816,8 @@ cv.addEventListener('pointerdown',e=>{
     if(sb&&sb.on&&dynOk(sb.type)&&!onHandle){
       const cg=colGeom(sb), pad=touch?10:6;
       const [hx]=handlePos(sb), ye=clamp(yDb(sb.gain+sb.dyn.range),PT,H-PB), hy=handlePos(sb)[1];
-      if(sb.dyn.on&&Math.hypot(p.x-hx,p.y-ye)<(touch?20:10)&&Math.abs(ye-hy)>8){ gest={k:'range',id:sb.id}; draw(); return; }
+      const rg=rangeGrip(sb);
+      if(sb.dyn.on&&Math.hypot(p.x-rg.x,p.y-rg.y)<(touch?22:10)){ gest={k:'range',id:sb.id,y0:p.y,r0:sb.dyn.range}; draw(); return; }
       if(p.x>cg.x-pad&&p.x<cg.x+cg.bw+pad+10&&p.y>cg.top-18&&p.y<cg.bot+4){
         const t=performance.now();
         if(t-lastTap.t<350&&Math.hypot(p.x-lastTap.x,p.y-lastTap.y)<36){ sb.dyn.on=!sb.dyn.on; computeStatic(); renderBus(); renderDeck(); lastTap.t=0; toast(sb.dyn.on?'Dynamic פעיל':'Dynamic כבוי'); gest={k:'none'}; return; }
@@ -1432,7 +1838,7 @@ cv.addEventListener('pointerdown',e=>{
 cv.addEventListener('pointermove',e=>{
   if(!ptrs.has(e.pointerId)) return; const p=pos(e); ptrs.set(e.pointerId,p); if(!gest) return;
   if(gest.k==='thr'&&ptrs.size===1){ const b=sel(); if(!b) return; b.dyn.thresh=Math.round(colV(colGeom(b),p.y)*2)/2; refreshDeck(); return; }
-  if(gest.k==='range'&&ptrs.size===1){ const b=sel(); if(!b) return; b.dyn.range=clamp(Math.round((dbY(p.y)-b.gain)*2)/2,-24,24); computeStatic(); refreshDeck(); return; }
+  if(gest.k==='range'&&ptrs.size===1){ const b=sel(); if(!b) return; b.dyn.range=clamp(Math.round((gest.r0+dbY(p.y)-dbY(gest.y0))*2)/2,-24,24); computeStatic(); refreshDeck(); return; }
   if(gest.k==='drag'&&ptrs.size===1){
     const b=S.bands.find(x=>x.id===gest.id); if(!b) return;
     if(Math.hypot(p.x-gest.sx,p.y-gest.sy)>3) gest.moved=true; if(!gest.moved) return;
@@ -1501,6 +1907,7 @@ function play(){
 }
 function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
 function select(i,autoplay){
+  if(RENDER.active) cancelRender();
   const was=S.playing||autoplay; pause(); cur=i;
   if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=t.folder||'שיר מהטלפון'; $('scrub').classList.remove('dis'); $('miniSeek').classList.remove('dis'); paintArt(t.name);
     if(t.native&&!t.blob){ $('npTitle').textContent='טוען… '+t.name;
@@ -1531,7 +1938,7 @@ $('back10').onclick=()=>{ if(cur>=0) aud.currentTime=Math.max(0,aud.currentTime-
 $('fwd10').onclick=()=>{ if(cur>=0&&isFinite(aud.duration)) aud.currentTime=Math.min(aud.duration-.1,aud.currentTime+10); };
 $('repBtn').onclick=()=>{ PL.rep=(PL.rep+1)%3; $('repBtn').classList.toggle('on',PL.rep>0); $('repOne').hidden=PL.rep!==2; toast(['חזרה כבויה','חזרה על כל התיקייה','חזרה על השיר'][PL.rep]); };
 $('shufBtn').onclick=()=>{ PL.shuf=!PL.shuf; $('shufBtn').classList.toggle('on',PL.shuf); toast(PL.shuf?'ערבוב פעיל':'ערבוב כבוי'); };
-aud.addEventListener('ended',()=>{ if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
+aud.addEventListener('ended',()=>{ if(RENDER.active){ renderTail(); return; } if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
 /* small generated cover: colour from the title */
 function paintArt(name){ let h=0; for(const ch of name) h=(h*31+ch.charCodeAt(0))>>>0;
   const a=h%360, b=(a+50+(h>>8)%80)%360; $('art').style.background=name?`linear-gradient(135deg,hsl(${a} 60% 42%),hsl(${b} 65% 28%))`:'linear-gradient(135deg,#7d5a8a,#3a3f6e)'; }
@@ -1680,23 +2087,33 @@ if(NATIVE){
   setInterval(pollSys,2000);
 }
 /* remember the setup between launches */
-function saveState(){ try{ localStorage.setItem('cabinq.v1',JSON.stringify({bands:S.bands,trim:S.trim,C,L,preset:presetSel.value,mode:S.mode,res:S.res})); }catch(_){} }
+function getState(){ return JSON.parse(JSON.stringify({bands:S.bands.map(b=>({type:b.type,freq:b.freq,gain:b.gain,q:b.q,slope:b.slope,on:b.on,dyn:b.dyn,slot:b.slot})),trim:S.trim,C,L,FX:typeof FX!=='undefined'?FX:undefined})); }
+function saveState(){ try{ const st=getState(); st.preset=presetSel.value; st.mode=S.mode; st.res=S.res; localStorage.setItem('cabinq.v1',JSON.stringify(st)); }catch(_){} }
 function loadState(){
   try{
     const st=JSON.parse(localStorage.getItem('cabinq.v1')||'null'); if(!st||!Array.isArray(st.bands)) return false;
+    applyState(st); return true;
+  }catch(_){ return false; }
+}
+function applyState(st){
+  {
     A.forEach(destroy); A.clear();
     S.bands=st.bands.map(o=>{ const b=mk(o.type,o.freq,o.gain,o.q,{slope:o.slope||24,on:o.on!==false,dyn:o.dyn}); b.slot=o.slot|0; return b; });
-    S.bands.forEach(build); S.trim=+st.trim||0; Object.assign(C,st.C||{}); Object.assign(L,st.L||{}); presetSel.value=st.preset||'';
+    S.bands.forEach(build); S.trim=+st.trim||0; Object.assign(C,st.C||{}); Object.assign(L,st.L||{});
     const d=S.bands.find(b=>b.dyn.on); S.sel=d?d.id:(S.bands.length?S.bands[0].id:null);
     const cb=$('compIn'); cb.classList.toggle('on',C.on); cb.setAttribute('aria-pressed',C.on);
-    structural(); sendComp(); return true;
-  }catch(_){ return false; }
+    if(st.FX&&typeof fxApply==='function') fxApply(st.FX);
+    structural(); sendComp(); if(typeof renderLim==='function'){ renderLim(); sendLim(); }
+    if(typeof out!=='undefined') out.gain.setTargetAtTime(10**(S.trim/20),ctx.currentTime,.02);
+    if(st.preset!==undefined){ presetSel.value=st.preset||''; if(presetSel.selectedIndex<0) presetSel.value=''; }
+    refreshDeck();
+  }
 }
 setInterval(saveState,1500);
 
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
-renderLim(); sendLim();
+renderLim(); sendLim(); fxOpenUI(); fxUI();
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install

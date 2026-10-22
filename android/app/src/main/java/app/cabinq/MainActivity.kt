@@ -32,6 +32,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import kotlin.concurrent.thread
+import android.content.ContentValues
+import android.provider.MediaStore
+import android.util.Base64
+import java.io.File
+import java.io.FileOutputStream
 
 /** Hosts the Cabin Q interface (web/index.html) and bridges it to the native EQ engine and the phone's files. */
 class MainActivity : Activity() {
@@ -364,6 +369,58 @@ class MainActivity : Activity() {
             return -1
         }
 
+        // ---- saving rendered songs: the page streams the WAV in base64 chunks ----
+        @JavascriptInterface
+        fun saveBegin(name: String): String {
+            val token = System.nanoTime().toString()
+            val f = File(cacheDir, "render-$token.tmp")
+            saves[token] = Triple(f, FileOutputStream(f), name)
+            return token
+        }
+
+        @JavascriptInterface
+        fun saveChunk(token: String, b64: String) {
+            saves[token]?.second?.write(Base64.decode(b64, Base64.DEFAULT))
+        }
+
+        /** Returns where the file ended up, or "" if it failed. */
+        @JavascriptInterface
+        fun saveEnd(token: String): String {
+            val (f, out, name) = saves.remove(token) ?: return ""
+            return try {
+                out.close()
+                if (Build.VERSION.SDK_INT >= 29) {
+                    val values = ContentValues().apply {
+                        put(MediaStore.Audio.Media.DISPLAY_NAME, name)
+                        put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav")
+                        put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/Cabin Q")
+                        put(MediaStore.Audio.Media.IS_PENDING, 1)
+                    }
+                    val col = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    val uri = contentResolver.insert(col, values) ?: return ""
+                    contentResolver.openOutputStream(uri)?.use { o -> f.inputStream().use { it.copyTo(o) } }
+                    values.clear(); values.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                    contentResolver.update(uri, values, null, null)
+                    "Music/Cabin Q"
+                } else {
+                    val dir = getExternalFilesDir(Environment.DIRECTORY_MUSIC) ?: return ""
+                    val dest = File(dir, name)
+                    f.copyTo(dest, overwrite = true)
+                    dest.absolutePath
+                }
+            } catch (e: Exception) {
+                ""
+            } finally {
+                f.delete()
+            }
+        }
+
+        @JavascriptInterface
+        fun keepAwake(on: Boolean) = runOnUiThread {
+            if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
         @JavascriptInterface
         fun getVersion(): Int = runCatching {
             if (Build.VERSION.SDK_INT >= 28) packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
@@ -418,6 +475,7 @@ class MainActivity : Activity() {
 
     // ---------------------------------------------------------------- updates
 
+    private val saves = HashMap<String, Triple<File, FileOutputStream, String>>()
     private var updateId = -1L
     private var updateReceiver: BroadcastReceiver? = null
 
