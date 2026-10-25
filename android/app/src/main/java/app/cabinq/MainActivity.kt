@@ -448,6 +448,19 @@ class MainActivity : Activity() {
             }
         }
 
+        /** Forget every remembered song and folder (the files themselves stay on the phone). */
+        @JavascriptInterface
+        fun clearLibrary() {
+            for (key in listOf("folders", "picked")) {
+                val arr = prefsArray(key)
+                for (i in 0 until arr.length()) {
+                    val u = if (key == "folders") arr.getString(i) else arr.getJSONObject(i).optString("uri")
+                    runCatching { contentResolver.releasePersistableUriPermission(Uri.parse(u), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                }
+                savePrefsArray(key, JSONArray())
+            }
+        }
+
         @JavascriptInterface
         fun removeFolder(uri: String) {
             val folders = prefsArray("folders")
