@@ -352,6 +352,50 @@ input[type=range]:disabled{opacity:.3}
 .tracks .grp{display:flex; align-items:center; gap:8px; padding:10px 10px 4px; font-family:var(--f-he); font-size:12px; color:var(--ink-3)}
 .tracks .grp button{width:auto; padding:2px 8px; margin-inline-start:auto; font-family:var(--f-he); font-size:11.5px; color:var(--ink-3); border:1px solid #2c3035; border-radius:6px}
 .lib-empty{padding:18px 12px; font-family:var(--f-he); font-size:13px; color:var(--ink-3); text-align:center}
+.head{position:relative}
+.ses-tog{position:absolute; top:4px; right:2px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 7px 4px; border-radius:10px;
+  border:1px solid #121416; background:linear-gradient(180deg,#363b41,#272b30); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); color:var(--ink-2)}
+.ses-tog svg{width:22px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linejoin:round}
+.ses-tog span{font-family:var(--f-he); font-size:10.5px; line-height:1}
+.ses-tog[aria-pressed="true"]{color:var(--led); border-color:rgba(255,154,60,.6); box-shadow:0 0 12px rgba(255,154,60,.25), inset 0 1px 0 rgba(255,255,255,.08)}
+.ses-bar{display:flex; flex-direction:column; gap:6px; padding:8px; border-radius:12px; background:var(--well); box-shadow:inset 0 1px 3px rgba(0,0,0,.7)}
+.ses-tabs{display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.ses-tabs::-webkit-scrollbar{display:none}
+.ses-tab{flex:none; display:flex; align-items:center; gap:7px; height:40px; max-width:190px; padding:0 10px; border-radius:9px; border:1px solid #121416;
+  background:linear-gradient(180deg,#30353a,#25282d); color:var(--ink-2); font-family:var(--f-he); font-size:13px}
+.ses-tab i{font-style:normal; font-family:var(--f-mono); font-size:11px; color:var(--ink-3)}
+.ses-tab span{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ses-tab small{font-family:var(--f-mono); font-size:10px; color:#7fe0a8}
+.ses-tab.cur{color:var(--ink); border-color:var(--led); background:linear-gradient(180deg,#41464c,#30343a); box-shadow:0 0 0 1px rgba(255,154,60,.3)}
+.ses-tab.cur i{color:var(--led)}
+.ses-tab.miss span{text-decoration:line-through; opacity:.6}
+.ses-tab.add,.ses-tab.sum{color:var(--ink-2); font-weight:500}
+.ses-tab.sum{margin-inline-start:auto; white-space:nowrap; line-height:1}
+.ses-tab.sum.cur{color:var(--led)}
+.ses-x{flex:none; width:30px; height:40px; border-radius:9px; border:1px solid #121416; background:transparent; color:var(--ink-3); font-size:18px; line-height:1}
+.ses-x.armed{color:#ff6a4a; border-color:#ff6a4a}
+.ses-info{display:flex; align-items:center; gap:10px; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); font-variant-numeric:tabular-nums; flex-wrap:wrap}
+.ses-info b{color:var(--ink); font-weight:500}
+.ses-info .he{font-family:var(--f-he); font-size:11.5px}
+.unit.sumview .modebar,.unit.sumview .screen,.unit.sumview .bands,.unit.sumview .deck{display:none !important}
+.sum{display:flex; flex-direction:column; gap:10px}
+.sum-h{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; font-family:var(--f-he); color:var(--ink)}
+.sum-h b{font-size:17px; font-weight:500}
+.sum-h span{font-family:var(--f-mono); font-size:12px; color:var(--ink-3)}
+.sum-ctl{display:flex; flex-direction:column; gap:10px; padding:10px; border-radius:12px; background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.08)); border:1px solid rgba(0,0,0,.35)}
+.sum-ctl .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.sum-list{display:flex; flex-direction:column; gap:0}
+.sum-row{display:flex; flex-direction:column; gap:6px; padding:10px; border-radius:11px; background:linear-gradient(180deg,#2c3035,#23262a); border:1px solid rgba(0,0,0,.4)}
+.sum-top{display:flex; align-items:center; gap:8px}
+.sum-top b{font-family:var(--f-mono); font-size:12px; color:var(--led); width:20px; text-align:center}
+.sum-top .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:var(--f-he); font-size:14px; color:var(--ink)}
+.sum-top small{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap}
+.sum-top .ib{width:32px; height:30px; border-radius:7px; border:1px solid #121416; background:rgba(255,255,255,.05); color:var(--ink-2); font-size:13px}
+.sum-wave{display:block; width:100%; height:64px; border-radius:7px; background:#0b171c; touch-action:none; cursor:ew-resize}
+.sum-times{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.sum-join{display:flex; align-items:center; justify-content:center; gap:8px; padding:5px 0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3)}
+.sum-join .pill{height:26px; font-size:12px}
+.sum-join:before,.sum-join:after{content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(255,154,60,.35),transparent)}
 .update{display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; background:rgba(255,154,60,.12); border:1px solid rgba(255,154,60,.45); font-family:var(--f-he); font-size:13.5px; color:var(--ink)}
 .update a{margin-inline-start:auto; text-decoration:none}
 /* limiter */
@@ -396,6 +440,8 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <div class="update" id="updBar" dir="rtl" hidden><span id="updTxt">גרסה חדשה זמינה</span><a class="pill" id="updLink" href="https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk">עדכן</a></div>
   <header class="head">
+    <button class="ses-tog" id="sesTog" aria-pressed="false" title="סשן: כמה שירים בכרטיסיות, וחיבור לרצועה אחת">
+      <svg viewBox="0 0 24 20"><path d="M2 6h6l1.5-3h5L16 6h6v12H2z"/><path d="M2 9h20"/></svg><span>סשן</span></button>
     <div class="brand">
       <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
         <defs>
@@ -424,6 +470,11 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     </div>
   </header>
 
+  <nav class="ses-bar" id="sesBar" hidden aria-label="כרטיסיות הסשן">
+    <div class="ses-tabs" id="sesTabs"></div>
+    <div class="ses-info" id="sesInfo"><span class="he" dir="rtl">עוצמה נמדדת בזמן הנגינה</span></div>
+  </nav>
+  <section class="sum" id="sumPanel" hidden dir="rtl"></section>
   <div class="modebar">
     <div class="seg" id="modeSeg" role="group" aria-label="Processing mode">
       <button data-m="mp" aria-pressed="true">ZERO LATENCY</button>
@@ -1052,7 +1103,7 @@ function activity(){
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
 }
 function loop(now){
-  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); drawFx(now); activity(); meters(now); updateTime(); renderProgress();
+  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); drawFx(now); if(SES.preview) previewTick(); activity(); meters(now); updateTime(); renderProgress();
   requestAnimationFrame(loop);
 }
 
@@ -1162,7 +1213,7 @@ const C={on:true,thr:-16,ri:1,ai:2,rli:4,makeup:3,mix:100,hpf:0};
 let compNode=null, compGR=0, needle=0, dcomp=null, dDry=null, dWet=null;
 const WORKLET=`
 class BusComp extends AudioWorkletProcessor{
-  constructor(){ super(); this.p={on:true,thr:-16,ratio:4,att:.001,rel:.6,auto:true,makeup:0,mix:1,hpf:0};
+  constructor(o){ super(); this.p={on:true,thr:-16,ratio:4,att:.001,rel:.6,auto:true,makeup:0,mix:1,hpf:0}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
     this.env=0; this.avg=0; this.cnt=0; this.mx=0; this.z=[[0,0,0,0],[0,0,0,0]]; this.b=null; this.setH();
     this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.setH(); }; }
   setH(){ const f=this.p.hpf; if(f>0){ const w=2*Math.PI*f/sampleRate, c=Math.cos(w), s=Math.sin(w), al=s/1.41421, a0=1+al;
@@ -1194,7 +1245,7 @@ registerProcessor('bus-comp',BusComp);
 /* Look-ahead brickwall limiter: sliding minimum of the needed gain, then a moving average over the
    same window, with the audio delayed so the gain is fully down when the peak arrives. Never overshoots. */
 class CabinLimiter extends AudioWorkletProcessor{
-  constructor(){ super(); this.p={on:true,mode:'modern',gain:0,ceil:-1,rel:100,look:2,style:0};
+  constructor(o){ super(); this.p={on:true,mode:'modern',gain:0,ceil:-1,rel:100,look:2,style:0}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
     this.cnt=0; this.mxGr=0; this.mxIn=0; this.mxOut=0; this.env=1; this.sus=0; this.t=0; this.alloc(); 
     this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.alloc(); }; }
   alloc(){ const p=this.p, ms= p.mode==='simple'? 1.5 : p.style===1? Math.min(p.look,1) : p.style===2? .3 : p.look;
@@ -1244,7 +1295,7 @@ registerProcessor('cabin-limiter',CabinLimiter);
 /* Tape machine / saturator. Tape: biased tanh saturation + wow & flutter (modulated delay).
    Saturator: odd/even harmonic blend with dry/wet mix. EQ colour (head bump, HF) is done with filters after this node. */
 class CabinSat extends AudioWorkletProcessor{
-  constructor(){ super(); this.p={mode:'tape',drive:4,machine:'a800',wow:.3,char:0,mix:1,out:0}; this.N=4096;
+  constructor(o){ super(); this.p={mode:'tape',drive:4,machine:'a800',wow:.3,char:0,mix:1,out:0}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions); this.N=4096;
     this.buf=[new Float32Array(4096),new Float32Array(4096)]; this.w=0; this.t=0; this.dr=0; this.cnt=0; this.acc=0; this.n=0;
     this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
   process(inputs,outputs){
@@ -1273,7 +1324,7 @@ registerProcessor('cabin-sat',CabinSat);
 
 /* Mid/side stereo width with mono bass, plus a correlation reading. */
 class CabinWidth extends AudioWorkletProcessor{
-  constructor(){ super(); this.p={width:1.2,mono:120}; this.z=[0,0,0,0]; this.cnt=0; this.lr=0; this.ll=0; this.rr=0; this.setH();
+  constructor(o){ super(); this.p={width:1.2,mono:120}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions); this.z=[0,0,0,0]; this.cnt=0; this.lr=0; this.ll=0; this.rr=0; this.setH();
     this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.setH(); }; }
   setH(){ const f=this.p.mono; if(f>0){ const w=2*Math.PI*f/sampleRate, c=Math.cos(w), s=Math.sin(w), al=s/1.41421, a0=1+al;
     this.b=[(1+c)/2/a0,-(1+c)/a0,(1+c)/2/a0]; this.a=[-2*c/a0,(1-al)/a0]; } else this.b=null; }
@@ -1306,8 +1357,64 @@ class CabinRec extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('cabin-rec',CabinRec);`;
-function compParams(){ const r=REL[C.rli]; return {on:C.on,thr:C.thr,ratio:RATIOS[C.ri],att:ATT[C.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:C.makeup,mix:C.mix/100,hpf:C.hpf}; }
+registerProcessor('cabin-rec',CabinRec);
+
+/* Dynamic EQ bands as one processor (used for offline rendering). Coefficients follow the Web Audio biquad formulas. */
+function cq(type,f,q,g){ const w=2*Math.PI*Math.min(f,sampleRate*.49)/sampleRate, cs=Math.cos(w), sn=Math.sin(w), A=Math.pow(10,g/40); let b0,b1,b2,a0,a1,a2;
+  if(type==='peaking'){ const al=sn/(2*q); b0=1+al*A; b1=-2*cs; b2=1-al*A; a0=1+al/A; a1=-2*cs; a2=1-al/A; }
+  else if(type==='lowshelf'){ const sA=2*Math.sqrt(A)*sn/2*Math.SQRT2; b0=A*((A+1)-(A-1)*cs+sA); b1=2*A*((A-1)-(A+1)*cs); b2=A*((A+1)-(A-1)*cs-sA); a0=(A+1)+(A-1)*cs+sA; a1=-2*((A-1)+(A+1)*cs); a2=(A+1)+(A-1)*cs-sA; }
+  else if(type==='highshelf'){ const sA=2*Math.sqrt(A)*sn/2*Math.SQRT2; b0=A*((A+1)+(A-1)*cs+sA); b1=-2*A*((A-1)+(A+1)*cs); b2=A*((A+1)+(A-1)*cs-sA); a0=(A+1)-(A-1)*cs+sA; a1=2*((A-1)-(A+1)*cs); a2=(A+1)-(A-1)*cs-sA; }
+  else if(type==='bandpass'){ const al=sn/(2*q); b0=al; b1=0; b2=-al; a0=1+al; a1=-2*cs; a2=1-al; }
+  else if(type==='lowpass'){ const al=sn/(2*q); b0=(1-cs)/2; b1=1-cs; b2=(1-cs)/2; a0=1+al; a1=-2*cs; a2=1-al; }
+  else { const al=sn/(2*q); b0=(1+cs)/2; b1=-(1+cs); b2=(1+cs)/2; a0=1+al; a1=-2*cs; a2=1-al; }
+  return [b0/a0,b1/a0,b2/a0,a1/a0,a2/a0]; }
+class CabinDynEq extends AudioWorkletProcessor{
+  constructor(o){ super(); const p=(o&&o.processorOptions)||{bands:[],stat:true}; this.stat=p.stat; const sr=sampleRate;
+    this.kp=1-Math.exp(-1/(.02*sr)); this.ka=1-Math.exp(-16/(.005*sr)); this.kr=1-Math.exp(-16/(.05*sr));
+    this.B=p.bands.map(b=>({b, z:[[0,0,0,0],[0,0,0,0]], sz:[0,0,0,0], pw:0, env:-120, d:0,
+      mt:b.type==='bell'?'peaking':b.type, sc:cq(b.type==='bell'?'bandpass':b.type==='lowshelf'?'lowpass':'highpass', b.freq, b.type==='bell'?Math.max(b.q,.7):1, 0)})); }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const n=inp[0].length, chs=out.length, L=inp[0], R=inp[1]||inp[0], sr=sampleRate;
+    for(let c=0;c<chs;c++) out[c].set(inp[c]||inp[0]);
+    for(const s of this.B){ const b=s.b, dy=b.dyn;
+      for(let i0=0;i0<n;i0+=16){ const i1=Math.min(n,i0+16), sc=s.sc, z=s.sz;
+        for(let i=i0;i<i1;i++){ const x=(L[i]+R[i])*.5, y=sc[0]*x+sc[1]*z[0]+sc[2]*z[1]-sc[3]*z[2]-sc[4]*z[3]; z[1]=z[0]; z[0]=x; z[3]=z[2]; z[2]=y; s.pw+=(y*y-s.pw)*this.kp; }
+        const lvl=10*Math.log10(s.pw+1e-12)+3; s.env+=(lvl-s.env)*(lvl>s.env?this.ka:this.kr);
+        const over=s.env-dy.thresh; const tgt= over>0? Math.sign(dy.range)*Math.min(Math.abs(dy.range),over*(1-1/dy.ratio)) : 0;
+        const tc=(Math.abs(tgt)>Math.abs(s.d)?dy.att:dy.rel)/1000; s.d+=(tgt-s.d)*(1-Math.exp(-16/(Math.max(tc,.0005)*sr)));
+        const k=cq(s.mt,b.freq,b.q,(this.stat?b.gain:0)+s.d);
+        for(let c=0;c<chs;c++){ const o=out[c], zz=s.z[c<2?c:1];
+          for(let i=i0;i<i1;i++){ const x=o[i], y=k[0]*x+k[1]*zz[0]+k[2]*zz[1]-k[3]*zz[2]-k[4]*zz[3]; zz[1]=zz[0]; zz[0]=x; zz[3]=zz[2]; zz[2]=y; o[i]=y; } }
+      }
+    }
+    return true;
+  }
+}
+registerProcessor('cabin-dyneq',CabinDynEq);
+
+/* Loudness (ITU-R BS.1770 K-weighting): posts the momentary loudness (400 ms) every 100 ms. */
+class CabinLoud extends AudioWorkletProcessor{
+  constructor(){ super(); const fs=sampleRate;
+    let K=Math.tan(Math.PI*1681.9744509555319/fs), Q=.7071752369554193, Vh=Math.pow(10,3.99984385397/20), Vb=Math.pow(Vh,.499666774155), a0=1+K/Q+K*K;
+    this.s1=[(Vh+Vb*K/Q+K*K)/a0,2*(K*K-Vh)/a0,(Vh-Vb*K/Q+K*K)/a0,2*(K*K-1)/a0,(1-K/Q+K*K)/a0];
+    K=Math.tan(Math.PI*38.13547087613982/fs); Q=.5003270373253953; a0=1+K/Q+K*K; this.s2=[1,-2,1,2*(K*K-1)/a0,(1-K/Q+K*K)/a0];
+    this.z=[[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]; this.hop=Math.round(fs*.1); this.acc=0; this.cnt=0; this.bl=[0,0,0,0]; this.bi=0; }
+  process(inputs){
+    const inp=inputs[0]; if(!inp||!inp.length) return true; const n=inp[0].length, a=this.s1, b=this.s2;
+    for(let i=0;i<n;i++){
+      for(let c=0;c<2;c++){ const x=(inp[c]||inp[0])[i], z=this.z[c];
+        const y1=a[0]*x+a[1]*z[0]+a[2]*z[1]-a[3]*z[2]-a[4]*z[3]; z[1]=z[0]; z[0]=x; z[3]=z[2]; z[2]=y1;
+        const y2=b[0]*y1+b[1]*z[4]+b[2]*z[5]-b[3]*z[6]-b[4]*z[7]; z[5]=z[4]; z[4]=y1; z[7]=z[6]; z[6]=y2;
+        this.acc+=y2*y2; }
+      if(++this.cnt>=this.hop){ this.bl[this.bi%4]=this.acc/this.hop; this.bi++; this.acc=0; this.cnt=0;
+        if(this.bi>=4){ const ms=(this.bl[0]+this.bl[1]+this.bl[2]+this.bl[3])/4; this.port.postMessage(-.691+10*Math.log10(ms+1e-12)); } }
+    }
+    return true;
+  }
+}
+registerProcessor('cabin-loud',CabinLoud);`;
+function compParams(Cx){ const c=Cx||C, r=REL[c.rli]; return {on:c.on,thr:c.thr,ratio:RATIOS[c.ri],att:ATT[c.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:c.makeup,mix:c.mix/100,hpf:c.hpf}; }
 function sendComp(){
   const p=compParams();
   if(compNode) compNode.port.postMessage(p);
@@ -1341,6 +1448,7 @@ function fallbackComp(){
     fxInit(true);
     recNode=new AudioWorkletNode(ctx,'cabin-rec',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     recNode.port.onmessage=e=>recMsg(e.data); fin.connect(recNode); recNode.connect(sink);
+    const ld=new AudioWorkletNode(ctx,'cabin-loud',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); ld.port.onmessage=e=>loudMsg(e.data); fin.connect(ld); ld.connect(sink);
   }catch(err){ console.warn("bus comp worklet unavailable",err); fallbackComp(); }
 })();
 $('compIn').onclick=()=>{ C.on=!C.on; const b=$('compIn'); b.classList.toggle('on',C.on); b.setAttribute('aria-pressed',C.on); sendComp(); };
@@ -1487,8 +1595,9 @@ const REVT={room:{er:[[.006,.5],[.011,.4],[.017,.35],[.023,.3],[.031,.22]],att:.
             plate:{er:[],att:.001,bright:.85}};
 let irT=0, irEnv=new Float32Array(200);
 function buildIR(){ clearTimeout(irT); irT=setTimeout(()=>{
-  if(!fxReady) return; const R=FX.rev, T=REVT[R.type], sr=ctx.sampleRate, len=Math.min(7,R.decay*1.35+.05), N=Math.floor(sr*len);
-  const buf=ctx.createBuffer(2,N,sr); let energy=0; irEnv=new Float32Array(200);
+  if(!fxReady) return; const r=makeIR(ctx,FX.rev); irEnv=r.env; fxBlocks.rev.conv.buffer=r.buf; },120); }
+function makeIR(c,R){ const T=REVT[R.type], sr=c.sampleRate, len=Math.min(7,R.decay*1.35+.05), N=Math.floor(sr*len);
+  const buf=c.createBuffer(2,N,sr); let energy=0; const irEnv=new Float32Array(200);
   const k0=T.bright*(.35+.65*R.tone), rate=(1-R.tone)*3.2/R.decay;
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); let y=0;
     for(let i=0;i<N;i++){ const t=i/sr; const env=Math.exp(-6.91*t/R.decay)*(1-Math.exp(-t/T.att));
@@ -1498,7 +1607,7 @@ function buildIR(){ clearTimeout(irT); irT=setTimeout(()=>{
   const sc=.5/Math.sqrt(energy/2+1e-9);
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<N;i++) d[i]*=sc; }
   let mx=0; for(const v of irEnv) if(v>mx) mx=v; for(let i=0;i<200;i++) irEnv[i]/=(mx||1);
-  fxBlocks.rev.conv.buffer=buf; },120); }
+  return {buf,env:irEnv}; }
 function fxApply(st){ for(const k of ['sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],st[k]); fxSend(); buildIR(); fxOpenUI(); }
 
 /* strips */
@@ -1601,21 +1710,113 @@ function drawFx(now){
     c.fillStyle='#ffd1a6'; c.textAlign='left'; c.fillText('PRE '+FX.rev.pre+' ms',xs(pre)+4,14); }
 }
 
+/* ---------- offline render: rebuilds the whole chain for one song from a saved state ---------- */
+let WURL=null; const workletURL=()=>WURL||(WURL=URL.createObjectURL(new Blob([WORKLET],{type:'application/javascript'})));
+const isDynBand=b=>b.on&&b.dyn&&b.dyn.on&&(b.type==='bell'||b.type==='lowshelf'||b.type==='highshelf');
+function limWin(Lx,sr){ const ms=Lx.mode==='simple'?1.5:Lx.style===1?Math.min(Lx.look,1):Lx.style===2?.3:Lx.look; return Math.max(2,Math.round(ms*sr/1000)); }
+function chainLatency(st,sr){ const F=st.FX||FX;
+  return (st.mode==='lp'&&!st.bypass?RES[st.res||'med']/2:0)+(st.L&&st.L.on?limWin(st.L,sr)-1:0)+(F.sat&&F.sat.on&&F.sat.mode==='tape'?Math.round(.002*sr):0); }
+function buildOffline(oc,st){
+  const sr=oc.sampleRate, Gn=()=>oc.createGain(), i=Gn(); let p=i;
+  const W=(name,opt)=>new AudioWorkletNode(oc,name,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],processorOptions:opt});
+  const link=n=>{ p.connect(n); p=n; };
+  const bands=(st.bands||[]).filter(b=>b.on);
+  const biq=(b,k)=>{ const n=oc.createBiquadFilter(); n.type=TMAP[b.type]; n.frequency.value=b.freq; n.Q.value=isCut(b.type)?20*Math.log10(BW[b.slope][k]):b.q; n.gain.value=b.gain; return n; };
+  const stages=b=>isCut(b.type)?BW[b.slope].length:1;
+  if(!st.bypass){
+    const dyn=bands.filter(isDynBand);
+    if(st.mode==='lp'){
+      const N=RES[st.res||'med'], h=N/2, fr=new Float32Array(h+1), mag=new Float32Array(h+1).fill(1), m=new Float32Array(h+1), ph=new Float32Array(h+1);
+      for(let k=0;k<=h;k++) fr[k]=Math.min(k*sr/N,sr/2-1);
+      for(const b of bands) for(let k=0;k<stages(b);k++){ biq(b,k).getFrequencyResponse(fr,m,ph); for(let j=0;j<=h;j++) if(isFinite(m[j])) mag[j]*=m[j]; }
+      const re=new Float64Array(N), im=new Float64Array(N); for(let k=0;k<=h;k++) re[k]=mag[k]; for(let k=1;k<h;k++) re[N-k]=mag[k]; fft(re,im,true);
+      const ir=oc.createBuffer(1,N,sr), d=ir.getChannelData(0);
+      for(let n=0;n<N;n++){ const w=.42-.5*Math.cos(2*Math.PI*n/(N-1))+.08*Math.cos(4*Math.PI*n/(N-1)); d[n]=re[(n+h)%N]*w; }
+      const cv=oc.createConvolver(); cv.normalize=false; cv.buffer=ir; link(cv);
+      if(dyn.length) link(W('cabin-dyneq',{bands:dyn,stat:false}));
+    } else {
+      if(dyn.length) link(W('cabin-dyneq',{bands:dyn,stat:true}));
+      for(const b of bands) if(!isDynBand(b)) for(let k=0;k<stages(b);k++) link(biq(b,k));
+    }
+  }
+  link(W('bus-comp',compParams(st.C||C)));
+  const F=st.FX||FX;
+  if(F.sat&&F.sat.on){ const sv=F.sat; link(W('cabin-sat',{mode:sv.mode,drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out}));
+    const f=[0,1,2,3].map(()=>oc.createBiquadFilter()); f[1].type='peaking'; f[2].type='highshelf'; f[3].type='lowpass';
+    if(sv.mode==='tape'){ const c=TAPE[sv.machine+sv.speed]; f[0].type='peaking'; f[0].frequency.value=c.b[0]; f[0].gain.value=c.b[1]; f[0].Q.value=c.b[2];
+      f[1].frequency.value=c.d[0]; f[1].gain.value=c.d[1]; f[1].Q.value=c.d[2]; f[2].frequency.value=c.h[0]; f[2].gain.value=c.h[1]; f[3].frequency.value=c.lp; }
+    else { f[0].type='lowshelf'; f[0].frequency.value=250; f[0].gain.value=-sv.tone*3; f[1].gain.value=0; f[2].frequency.value=3500; f[2].gain.value=sv.tone*4; f[3].frequency.value=22000; }
+    f.forEach(link); }
+  if(F.rev&&F.rev.on){ const R=F.rev, o=Gn(), pre=oc.createDelay(.5), hp=oc.createBiquadFilter(), cv=oc.createConvolver(), wet=Gn();
+    pre.delayTime.value=R.pre/1000; hp.type='highpass'; hp.frequency.value=R.lowcut; cv.normalize=false; cv.buffer=makeIR(oc,R).buf; wet.gain.value=R.mix/100;
+    p.connect(o); p.connect(pre); pre.connect(hp); hp.connect(cv); cv.connect(wet); wet.connect(o); p=o; }
+  if(F.wid&&F.wid.on) link(W('cabin-width',{width:F.wid.width/100,mono:F.wid.mono}));
+  const tg=Gn(); tg.gain.value=10**((+st.trim||0)/20); link(tg);
+  link(W('cabin-limiter',Object.assign({},st.L||L)));
+  return {i,o:p};
+}
+async function decodeTrack(t){ const r=await fetch(t.blob||t.url); if(!r.ok) throw new Error('read'); const ab=await r.arrayBuffer(); return await ctx.decodeAudioData(ab); }
+/* renders [from,to] seconds of the song through state st; returns exactly the requested length */
+async function renderOffline(buf,st,from,to,onProg,abort){
+  const sr=ctx.sampleRate, want=Math.max(1,Math.round((to-from)*sr)), lat=chainLatency(st,sr), len=want+lat;
+  const oc=new OfflineAudioContext(2,len,sr); await oc.audioWorklet.addModule(workletURL());
+  const src=oc.createBufferSource(); src.buffer=buf; const ch=buildOffline(oc,st); src.connect(ch.i); ch.o.connect(oc.destination);
+  src.start(0,from,to-from);
+  const total=len/sr; for(let t=2;t<total-.05;t+=2){ oc.suspend(t).then(()=>{ onProg&&onProg(t/total); if(abort&&abort()) {} oc.resume(); }); }
+  const out=await oc.startRendering();
+  const l=new Float32Array(want), r=new Float32Array(want), L0=out.getChannelData(0), R0=out.getChannelData(1);
+  l.set(L0.subarray(lat,lat+want)); r.set(R0.subarray(lat,lat+want)); return {l,r};
+}
+/* streams a WAV file out piece by piece, so a long session never has to sit in memory at once */
+function wavWriter(name,frames,bits,sr){
+  const bps=bits/8, bytes=frames*2*bps, hd=new Uint8Array(44), v=new DataView(hd.buffer), wr=(o,t)=>{ for(let i=0;i<t.length;i++) hd[o+i]=t.charCodeAt(i); };
+  wr(0,'RIFF'); v.setUint32(4,36+bytes,true); wr(8,'WAVE'); wr(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,2,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2*bps,true); v.setUint16(32,2*bps,true); v.setUint16(34,bits,true); wr(36,'data'); v.setUint32(40,bytes,true);
+  const nat=!!(NATIVE&&NATIVE.saveBegin), tok=nat?NATIVE.saveBegin(name):null, parts=[];
+  const put=u8=>{ if(nat) NATIVE.saveChunk(tok,b64(u8)); else parts.push(new Blob([u8])); };
+  put(hd); let written=0;
+  return {
+    get written(){ return written; },
+    async pcm(l,r,a,b){ const STEP=262144; for(let s0=a;s0<b;s0+=STEP){ const s1=Math.min(b,s0+STEP), n=s1-s0, u=new Uint8Array(n*2*bps); let o=0;
+        if(bits===24){ for(let k=s0;k<s1;k++){ let x=l[k]; x=x>1?1:x<-1?-1:x; let q=Math.round(x*8388607); if(q<0) q+=16777216; u[o]=q&255; u[o+1]=(q>>8)&255; u[o+2]=(q>>16)&255;
+            x=r[k]; x=x>1?1:x<-1?-1:x; q=Math.round(x*8388607); if(q<0) q+=16777216; u[o+3]=q&255; u[o+4]=(q>>8)&255; u[o+5]=(q>>16)&255; o+=6; } }
+        else { for(let k=s0;k<s1;k++){ let x=l[k]; x=x>1?1:x<-1?-1:x; let q=Math.round(x*32767); if(q<0) q+=65536; u[o]=q&255; u[o+1]=(q>>8)&255;
+            x=r[k]; x=x>1?1:x<-1?-1:x; q=Math.round(x*32767); if(q<0) q+=65536; u[o+2]=q&255; u[o+3]=(q>>8)&255; o+=4; } }
+        put(u); written+=n; await new Promise(z=>setTimeout(z,0)); } },
+    async silence(n){ const z=new Float32Array(Math.min(n,262144)); let left=n; while(left>0){ const k=Math.min(left,z.length); await this.pcm(z,z,0,k); left-=k; } },
+    async end(){ if(written<frames) await this.silence(frames-written);
+      if(nat) return {where:NATIVE.saveEnd(tok)}; return {file:new File(parts,name,{type:'audio/wav'})}; },
+    abort(){ if(nat){ try{ NATIVE.saveAbort(tok); }catch(_){ } } parts.length=0; }
+  };
+}
+async function deliverFile(file,txt){ const mb=(file.size/1048576).toFixed(1);
+  if(navigator.canShare&&navigator.canShare({files:[file]})){ txt('הקובץ מוכן ('+mb+' MB). בחר "שמור בקבצים".'); await navigator.share({files:[file],title:file.name}); return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); txt('הקובץ ירד ('+mb+' MB): '+file.name); }
+
 /* ---------- render: record the processed song in real time and save it as WAV ---------- */
 const RENDER={active:false,ch:[],frames:0,startT:0,stopping:false};
 function recMsg(m){ if(m.done){ finishRender(); return; } if(!RENDER.active) return; RENDER.ch.push(m); RENDER.frames+=m.n; }
-function renderUI(){ const a=RENDER.active; $('renderBtn').classList.toggle('rec',a); $('renderBtn').disabled=a; $('renderCancel').hidden=!a; $('renderBar').hidden=!a;
+function renderUI(){ const a=RENDER.active; $('renderBtn').classList.toggle('rec',a); $('renderBtn').disabled=a; $('renderCancel').hidden=!a||!!RENDER.off; $('renderBar').hidden=!a;
   $('scrub').classList.toggle('dis',a||cur<0); $('miniSeek').classList.toggle('dis',a||cur<0); }
 function keepAwake(on){ try{ if(NATIVE&&NATIVE.keepAwake) NATIVE.keepAwake(on); }catch(_){} try{ if(on&&navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>RENDER.wl=w).catch(()=>{}); else if(RENDER.wl){ RENDER.wl.release(); RENDER.wl=null; } }catch(_){} }
-$('renderBtn').onclick=()=>{
+$('renderBtn').onclick=async()=>{
   if(cur<0){ toast('בחר שיר מהספרייה כדי לרנדר אותו'); return; }
+  if(window.OfflineAudioContext&&fxWorklet&&!RENDER.active){
+    const t=tracks[cur], txt=x=>$('renderTxt').textContent=x; pause(); RENDER.active=true; RENDER.off=true; renderUI(); keepAwake(true);
+    try{ txt('קורא את השיר…'); const buf=await decodeTrack(t), st=getState(), tail=FX.rev.on?Math.min(7,FX.rev.decay*1.2)+.3:.3, sr=ctx.sampleRate;
+      const r=await renderOffline(buf,st,0,buf.duration+tail,f=>{ $('renderFill').style.width=(f*100)+'%'; txt('מעבד… '+Math.round(f*100)+'%'); });
+      const name=t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q).wav', w=wavWriter(name,r.l.length,24,sr);
+      txt('שומר את הקובץ…'); await w.pcm(r.l,r.r,0,r.l.length); const res=await w.end();
+      if(res.where){ txt('נשמר בתיקייה '+res.where); toast('הקובץ נשמר'); } else await deliverFile(res.file,txt);
+    }catch(e){ txt('הרינדור נעצר. אפשר לנסות שוב.'); }
+    RENDER.active=false; RENDER.off=false; keepAwake(false); renderUI(); return; }
   if(!recNode){ toast('הרינדור לא נתמך בדפדפן הזה'); return; }
   pause(); aud.currentTime=0; RENDER.active=true; RENDER.ch=[]; RENDER.frames=0; RENDER.stopping=false; RENDER.name=tracks[cur].name;
   recNode.port.postMessage('start'); keepAwake(true); renderUI(); play();
   $('renderTxt').textContent='מרנדר בזמן אמת. השאר את המסך דולק עד הסוף.';
 };
 $('renderCancel').onclick=()=>cancelRender();
-function cancelRender(){ if(!RENDER.active) return; RENDER.active=false; RENDER.ch=[]; try{ recNode.port.postMessage('stop'); }catch(_){} keepAwake(false); pause(); renderUI(); $('renderTxt').textContent='הרינדור בוטל.'; }
+function cancelRender(){ if(!RENDER.active||RENDER.off) return; RENDER.active=false; RENDER.ch=[]; try{ recNode.port.postMessage('stop'); }catch(_){} keepAwake(false); pause(); renderUI(); $('renderTxt').textContent='הרינדור בוטל.'; }
 function renderTail(){ if(RENDER.stopping) return; RENDER.stopping=true; setPlaying(false); $('renderTxt').textContent='מסיים את הזנב של העיבוד…';
   setTimeout(()=>{ if(RENDER.active) recNode.port.postMessage('stop'); }, FX.rev.on? Math.min(7000,FX.rev.decay*1200)+300 : 400); }
 function renderProgress(){ if(!RENDER.active||RENDER.stopping) return; const d=aud.duration; if(!isFinite(d)||d<=0) return;
@@ -1932,13 +2133,13 @@ function stepIdx(dir,auto){
   return q[n];
 }
 $('playBtn').onclick=$('miniPlay').onclick=e=>{ e.stopPropagation(); S.playing?pause():play(); };
-$('nextBtn').onclick=$('miniNext').onclick=e=>{ e.stopPropagation(); const n=stepIdx(1,false); if(n>=0) select(n,false); };
-$('prevBtn').onclick=()=>{ if(cur>=0&&aud.currentTime>3){ aud.currentTime=0; return; } const n=stepIdx(-1,false); if(n>=0) select(n,false); };
+$('nextBtn').onclick=$('miniNext').onclick=e=>{ e.stopPropagation(); if(SES.on&&SES.tabs.length){ switchTab((SES.cur+1)%SES.tabs.length,{}); return; } const n=stepIdx(1,false); if(n>=0) select(n,false); };
+$('prevBtn').onclick=()=>{ if(cur>=0&&aud.currentTime>3){ aud.currentTime=0; return; } if(SES.on&&SES.tabs.length){ switchTab((SES.cur-1+SES.tabs.length)%SES.tabs.length,{}); return; } const n=stepIdx(-1,false); if(n>=0) select(n,false); };
 $('back10').onclick=()=>{ if(cur>=0) aud.currentTime=Math.max(0,aud.currentTime-10); };
 $('fwd10').onclick=()=>{ if(cur>=0&&isFinite(aud.duration)) aud.currentTime=Math.min(aud.duration-.1,aud.currentTime+10); };
 $('repBtn').onclick=()=>{ PL.rep=(PL.rep+1)%3; $('repBtn').classList.toggle('on',PL.rep>0); $('repOne').hidden=PL.rep!==2; toast(['חזרה כבויה','חזרה על כל התיקייה','חזרה על השיר'][PL.rep]); };
 $('shufBtn').onclick=()=>{ PL.shuf=!PL.shuf; $('shufBtn').classList.toggle('on',PL.shuf); toast(PL.shuf?'ערבוב פעיל':'ערבוב כבוי'); };
-aud.addEventListener('ended',()=>{ if(RENDER.active){ renderTail(); return; } if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
+aud.addEventListener('ended',()=>{ if(RENDER.active){ renderTail(); return; } if(SES.on&&SES.tabs.length){ SES.preview=null; if(SES.cur<SES.tabs.length-1){ SES.tabs[SES.cur].pos=0; switchTab(SES.cur+1,{play:true,pos:SES.tabs[SES.cur+1].in||0,keepView:SES.view==='sum'}); } else setPlaying(false); return; } if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
 /* small generated cover: colour from the title */
 function paintArt(name){ let h=0; for(const ch of name) h=(h*31+ch.charCodeAt(0))>>>0;
   const a=h%360, b=(a+50+(h>>8)%80)%360; $('art').style.background=name?`linear-gradient(135deg,hsl(${a} 60% 42%),hsl(${b} 65% 28%))`:'linear-gradient(135deg,#7d5a8a,#3a3f6e)'; }
@@ -1960,6 +2161,11 @@ $('mini').onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); s
 /* queue list */
 function renderQueue(scrollToCur){
   const ul=$('queue'); if(!ul) return; ul.textContent='';
+  if(typeof SES!=='undefined'&&SES.on){ $('qTitle').textContent='כרטיסיות הסשן';
+    SES.tabs.forEach((t,k)=>{ const li=document.createElement('li'), b=document.createElement('button'); b.className=k===SES.cur?'cur':'';
+      b.innerHTML=(k===SES.cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${k+1}</span>`)+'<span></span><small dir="ltr"></small>';
+      b.children[1].textContent=t.name; const I=integrated(t.loud); b.children[2].textContent=I!=null?I.toFixed(1)+' LUFS':''; b.onclick=()=>switchTab(k,{play:true}); li.appendChild(b); ul.appendChild(li); });
+    return; }
   const q=cur>=0? queueIdx() : tracks.map((x,i)=>i);
   const t=tracks[cur];
   $('qTitle').textContent= t&&t.folder? 'הבאים בתור · '+t.folder : tracks.length? 'הבאים בתור' : 'אין עדיין שירים';
@@ -1999,7 +2205,7 @@ function addFiles(list,fromStore){
   const fs=[...list].filter(f=>fromStore||f.type.startsWith('audio/')||AUDIO_EXT.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name));
   if(!fs.length){ if(!fromStore) toast('לא נמצאו קבצי שמע'); return; }
   const start=tracks.length;
-  fs.forEach(f=>tracks.push({name:(f.name||'Track').replace(/\.[^.]+$/,''),url:URL.createObjectURL(f.blob||f),size:f.size||(f.blob&&f.blob.size)||0,saved:!NATIVE}));
+  fs.forEach(f=>tracks.push({name:(f.name||'Track').replace(/\.[^.]+$/,''),url:URL.createObjectURL(f.blob||f),size:f.size||(f.blob&&f.blob.size)||0,saved:!NATIVE,key:f.id||((f.name||'')+'|'+(f.size||0)+'|'+(f.lastModified||0))}));
   renderTracks(); if(cur<0&&!S.playing) select(start,false);
   if(fromStore) return;
   toast(fs.length+' קבצים נוספו');
@@ -2009,7 +2215,7 @@ function addFiles(list,fromStore){
       .then(ok=>{ if(!ok) toast('אין מספיק מקום לשמור את השירים לפעם הבאה'); });
   }
 }
-if(!NATIVE) libLoad().then(items=>{ if(items.length) addFiles(items.sort((a,b)=>a.added-b.added||a.name.localeCompare(b.name)).map(it=>({name:it.name,size:it.size,blob:it.blob})),true); });
+if(!NATIVE) libLoad().then(items=>{ if(items.length) addFiles(items.sort((a,b)=>a.added-b.added||a.name.localeCompare(b.name)).map(it=>({name:it.name,size:it.size,blob:it.blob,id:it.id})),true); });
 $('fileIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
 /* tracks coming from the Android app: {folder, folderUri, tracks:[{name,url,size}], replace} */
 window.cabinAddTracks=function(d){
@@ -2041,9 +2247,9 @@ function renderTracks(){
   const ul=$('tracks'); ul.textContent='';
   const q=($('libSearch').value||'').trim().toLowerCase();
   $('libSearch').hidden=tracks.length<8;
-  const row=(i,name,meta)=>{ const li=document.createElement('li'), b=document.createElement('button'); b.className=i===cur?'cur':'';
+  const row=(i,name,meta)=>{ if(SES.on&&i>=0&&SES.tabs.some(x=>x.key===tKey(tracks[i]))) meta='✓ בסשן';  const li=document.createElement('li'), b=document.createElement('button'); b.className=i===cur?'cur':'';
     b.innerHTML=`<span class="led${i===cur?' lit':''}"></span><span></span><small>${meta}</small>`; b.children[1].textContent=name;
-    b.onclick=()=>{ select(i,true); if(i>=0) $('sheet').hidden=true; }; li.appendChild(b); ul.appendChild(li); };
+    b.onclick=()=>{ if(SES.on&&i>=0){ const first=!SES.tabs.length; addTab(i,first); toast('נוסף לסשן · '+SES.tabs.length+' שירים'); renderTracks(); return; } select(i,true); if(i>=0) $('sheet').hidden=true; }; li.appendChild(b); ul.appendChild(li); };
   if(!q) row(-1,'Pink noise · reference','CAL');
   let lastF=null, shown=0;
   tracks.forEach((t,i)=>{ if(q&&!t.name.toLowerCase().includes(q)) return;
@@ -2087,7 +2293,7 @@ if(NATIVE){
   setInterval(pollSys,2000);
 }
 /* remember the setup between launches */
-function getState(){ return JSON.parse(JSON.stringify({bands:S.bands.map(b=>({type:b.type,freq:b.freq,gain:b.gain,q:b.q,slope:b.slope,on:b.on,dyn:b.dyn,slot:b.slot})),trim:S.trim,C,L,FX:typeof FX!=='undefined'?FX:undefined})); }
+function getState(){ return JSON.parse(JSON.stringify({bands:S.bands.map(b=>({type:b.type,freq:b.freq,gain:b.gain,q:b.q,slope:b.slope,on:b.on,dyn:b.dyn,slot:b.slot})),trim:S.trim,C,L,FX:typeof FX!=='undefined'?FX:undefined,mode:S.mode,res:S.res,bypass:S.bypass})); }
 function saveState(){ try{ const st=getState(); st.preset=presetSel.value; st.mode=S.mode; st.res=S.res; localStorage.setItem('cabinq.v1',JSON.stringify(st)); }catch(_){} }
 function loadState(){
   try{
@@ -2103,7 +2309,10 @@ function applyState(st){
     const d=S.bands.find(b=>b.dyn.on); S.sel=d?d.id:(S.bands.length?S.bands[0].id:null);
     const cb=$('compIn'); cb.classList.toggle('on',C.on); cb.setAttribute('aria-pressed',C.on);
     if(st.FX&&typeof fxApply==='function') fxApply(st.FX);
+    if(st.res) S.res=st.res; if(st.mode&&typeof setMode==='function'){ $('resSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.r===S.res)); }
+    if('bypass' in st&&typeof setBypass==='function'&&!!st.bypass!==S.bypass) setBypass(!!st.bypass);
     structural(); sendComp(); if(typeof renderLim==='function'){ renderLim(); sendLim(); }
+    if(st.mode&&typeof setMode==='function') setMode(st.mode);
     if(typeof out!=='undefined') out.gain.setTargetAtTime(10**(S.trim/20),ctx.currentTime,.02);
     if(st.preset!==undefined){ presetSel.value=st.preset||''; if(presetSel.selectedIndex<0) presetSel.value=''; }
     refreshDeck();
@@ -2111,9 +2320,216 @@ function applyState(st){
 }
 setInterval(saveState,1500);
 
+/* ---------- SESSION: several songs in tabs, each with its own processing, joined into one long track ---------- */
+var SES={on:false,tabs:[],cur:-1,view:'tab',join:{mode:'xfade',sec:3,fin:.5,fout:3,thr:-50,bits:24},preview:null,busy:false};
+let sesUid=1, pendingSeek=null, loudM=-120;
+function tKey(t){ return t.key||t.url; }
+function sesSave(){ try{ localStorage.setItem('cabinq.session',JSON.stringify({on:SES.on,cur:SES.cur,view:SES.view,join:SES.join,
+  tabs:SES.tabs.map(t=>({id:t.id,key:t.key,name:t.name,state:t.state,pos:t.pos,in:t.in,out:t.out,dur:t.dur}))})); }catch(_){} }
+function sesLoad(){ try{ const d=JSON.parse(localStorage.getItem('cabinq.session')||'null'); if(!d) return;
+  Object.assign(SES.join,d.join||{}); SES.tabs=(d.tabs||[]).map(t=>Object.assign({loud:[],sig:''},t)); SES.cur=Math.min(d.cur??-1,SES.tabs.length-1);
+  SES.tabs.forEach(t=>{ if(t.id>=sesUid) sesUid=t.id+1; }); if(d.on) sesToggle(true,true); if(d.view==='sum'&&SES.on) showSum(true); }catch(_){} }
+function curTab(){ return SES.tabs[SES.cur]||null; }
+function saveCurTab(){ const t=curTab(); if(!t) return; t.state=getState(); if(cur>=0&&tKey(tracks[cur])===t.key&&isFinite(aud.currentTime)) t.pos=aud.currentTime; }
+function trackOf(tab){ return tracks.findIndex(x=>tKey(x)===tab.key); }
+function sesToggle(on,quiet){
+  SES.on=on; const b=$('sesTog'); b.setAttribute('aria-pressed',on); $('sesBar').hidden=!on;
+  if(on&&!SES.tabs.length&&cur>=0) addTab(cur,false);
+  if(!on){ showSum(false); SES.preview=null; }
+  renderSes(); renderQueue(false); if(!quiet) toast(on?'מצב סשן: כל שיר בכרטיסייה משלו':'חזרה למסך אחד'); sesSave();
+}
+$('sesTog').onclick=()=>sesToggle(!SES.on);
+function addTab(i,go){
+  const t=tracks[i]; if(!t) return; const ex=SES.tabs.findIndex(x=>x.key===tKey(t)); if(ex>=0){ if(go) switchTab(ex,{}); return; }
+  saveCurTab();
+  SES.tabs.push({id:sesUid++,key:tKey(t),name:t.name,state:getState(),pos:0,in:0,out:null,dur:null,loud:[],sig:''});
+  if(SES.cur<0) SES.cur=SES.tabs.length-1;
+  if(go) switchTab(SES.tabs.length-1,{fresh:true}); else renderSes(); sesSave();
+}
+/* move to another tab: keep the old tab's settings, load the new tab's settings and song; keep playing if we were */
+function switchTab(k,o){ o=o||{};
+  const tab=SES.tabs[k]; if(!tab) return;
+  if(k===SES.cur&&!o.force){ if(SES.view==='sum'&&!o.keepView) showSum(false); return; }
+  const was=S.playing||!!o.play;
+  if(!o.fresh) saveCurTab(); pause(); SES.cur=k;
+  if(!o.keepView&&SES.view==='sum') showSum(false);
+  applyState(tab.state);
+  const idx=trackOf(tab);
+  if(idx<0){ toast('השיר של הכרטיסייה לא נמצא בספרייה'); renderSes(); return; }
+  pendingSeek=o.pos!=null? o.pos : (tab.pos||0);
+  select(idx,was); renderSes(); sesSave();
+}
+aud.addEventListener('loadedmetadata',()=>{ if(pendingSeek!=null){ try{ aud.currentTime=Math.min(pendingSeek,Math.max(0,aud.duration-.5)); }catch(_){} pendingSeek=null; } });
+function removeTab(k){ const was=SES.cur===k; SES.tabs.splice(k,1);
+  if(!SES.tabs.length){ SES.cur=-1; renderSes(); sesSave(); return; }
+  if(was){ SES.cur=-1; switchTab(Math.min(k,SES.tabs.length-1),{fresh:true,force:true}); } else { if(SES.cur>k) SES.cur--; renderSes(); } sesSave(); }
+function integrated(arr){ const a=arr.filter(v=>v>-70); if(!a.length) return null; const en=v=>Math.pow(10,(v+.691)/10);
+  const m1=a.reduce((x,v)=>x+en(v),0)/a.length, rel=-.691+10*Math.log10(m1)-10, b=a.filter(v=>v>rel); if(!b.length) return null;
+  return -.691+10*Math.log10(b.reduce((x,v)=>x+en(v),0)/b.length); }
+function renderSes(){
+  const el=$('sesTabs'); if(!el) return; el.textContent='';
+  SES.tabs.forEach((t,k)=>{ const b=document.createElement('button'); const I=integrated(t.loud);
+    b.className='ses-tab'+(k===SES.cur&&SES.view==='tab'?' cur':'')+(trackOf(t)<0?' miss':''); b.dir='auto';
+    b.innerHTML='<i>'+(k+1)+'</i><span></span>'+(I!=null?'<small>'+I.toFixed(1)+'</small>':''); b.children[1].textContent=t.name;
+    b.onclick=()=>switchTab(k,{}); el.appendChild(b);
+    if(k===SES.cur&&SES.view==='tab'){ const x=document.createElement('button'); x.className='ses-x'; x.textContent='×'; x.title='הסרת הכרטיסייה';
+      x.onclick=()=>{ if(!x.classList.contains('armed')){ x.classList.add('armed'); setTimeout(()=>x.classList.remove('armed'),2500); toast('לחץ שוב כדי להסיר את הכרטיסייה'); return; } removeTab(k); };
+      el.appendChild(x); }
+  });
+  const add=document.createElement('button'); add.className='ses-tab add'; add.textContent='+ שיר'; add.onclick=()=>{ $('sheet').hidden=false; toast('בחר שיר, והוא ייפתח בכרטיסייה חדשה'); }; el.appendChild(add);
+  const sm=document.createElement('button'); sm.className='ses-tab sum'+(SES.view==='sum'?' cur':''); sm.textContent='Σ סיכום'; sm.onclick=()=>showSum(true); el.appendChild(sm);
+  const c=el.querySelector('.ses-tab.cur'); if(c) c.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+function renderSesInfo(){ const t=curTab(); const I=t?integrated(t.loud):null;
+  $('sesInfo').innerHTML=SES.view==='sum'? '<span class="he" dir="rtl">סיכום: סידור, חיתוך ומעברים</span>' :
+    'M <b>'+(loudM>-70?loudM.toFixed(1):'—')+'</b> · I <b>'+(I!=null?I.toFixed(1):'—')+'</b> LUFS'+
+    '<span class="he" dir="rtl">'+(t?'· נמדד מאז השינוי האחרון בכרטיסייה':'')+'</span>'; }
+function loudMsg(v){ loudM=v; const t=curTab();
+  if(SES.on&&t&&S.playing&&SES.view==='tab'&&cur>=0&&tKey(tracks[cur])===t.key){ t.loud.push(v); if(t.loud.length>30000) t.loud.shift(); } }
+/* every 1.5 s: remember the tab's settings; restart its loudness reading when the sound changed */
+setInterval(()=>{ if(!SES.on) return; const t=curTab(); if(!t) return;
+  if(SES.view==='tab'){ const sig=JSON.stringify(getState()); if(sig!==t.sig){ if(t.sig) t.loud=[]; t.sig=sig; } t.state=JSON.parse(sig);
+    if(cur>=0&&tKey(tracks[cur])===t.key) t.pos=aud.currentTime; }
+  if(cur<0&&!SES.booted){ const i=trackOf(t); if(i>=0){ SES.booted=true; pendingSeek=t.pos||0; select(i,false); } }
+  renderSesInfo(); if(SES.view==='tab'&&S.playing) renderSes(); sesSave(); },1500);
+
+/* ---------- summary: order, trims, transitions, render ---------- */
+function showSum(on){ SES.view=on?'sum':'tab'; $('unit').classList.toggle('sumview',on); $('sumPanel').hidden=!on;
+  if(on){ saveCurTab(); renderSum(); analyzeAll(); } renderSes(); renderSesInfo(); sesSave(); }
+const fmtS=s=>{ if(s==null||!isFinite(s)) return '—'; const m=Math.floor(s/60), r=s-m*60; return m+':'+(r<10?'0':'')+r.toFixed(1); };
+function tabLen(t){ if(t.dur==null) return null; return Math.max(0,(t.out??t.dur)-(t.in||0)); }
+function sesTotal(){ let tot=0, ok=true; const J=SES.join, n=SES.tabs.length;
+  SES.tabs.forEach((t,k)=>{ const l=tabLen(t); if(l==null){ ok=false; return; } tot+=l;
+    if(k<n-1){ const l2=tabLen(SES.tabs[k+1])||0; tot+= J.mode==='gap'? J.sec : -Math.min(J.sec,l/2,l2/2); } });
+  return ok?tot:null; }
+const META=new Map();  // per tab: waveform peaks and 10 ms loudness map (not saved)
+async function analyzeTab(t){ if(META.has(t.id)) return META.get(t.id); const i=trackOf(t); if(i<0) return null;
+  const buf=await decodeTrack(tracks[i]); const L=buf.getChannelData(0), R=buf.numberOfChannels>1?buf.getChannelData(1):L, sr=buf.sampleRate;
+  const P=600, peaks=new Float32Array(P), blk=Math.round(sr*.01), nb=Math.ceil(L.length/blk), rms=new Float32Array(nb);
+  for(let b=0;b<nb;b++){ let s=0; const a=b*blk, e=Math.min(L.length,a+blk); for(let k=a;k<e;k++){ const v=(L[k]+R[k])*.5; s+=v*v; const pi=Math.floor(k/L.length*P), av=Math.abs(v); if(av>peaks[pi]) peaks[pi]=av; } rms[b]=10*Math.log10(s/Math.max(1,e-a)+1e-12); }
+  const m={peaks,rms}; META.set(t.id,m); t.dur=buf.duration; if(t.out==null||t.out>t.dur) t.out=t.dur; return m; }
+async function analyzeAll(){ for(const t of SES.tabs){ if(SES.view!=='sum') return; if(META.has(t.id)) continue;
+  try{ await analyzeTab(t); }catch(_){ t.err=true; } renderSum(); } }
+function autoTrim(t){ const m=META.get(t.id); if(!m) return; const thr=SES.join.thr; let a=0,b=m.rms.length-1;
+  while(a<m.rms.length&&m.rms[a]<thr) a++; while(b>a&&m.rms[b]<thr) b--;
+  if(a>=m.rms.length) return; t.in=Math.max(0,a*.01-.02); t.out=Math.min(t.dur,(b+1)*.01+.05); }
+function drawWave(cv,t){ const m=META.get(t.id), d=Math.min(2,window.devicePixelRatio||1), w=cv.clientWidth||300, h=cv.clientHeight||64;
+  cv.width=Math.round(w*d); cv.height=Math.round(h*d); const c=cv.getContext('2d'); c.setTransform(d,0,0,d,0,0); c.clearRect(0,0,w,h);
+  if(!m||!t.dur){ c.fillStyle='rgba(200,215,225,.5)'; c.font='12px Heebo, sans-serif'; c.textAlign='center'; c.fillText(t.err?'לא הצלחתי לקרוא את השיר':'מנתח…',w/2,h/2+4); return; }
+  const P=m.peaks.length, mid=h/2; c.fillStyle='rgba(143,179,194,.85)';
+  for(let x=0;x<w;x++){ const v=m.peaks[Math.floor(x/w*P)]; c.fillRect(x,mid-v*mid*.95,1,Math.max(1,v*mid*1.9)); }
+  const xi=s=>s/t.dur*w, a=xi(t.in||0), b=xi(t.out??t.dur);
+  c.fillStyle='rgba(0,0,0,.62)'; c.fillRect(0,0,a,h); c.fillRect(b,0,w-b,h);
+  c.fillStyle='#ff9a3c'; c.fillRect(a-1,0,3,h); c.fillRect(b-2,0,3,h);
+  c.beginPath(); c.moveTo(a,0); c.lineTo(a+9,0); c.lineTo(a,10); c.fill(); c.beginPath(); c.moveTo(b,h); c.lineTo(b-9,h); c.lineTo(b,h-10); c.fill(); }
+function bindWave(cv,t,row){ let which=null;
+  const tm=e=>{ const r=cv.getBoundingClientRect(); return clamp((e.clientX-r.left)/r.width,0,1)*(t.dur||0); };
+  cv.addEventListener('pointerdown',e=>{ if(!t.dur) return; const x=tm(e); which=Math.abs(x-(t.in||0))<=Math.abs(x-(t.out??t.dur))?'in':'out'; cv.setPointerCapture(e.pointerId); mv(e); });
+  const mv=e=>{ if(!which) return; const x=tm(e); if(which==='in') t.in=clamp(x,0,(t.out??t.dur)-1); else t.out=clamp(x,(t.in||0)+1,t.dur); drawWave(cv,t); updRow(row,t); sumHead(); };
+  cv.addEventListener('pointermove',mv); const up=()=>{ if(which){ which=null; sesSave(); } }; cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); }
+function updRow(row,t){ row.querySelector('.tin').textContent='התחלה '+fmtS(t.in||0); row.querySelector('.tout').textContent='סוף '+fmtS(t.out??t.dur);
+  row.querySelector('.len').textContent=fmtS(tabLen(t)); }
+function sumHead(){ const tot=sesTotal(), J=SES.join, bps=J.bits/8;
+  $('sumTot').textContent=SES.tabs.length+' שירים · '+(tot!=null?fmtT(tot):'מחשב…');
+  $('sumSize').textContent=tot!=null?'≈ '+Math.round(tot*ctx.sampleRate*2*bps/1048576)+' MB':''; }
+function renderSum(){
+  const P=$('sumPanel'); if(SES.view!=='sum') return; const J=SES.join;
+  if(!P.dataset.built){ P.dataset.built='1'; P.innerHTML=`
+    <div class="sum-h"><b>סיכום הסשן</b><span id="sumTot" dir="ltr"></span></div>
+    <div class="sum-ctl">
+      <div class="row"><div class="seg" id="joinMode"><button data-v="xfade">CROSSFADE</button><button data-v="gap">GAP</button></div><span class="dyn-note" id="joinNote"></span></div>
+      <div class="knobs wrap" id="kJoin" dir="ltr"></div>
+      <div class="row"><button class="pill he-pill" id="autoTrimBtn">חיתוך אוטומטי של קצוות</button><span class="dyn-note">מוריד שקט בהתחלה ובסוף של כל שיר לפי הסף</span></div>
+    </div>
+    <div class="sum-list" id="sumList"></div>
+    <div class="sum-ctl">
+      <div class="row"><div class="seg" id="bitSeg"><button data-v="24">WAV 24-BIT</button><button data-v="16">WAV 16-BIT</button></div><span class="dyn-note" id="sumSize" dir="ltr"></span></div>
+      <div class="row"><button class="pill he-pill" id="sesRender"><span class="led"></span>רינדור הסשן לקובץ אחד</button><button class="pill he-pill" id="sesCancel" hidden>ביטול</button></div>
+      <div class="render-bar" id="sesBar2" hidden><i id="sesFill"></i></div>
+      <span class="render-txt" id="sesTxt">כל שיר מעובד עם ההגדרות של הכרטיסייה שלו, ואז כולם מתחברים לפי המעברים שבחרת. הרינדור מהיר מזמן אמת.</span>
+    </div>`;
+    const kj=$('kJoin'), J2=()=>SES.join, ch=()=>{ sumHead(); sesSave(); updJoin(); };
+    knob(kj,{label:()=>J2().mode==='gap'?'GAP':'CROSSFADE',color:'#ff9a3c',enabled:()=>true,get:()=>J2().sec/10,set:n=>{ J2().sec=Math.round(n*100)/10; ch(); },text:()=>J2().sec.toFixed(1)+' s',reset:()=>{ J2().sec=3; ch(); }});
+    knob(kj,{label:()=>'FADE IN',color:'#7fe0a8',enabled:()=>true,get:()=>J2().fin/5,set:n=>{ J2().fin=Math.round(n*50)/10; ch(); },text:()=>J2().fin.toFixed(1)+' s',reset:()=>{ J2().fin=.5; ch(); }});
+    knob(kj,{label:()=>'FADE OUT',color:'#5aa9ff',enabled:()=>true,get:()=>J2().fout/10,set:n=>{ J2().fout=Math.round(n*100)/10; ch(); },text:()=>J2().fout.toFixed(1)+' s',reset:()=>{ J2().fout=3; ch(); }});
+    knob(kj,{label:()=>'TRIM THR',color:'#b38cff',enabled:()=>true,get:()=>lin(J2().thr,-80,-30),set:n=>{ J2().thr=Math.round(unlin(n,-80,-30)); ch(); },text:()=>J2().thr+' dB',reset:()=>{ J2().thr=-50; ch(); }});
+    $('joinMode').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; SES.join.mode=b.dataset.v; ch(); knobs.forEach(k=>k.refresh()); };
+    $('bitSeg').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; SES.join.bits=+b.dataset.v; ch(); };
+    $('autoTrimBtn').onclick=()=>{ let n=0; SES.tabs.forEach(t=>{ if(META.has(t.id)){ autoTrim(t); n++; } }); renderSum(); sesSave(); toast(n?'הקצוות נחתכו ב-'+n+' שירים':'עוד מנתח את השירים'); };
+    $('sesRender').onclick=()=>renderSession(); $('sesCancel').onclick=()=>{ SES.cancel=true; $('sesTxt').textContent='מבטל…'; };
+  }
+  function updJoin(){ $('joinMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SES.join.mode));
+    $('bitSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===SES.join.bits));
+    $('joinNote').textContent=SES.join.mode==='gap'?'שקט בין השירים':'השירים נכנסים זה בזה'; document.querySelectorAll('.sum-join small').forEach(x=>x.textContent=joinTxt()); }
+  const list=$('sumList'); list.textContent='';
+  if(!SES.tabs.length){ list.innerHTML='<div class="lib-empty">עוד אין שירים בסשן. לחץ על "+ שיר" כדי להוסיף.</div>'; }
+  SES.tabs.forEach((t,k)=>{
+    if(k>0){ const j=document.createElement('div'); j.className='sum-join'; j.innerHTML='<button class="pill he-pill">▶ השמע מעבר</button><small dir="ltr"></small>';
+      j.querySelector('small').textContent=joinTxt(); j.querySelector('button').onclick=()=>previewJoin(k-1); list.appendChild(j); }
+    const row=document.createElement('div'); row.className='sum-row';
+    row.innerHTML='<div class="sum-top"><b>'+(k+1)+'</b><span class="nm" dir="auto"></span><small class="lufs" dir="ltr"></small><small class="len" dir="ltr"></small>'+
+      '<button class="ib" data-a="up" title="למעלה">▲</button><button class="ib" data-a="dn" title="למטה">▼</button><button class="ib" data-a="go" title="פתיחת הכרטיסייה">✎</button></div>'+
+      '<canvas class="sum-wave" dir="ltr"></canvas><div class="sum-times" dir="ltr"><span class="tin"></span><span class="tout"></span></div>';
+    row.querySelector('.nm').textContent=t.name; const I=integrated(t.loud); row.querySelector('.lufs').textContent=I!=null?I.toFixed(1)+' LUFS':'';
+    row.querySelector('[data-a=up]').disabled=k===0; row.querySelector('[data-a=dn]').disabled=k===SES.tabs.length-1;
+    row.querySelector('[data-a=up]').onclick=()=>{ moveTab(k,-1); }; row.querySelector('[data-a=dn]').onclick=()=>{ moveTab(k,1); };
+    row.querySelector('[data-a=go]').onclick=()=>switchTab(k,{force:k===SES.cur});
+    list.appendChild(row); const cv=row.querySelector('canvas'); updRow(row,t); requestAnimationFrame(()=>drawWave(cv,t)); bindWave(cv,t,row);
+  });
+  updJoin(); sumHead(); knobs.forEach(k=>k.refresh());
+}
+function joinTxt(){ const J=SES.join; return J.mode==='gap'? 'GAP '+J.sec.toFixed(1)+' s' : 'CROSSFADE '+J.sec.toFixed(1)+' s'; }
+function moveTab(k,d){ const j=k+d; if(j<0||j>=SES.tabs.length) return; const c=SES.tabs[SES.cur];
+  [SES.tabs[k],SES.tabs[j]]=[SES.tabs[j],SES.tabs[k]]; SES.cur=SES.tabs.indexOf(c); renderSum(); renderSes(); sesSave(); }
+/* listen to a transition: the last seconds of one song, then the start of the next (each with its own settings) */
+function previewJoin(k){ const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b||a.dur==null){ toast('עוד מנתח את השירים'); return; }
+  const outA=a.out??a.dur; SES.preview={a:k,b:k+1,outA,stage:1};
+  switchTab(k,{pos:Math.max(a.in||0,outA-6),play:true,keepView:true,force:true}); toast('מעבר בין '+(k+1)+' ל-'+(k+2)); }
+function previewTick(){ const P=SES.preview; if(!P||!S.playing) return;
+  if(P.stage===1&&SES.cur===P.a&&aud.currentTime>=P.outA){ const b=SES.tabs[P.b]; P.stage=2; P.end=(b.in||0)+6; switchTab(P.b,{pos:b.in||0,play:true,keepView:true}); }
+  else if(P.stage===2&&SES.cur===P.b&&aud.currentTime>=P.end){ pause(); SES.preview=null; } }
+/* render the whole session: each song offline with its own settings, then stream the joined result into one WAV */
+async function renderSession(){
+  if(SES.busy) return; if(!SES.tabs.length){ toast('אין שירים בסשן'); return; }
+  if(!window.OfflineAudioContext||!fxWorklet){ toast('הרינדור הזה לא נתמך בדפדפן הזה'); return; }
+  saveCurTab(); pause(); SES.busy=true; SES.cancel=false;
+  const ui=(f,txt)=>{ $('sesBar2').hidden=false; $('sesFill').style.width=(f*100)+'%'; if(txt) $('sesTxt').textContent=txt; };
+  $('sesRender').disabled=true; $('sesCancel').hidden=false; keepAwake(true);
+  let wr=null;
+  try{
+    for(const t of SES.tabs){ if(t.dur==null){ ui(0,'מנתח: '+t.name); await analyzeTab(t); } }
+    const sr=ctx.sampleRate, J=SES.join, n=SES.tabs.length, len=SES.tabs.map(t=>Math.round(tabLen(t)*sr));
+    const ov=len.map((l,k)=>k<n-1&&J.mode==='xfade'? Math.min(Math.round(J.sec*sr),Math.floor(l/2),Math.floor(len[k+1]/2)) : 0);
+    const gap=J.mode==='gap'?Math.round(J.sec*sr):0;
+    const total=len.reduce((a,b)=>a+b,0)-ov.reduce((a,b)=>a+b,0)+gap*(n-1);
+    const name='Cabin Q Session '+new Date().toISOString().slice(0,16).replace('T',' ').replace(':','-')+'.wav';
+    wr=wavWriter(name,total,J.bits,sr); let carry=null;
+    for(let k=0;k<n;k++){ if(SES.cancel) throw 'cancel';
+      const t=SES.tabs[k], i=trackOf(t); if(i<0) throw new Error('השיר "'+t.name+'" לא נמצא בספרייה');
+      const base=k/n; ui(base,'שיר '+(k+1)+' מתוך '+n+': '+t.name);
+      const buf=await decodeTrack(tracks[i]);
+      const r=await renderOffline(buf,t.state,t.in||0,(t.in||0)+len[k]/sr,f=>ui(base+f/n*.9),()=>SES.cancel);
+      const L=r.l, R=r.r, N=len[k];
+      if(k===0&&J.fin>0){ const F=Math.min(N,Math.round(J.fin*sr)); for(let x=0;x<F;x++){ const g=x/F; L[x]*=g; R[x]*=g; } }
+      if(k===n-1&&J.fout>0){ const F=Math.min(N,Math.round(J.fout*sr)); for(let x=0;x<F;x++){ const g=x/F; L[N-1-x]*=g; R[N-1-x]*=g; } }
+      let start=0;
+      if(k>0&&carry){ const O=carry.l.length; for(let x=0;x<O;x++){ const u=(x+.5)/O, gi=Math.sin(u*Math.PI/2), go=Math.cos(u*Math.PI/2); L[x]=L[x]*gi+carry.l[x]*go; R[x]=R[x]*gi+carry.r[x]*go; } }
+      if(k>0&&gap) await wr.silence(gap);
+      const O2=ov[k]; await wr.pcm(L,R,start,N-O2);
+      carry=O2? {l:L.slice(N-O2),r:R.slice(N-O2)} : null;
+    }
+    ui(1,'שומר את הקובץ…'); const res=await wr.end(); wr=null;
+    if(res.where){ $('sesTxt').textContent='נשמר: '+name+' בתיקייה '+res.where; toast('הסשן נשמר'); }
+    else if(res.file) await deliverFile(res.file,x=>$('sesTxt').textContent=x);
+    else $('sesTxt').textContent='השמירה נכשלה';
+  }catch(e){ if(wr) wr.abort(); $('sesTxt').textContent= e==='cancel'? 'הרינדור בוטל.' : 'הרינדור נעצר: '+(e&&e.message?e.message:'שגיאה'); }
+  SES.busy=false; keepAwake(false); $('sesRender').disabled=false; $('sesCancel').hidden=true;
+}
+
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
-renderLim(); sendLim(); fxOpenUI(); fxUI();
+renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
+window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install

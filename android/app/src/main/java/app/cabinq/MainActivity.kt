@@ -416,6 +416,11 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface
+        fun saveAbort(token: String) {
+            saves.remove(token)?.let { (f, out, _) -> runCatching { out.close() }; f.delete() }
+        }
+
+        @JavascriptInterface
         fun keepAwake(on: Boolean) = runOnUiThread {
             if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
