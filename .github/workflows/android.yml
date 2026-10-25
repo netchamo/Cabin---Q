@@ -3,7 +3,7 @@ name: Android APK
 on:
   push:
     branches: [main]
-    paths: ["android/**", "web/**", ".github/workflows/android.yml"]
+    paths: ["android/**", "web/min-native.txt", ".github/workflows/android.yml"]
   workflow_dispatch:
 
 permissions:
@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Stamp the interface version
+        run: |
+          echo "{\"sha\":\"$GITHUB_SHA\",\"time\":$(git log -1 --format=%ct),\"minNative\":$(cat web/min-native.txt)}" > web/version.json
+          cat web/version.json
 
       - uses: actions/setup-java@v4
         with:

@@ -8,6 +8,12 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.graphics.Bitmap
+import java.io.FileInputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.view.View
@@ -70,7 +76,17 @@ class MainActivity : Activity() {
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
                 val url = request?.url ?: return null
                 if (url.host == HOST && url.path == "/media") return serveMedia(url.getQueryParameter("u"))
+                if (url.host == HOST && (url.path == "/index.html" || url.path == "/version.json")) serveWeb(url.path!!)?.let { return it }
                 return assets.shouldInterceptRequest(url)
+            }
+
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                jsReady = false
+                // If a downloaded interface never reports in, it is broken: drop it and go back to the built-in one.
+                if (servedDownloaded) main.postDelayed({
+                    if (!jsReady && servedDownloaded) { File(filesDir, "web").deleteRecursively(); servedDownloaded = false; web.reload() }
+                }, 15000)
             }
 
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -107,6 +123,7 @@ class MainActivity : Activity() {
         setContentView(web)
         web.loadUrl("https://$HOST/index.html")
         handleOpenIntent(intent)
+        checkWebUpdate()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -348,6 +365,7 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun ready() = runOnUiThread {
             jsReady = true
+            if (webUpdateReady) web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null)
             pending.forEach { web.evaluateJavascript("window.cabinAddTracks&&window.cabinAddTracks($it)", null) }
             pending.clear()
             loadLibrary()
@@ -534,6 +552,57 @@ class MainActivity : Activity() {
         fun setFullscreen(on: Boolean) = runOnUiThread { this@MainActivity.setFullscreen(on) }
     }
 
+    // ---------------------------------------------------------------- interface updates (no install needed)
+    // The interface (index.html) is published to GitHub Pages on every change. The app downloads a newer copy in
+    // the background and uses it from the next load, as long as it does not need a newer Android build.
+
+    private val main = Handler(Looper.getMainLooper())
+    @Volatile private var servedDownloaded = false
+    @Volatile private var webUpdateReady = false
+
+    private fun myCode(): Long = runCatching { packageManager.getPackageInfo(packageName, 0).longVersionCode }.getOrDefault(0L)
+    private fun bundledMeta(): JSONObject? = runCatching { JSONObject(assets.open("version.json").bufferedReader().readText()) }.getOrNull()
+    private fun downloadedMeta(): JSONObject? = runCatching { JSONObject(File(File(filesDir, "web"), "version.json").readText()) }.getOrNull()
+
+    private fun useDownloaded(): Boolean {
+        val d = downloadedMeta() ?: return false
+        if (!File(File(filesDir, "web"), "index.html").exists()) return false
+        if (d.optLong("minNative", 0) > myCode()) return false
+        return d.optLong("time", 0) > (bundledMeta()?.optLong("time", 0) ?: 0)
+    }
+
+    private fun serveWeb(path: String): WebResourceResponse? {
+        if (!useDownloaded()) { if (path == "/index.html") servedDownloaded = false; return null }
+        if (path == "/index.html") servedDownloaded = true
+        val f = File(File(filesDir, "web"), path.trimStart('/'))
+        val mime = if (path.endsWith(".json")) "application/json" else "text/html"
+        return WebResourceResponse(mime, "utf-8", 200, "OK", mapOf("Cache-Control" to "no-store"), FileInputStream(f))
+    }
+
+    private fun httpGet(u: String): String? = runCatching {
+        val c = URL(u).openConnection() as HttpURLConnection
+        c.connectTimeout = 8000; c.readTimeout = 20000; c.useCaches = false
+        c.setRequestProperty("Cache-Control", "no-cache")
+        try { if (c.responseCode == 200) c.inputStream.bufferedReader().readText() else null } finally { c.disconnect() }
+    }.getOrNull()
+
+    private fun checkWebUpdate() = thread(name = "web-update") {
+        val t = System.currentTimeMillis()
+        val remote = httpGet("$WEB_URL/version.json?t=$t")?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return@thread
+        if (remote.optLong("minNative", 0) > myCode()) return@thread
+        val current = maxOf(bundledMeta()?.optLong("time", 0) ?: 0, if (useDownloaded()) downloadedMeta()?.optLong("time", 0) ?: 0 else 0)
+        if (remote.optLong("time", 0) <= current) return@thread
+        val html = httpGet("$WEB_URL/index.html?t=$t") ?: return@thread
+        if (html.length < 100_000 || !html.contains("CABIN") || !html.contains("CabinNative")) return@thread
+        val dir = File(filesDir, "web").apply { mkdirs() }
+        File(dir, "index.html.tmp").writeText(html)
+        File(dir, "version.json.tmp").writeText(remote.toString())
+        File(dir, "index.html.tmp").renameTo(File(dir, "index.html"))
+        File(dir, "version.json.tmp").renameTo(File(dir, "version.json"))
+        webUpdateReady = true
+        runOnUiThread { if (jsReady) web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null) }
+    }
+
     // ---------------------------------------------------------------- updates
 
     private val saves = HashMap<String, Triple<File, FileOutputStream, String>>()
@@ -580,6 +649,7 @@ class MainActivity : Activity() {
     }
 
     companion object {
+        private const val WEB_URL = "https://netchamo.github.io/Cabin---Q"
         private const val UPDATE_URL = "https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk"
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val HOST = "appassets.androidplatform.net"

@@ -23,6 +23,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Stamp the interface version
+        run: |
+          echo "{\"sha\":\"$GITHUB_SHA\",\"time\":$(git log -1 --format=%ct),\"minNative\":$(cat web/min-native.txt)}" > web/version.json
+          cat web/version.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

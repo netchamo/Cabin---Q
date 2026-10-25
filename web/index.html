@@ -2663,10 +2663,15 @@ async function renderSession(){
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
 renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
+fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{ const t=$('verTag'); t.textContent=(t.textContent?t.textContent+' · ':'')+'UI '+String(v.sha||'').slice(0,7); }).catch(()=>{});
 window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
+  // a newer interface was downloaded in the background: use it right away if nothing is playing yet, otherwise offer a refresh
+  window.cabinWebUpdate=()=>{ if(!S.playing&&performance.now()<20000&&!RENDER.active&&!(SES&&SES.busy)){ saveState(); location.reload(); return; }
+    $('updTxt').textContent='עדכון ממשק מוכן · בלי התקנה'; $('updLink').textContent='רענון'; $('updLink').hidden=false; $('updBar').hidden=false;
+    $('updLink').onclick=e=>{ e.preventDefault(); saveState(); location.reload(); }; };
   try{ const mine=+NATIVE.getVersion(); $('verTag').textContent='BUILD '+mine;
     fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest').then(r=>r.json()).then(r=>{
       const m=/Build #(\d+)/.exec(r.body||''); const latest=m?+m[1]:0;
