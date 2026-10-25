@@ -39,6 +39,7 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import kotlin.concurrent.thread
 import android.content.ContentValues
+import android.content.ContentUris
 import android.provider.MediaStore
 import android.util.Base64
 import java.io.File
@@ -333,6 +334,52 @@ class MainActivity : Activity() {
         }
     }
 
+    // ---------------------------------------------------------------- music on this phone (MediaStore)
+
+    @Volatile private var pendingDevice: String? = null
+    private fun audioPerm() = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
+    private fun hasAudioPerm() = checkSelfPermission(audioPerm()) == PackageManager.PERMISSION_GRANTED
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != REQ_AUDIO) return
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) scanDeviceAudio()
+        else deliverDevice(JSONObject().put("denied", true).toString())
+    }
+
+    private fun deliverDevice(json: String) = runOnUiThread {
+        if (jsReady) web.evaluateJavascript("window.cabinDeviceAudio&&window.cabinDeviceAudio($json)", null) else pendingDevice = json
+    }
+
+    private fun scanDeviceAudio() = thread(name = "device-audio") {
+        val base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val q = Build.VERSION.SDK_INT >= 29
+        val cols = arrayOf(
+            MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.SIZE,
+            if (q) MediaStore.Audio.Media.RELATIVE_PATH else @Suppress("DEPRECATION") MediaStore.Audio.Media.DATA
+        )
+        val sel = "${MediaStore.Audio.Media.IS_NOTIFICATION}=0 AND ${MediaStore.Audio.Media.IS_RINGTONE}=0 AND ${MediaStore.Audio.Media.IS_ALARM}=0"
+        val items = JSONArray()
+        runCatching {
+            contentResolver.query(base, cols, sel, null, "${cols[6]} ASC, ${MediaStore.Audio.Media.DISPLAY_NAME} ASC")?.use { c ->
+                while (c.moveToNext() && items.length() < 8000) {
+                    val id = c.getLong(0)
+                    val file = c.getString(1) ?: continue
+                    val title = c.getString(2)?.takeIf { it.isNotBlank() } ?: file.substringBeforeLast('.')
+                    val artist = c.getString(3)?.takeIf { it != "<unknown>" } ?: ""
+                    val raw = c.getString(6) ?: ""
+                    val path = (if (q) raw else raw.substringBeforeLast('/', "")).trim('/').ifEmpty { "Music" }
+                    items.put(JSONObject()
+                        .put("name", title).put("artist", artist)
+                        .put("dur", c.getLong(4) / 1000.0).put("size", c.getLong(5))
+                        .put("path", path).put("url", mediaUrl(ContentUris.withAppendedId(base, id))))
+                }
+            }
+        }
+        deliverDevice(JSONObject().put("items", items).toString())
+    }
+
     // ---------------------------------------------------------------- screen
 
     private fun askNotificationPermission() {
@@ -365,6 +412,7 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun ready() = runOnUiThread {
             jsReady = true
+            pendingDevice?.let { web.evaluateJavascript("window.cabinDeviceAudio&&window.cabinDeviceAudio($it)", null); pendingDevice = null }
             if (webUpdateReady) web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null)
             pending.forEach { web.evaluateJavascript("window.cabinAddTracks&&window.cabinAddTracks($it)", null) }
             pending.clear()
@@ -466,6 +514,17 @@ class MainActivity : Activity() {
             if (Build.VERSION.SDK_INT >= 28) packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
             else 0
         }.getOrDefault(0)
+
+        /** "ok" when the app may list the phone's music, "ask" when it still needs permission. */
+        @JavascriptInterface
+        fun deviceAudioState(): String = if (hasAudioPerm()) "ok" else "ask"
+
+        /** Lists all music on the phone (asks for permission the first time). The result arrives in window.cabinDeviceAudio. */
+        @JavascriptInterface
+        fun deviceAudio(): String {
+            if (!hasAudioPerm()) { runOnUiThread { requestPermissions(arrayOf(audioPerm()), REQ_AUDIO) }; return "perm" }
+            scanDeviceAudio(); return "ok"
+        }
 
         @JavascriptInterface
         fun pickRefs() = runOnUiThread {
@@ -658,6 +717,7 @@ class MainActivity : Activity() {
         private const val REQ_NOTIF = 42
         private const val REQ_PICK = 43
         private const val REQ_TREE = 44
+        private const val REQ_AUDIO = 45
         private const val MAX_TRACKS = 3000
         private val AUDIO_EXT = Regex(".*\\.(mp3|m4a|aac|wav|flac|ogg|opus|aiff?|alac|wma)$", RegexOption.IGNORE_CASE)
     }

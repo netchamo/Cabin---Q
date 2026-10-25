@@ -320,7 +320,7 @@ body.noscroll{overflow:hidden}
 .queue .fold .fi svg{width:21px; height:21px; fill:none; stroke:#fff; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
 .queue .fold .ft{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
 .queue .fold .ft b{font-weight:500; font-size:15px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.queue .fold .ft em{font-style:normal; font-size:12px; color:var(--ink-3)}
+.queue .fold .ft em{font-style:normal; font-size:12px; color:var(--ink-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:ltr; text-align:right}
 .queue .fold.now .ft em{color:var(--led)}
 .queue .row{display:flex; align-items:center; gap:4px}
 .queue .row>button:first-child{flex:1; min-width:0}
@@ -329,6 +329,16 @@ body.noscroll{overflow:hidden}
 .queue .act.del{color:#ff7a5a}
 .queue .act.clr{width:auto; padding:0 10px; font-family:var(--f-he); font-size:12.5px; color:#ff7a5a; border:1px solid rgba(255,106,74,.45)}
 .queue .act.clr.armed{background:#ff5a3c; color:#1a0905}
+.br-quick{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.br-quick.one{grid-template-columns:1fr}
+.br-q{display:flex; align-items:center; gap:10px; min-height:58px; padding:10px 12px; border-radius:12px; border:0; text-align:start;
+  background:linear-gradient(180deg,#ffb27a,#ff8a3d); color:#1d1006; font-family:var(--f-he); font-size:15px; font-weight:500; box-shadow:0 6px 16px rgba(255,138,61,.25)}
+.br-q.alt{background:rgba(255,255,255,.08); color:var(--ink); box-shadow:none}
+.br-q svg{width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.br-q small{display:block; font-size:11.5px; font-weight:400; opacity:.75}
+.br-dev{display:flex; align-items:center; gap:12px; margin:4px; padding:12px; border-radius:12px; border:1px dashed rgba(127,224,168,.45); background:rgba(127,224,168,.06); color:var(--ink); font-family:var(--f-he); font-size:14px; text-align:start; width:calc(100% - 8px)}
+.br-dev svg{width:26px; height:26px; flex:none; fill:none; stroke:#7fe0a8; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.br-dev small{display:block; font-size:12px; color:var(--ink-3)}
 .queue .sec{padding:10px 10px 4px; font-family:var(--f-he); font-size:12px; color:var(--ink-3)}
 .queue .gen-ic{width:46px; height:28px; flex:none; border-radius:7px; display:grid; place-items:center; background:rgba(127,224,168,.12); color:#7fe0a8; font-family:var(--f-mono); font-size:10px}
 .queue-h .pill{margin-inline-start:auto; font-family:var(--f-he); letter-spacing:0; font-size:12.5px; text-transform:none}
@@ -653,6 +663,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="br-ib" id="brAdd" title="הוספה"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
         <button class="br-ib" id="brEdit" title="עריכה"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></button></div>
       <div class="br-menu" id="brMenu" dir="rtl" hidden></div>
+      <div class="br-quick" id="brQuick" dir="rtl" hidden></div>
       <input class="br-search" id="brSearch" type="search" dir="rtl" placeholder="חיפוש בכל הספרייה" hidden>
       <ul class="queue" id="queue" dir="rtl"></ul>
     </div>
@@ -2151,7 +2162,7 @@ function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
 function select(i,autoplay){
   if(RENDER.active) cancelRender();
   const was=S.playing||autoplay; pause(); cur=i;
-  if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=t.folder||'שיר מהטלפון'; $('scrub').classList.remove('dis'); $('miniSeek').classList.remove('dis'); paintArt(t.name);
+  if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=(t.artist&&t.artist!==t.folder?t.artist+' · ':'')+(t.folder||'שיר מהטלפון'); $('scrub').classList.remove('dis'); $('miniSeek').classList.remove('dis'); paintArt(t.name);
     if(t.native&&!t.blob){ $('npTitle').textContent='טוען… '+t.name;
       fetch(t.url).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(b=>{ tracks.forEach(x=>{ if(x.blob&&x!==t){ URL.revokeObjectURL(x.blob); x.blob=null; } });
         t.blob=URL.createObjectURL(b); if(tracks[cur]===t){ aud.src=t.blob; $('npTitle').textContent=t.name; if(was) play(); } })
@@ -2304,19 +2315,35 @@ const PL_IC='<svg viewBox="0 0 24 24"><path d="M4 6h11M4 11h11M4 16h7"/><circle 
 const TEST_IC='<svg viewBox="0 0 24 24"><path d="M3 12h3l2-6 4 13 3-9 2 4h4"/></svg>';
 const SES_IC='<svg viewBox="0 0 24 24"><path d="M3 7h6l1.5-3h4L16 7h5v12H3z"/></svg>';
 function folders(){ const out=[]; const seen=new Map();
-  tracks.forEach(t=>{ const u=t.folderUri||''; if(u===''||u==='__ref') return; if(!seen.has(u)){ seen.set(u,{id:u,name:t.folder||'תיקייה',n:0}); } seen.get(u).n++; });
+  tracks.forEach(t=>{ const u=t.folderUri||''; if(u===''||u==='__ref'||u.startsWith('dev:')) return; if(!seen.has(u)){ seen.set(u,{id:u,name:t.folder||'תיקייה',n:0}); } seen.get(u).n++; });
   if(SES.on) out.push({id:'__ses',name:'כרטיסיות הסשן',n:SES.tabs.length,ic:SES_IC,fc:'#7a5a2c'});
   out.push({id:'pl',name:'רשימת השמעה',n:PLX.keys.filter(k=>tracks.some(t=>tKey(t)===k)).length,ic:PL_IC,fc:'#c0602c'});
   [...seen.values()].sort((a,b)=>a.name.localeCompare(b.name)).forEach(f=>out.push(Object.assign(f,{ic:FOLD_IC,fc:'#3d5a78'})));
   out.push({id:'__test',name:'בדיקות שמע',n:GENS.length+tracks.filter(t=>t.folderUri==='__ref').length,ic:TEST_IC,fc:'#2f6b55'});
   return out; }
-function folderName(id){ const f=folders().find(x=>x.id===id); return f?f.name:'ספרייה'; }
+const DEV={state:NATIVE&&NATIVE.deviceAudioState?'ask':'none'};
+let DEVHIDE=[]; try{ DEVHIDE=JSON.parse(localStorage.getItem('cabinq.devhide')||'[]'); }catch(_){}
+function devFolders(all){ const m=new Map(); tracks.forEach(t=>{ const u=t.folderUri||''; if(!u.startsWith('dev:')) return; if(!all&&DEVHIDE.includes(u)) return;
+    if(!m.has(u)) m.set(u,{id:u,name:t.folder,n:0,ic:FOLD_IC,fc:'#4a4f7a',path:u.slice(4)}); m.get(u).n++; });
+  return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name)); }
+function folderName(id){ const f=folders().concat(devFolders(true)).find(x=>x.id===id); return f?f.name:'ספרייה'; }
+/* the phone's own music, grouped by folder (Android build 13+) */
+window.cabinDeviceAudio=function(d){
+  if(d.denied){ DEV.state='denied'; toast('בלי הרשאה אי אפשר להציג את המוזיקה שבטלפון'); renderBrowser(); return; }
+  const c=tracks[cur]; tracks=tracks.filter(t=>!(t.folderUri||'').startsWith('dev:')||t===c);
+  const have=new Set(tracks.map(tKey));
+  (d.items||[]).forEach(it=>{ if(have.has(it.url)) return; const seg=String(it.path||'Music').split('/').filter(Boolean);
+    tracks.push({name:it.name,artist:it.artist||'',dur:it.dur||0,url:it.url,size:it.size||0,native:true,folder:seg[seg.length-1]||'Music',folderUri:'dev:'+(it.path||'Music')}); });
+  cur=c?tracks.indexOf(c):cur; DEV.state='ok'; renderBrowser();
+};
+function scanDevice(ask){ if(!NATIVE||!NATIVE.deviceAudio) return; if(!ask&&NATIVE.deviceAudioState()!=='ok') return; DEV.state='loading'; renderBrowser(); try{ NATIVE.deviceAudio(); }catch(_){ DEV.state='ask'; } }
 function playFrom(src,i){ if(SES.on&&src!=='__ses'){ const first=!SES.tabs.length; addTab(i,first); toast('נוסף לסשן · '+SES.tabs.length+' שירים'); renderBrowser(); return; }
   PLAY.src=src; select(i,true); }
 function songRow(ul,i,src,n,trail){ const t=tracks[i], li=document.createElement('li'); li.className='row';
   const b=document.createElement('button'); b.className=i===cur?'cur':'';
   b.innerHTML=(i===cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${n}</span>`)+'<span dir="auto"></span><small dir="ltr"></small>';
-  b.children[1].textContent=t.name; b.children[2].textContent=SES.on&&SES.tabs.some(x=>x.key===tKey(t))?'✓ בסשן':(t.size?(t.size/1048576).toFixed(1)+' MB':'');
+  b.children[1].textContent=t.artist? t.name+' · '+t.artist : t.name;
+  b.children[2].textContent=SES.on&&SES.tabs.some(x=>x.key===tKey(t))?'✓ בסשן':(t.dur?fmtT(t.dur):t.size?(t.size/1048576).toFixed(1)+' MB':'');
   b.onclick=()=>playFrom(src,i); li.appendChild(b); (trail||[]).forEach(x=>li.appendChild(x)); ul.appendChild(li); return b; }
 function actBtn(txt,cls,title,fn){ const a=document.createElement('button'); a.className='act '+cls; a.textContent=txt; a.title=title; a.onclick=e=>{ e.stopPropagation(); fn(a); }; return a; }
 function armed(a,label,fn){ if(a.classList.contains('armed')){ fn(); return; } a.classList.add('armed'); const o=a.textContent; a.textContent=label; setTimeout(()=>{ a.classList.remove('armed'); a.textContent=o; },2600); }
@@ -2325,22 +2352,34 @@ function renderBrowser(scrollToCur){
   const at=BR.at, q=BR.q.trim().toLowerCase();
   $('brBack').hidden=at===null&&!q; $('qTitle').textContent= q? 'חיפוש' : at===null? 'ספרייה' : folderName(at);
   $('brEdit').classList.toggle('on',BR.edit); $('brEdit').hidden= at!==null&&at!=='pl'&&at!=='__test';
-  $('brAdd').hidden= at!==null&&at!=='pl'&&at!=='__test';
-  $('brSearch').hidden= at!==null; if($('brSearch').value!==BR.q) $('brSearch').value=BR.q;
+  $('brAdd').hidden= at!=='pl'&&at!=='__test';
+  $('brSearch').hidden= at!==null; $('brQuick').hidden= at!==null||!!q; if($('brSearch').value!==BR.q) $('brSearch').value=BR.q;
   const sec=t=>{ const li=document.createElement('li'); li.className='sec'; li.dir='rtl'; li.textContent=t; ul.appendChild(li); };
   if(q){ let n=0; tracks.forEach((t,i)=>{ if(!t.name.toLowerCase().includes(q)) return; const b=songRow(ul,i,(t.folderUri||'')===''?'pl':t.folderUri,++n); if(i===cur) curBtn=b; });
     if(!n){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצא שיר בשם הזה'; ul.appendChild(e); } }
   else if(at===null){
-    folders().forEach(f=>{ const li=document.createElement('li'); li.className='row'; const b=document.createElement('button');
-      const now=f.id===PLAY.src&&(cur>=0||f.id==='__test')&&S.playing || (f.id==='__test'&&cur<0&&S.playing) || (f.id==='__ses'&&SES.on&&S.playing);
-      b.className='fold'+(now?' now':''); b.style.setProperty('--fc',f.fc);
+    const qk=$('brQuick'); qk.className='br-quick'+(IOS?' one':'');
+    qk.innerHTML='<button class="br-q" id="qSongs"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>בחירת שירים<small>'+(NATIVE?'מהטלפון, Drive או כל אפליקציה':IOS?'מאפליקציית הקבצים או iCloud':'מהמחשב')+'</small></span></button>'+
+      (IOS?'':'<button class="br-q alt" id="qFolder"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg><span>הוספת תיקייה<small>כל השירים שבה</small></span></button>');
+    qk.querySelector('#qSongs').onclick=pickSongs; const qf=qk.querySelector('#qFolder'); if(qf) qf.onclick=pickFolder;
+    const foldRow=f=>{ const li=document.createElement('li'); li.className='row'; const b=document.createElement('button');
+      const playing=S.playing&&(f.id==='__ses'?SES.on:f.id==='__test'?cur<0:(cur>=0&&PLAY.src===f.id));
+      b.className='fold'+(playing?' now':''); b.style.setProperty('--fc',f.fc);
       b.innerHTML='<span class="fi">'+f.ic+'</span><span class="ft"><b></b><em></em></span>';
-      b.querySelector('b').textContent=f.name; b.querySelector('em').textContent=(now?'מתנגן עכשיו · ':'')+f.n+(f.id==='__test'?' צלילים':' שירים');
+      b.querySelector('b').textContent=f.name; b.querySelector('em').textContent=(playing?'מתנגן עכשיו · ':'')+(f.path?f.path+' · ':'')+f.n+(f.id==='__test'?' צלילים':' שירים');
       b.onclick=()=>{ BR.at=f.id; BR.menu=false; renderBrowser(true); }; li.appendChild(b);
       if(BR.edit){ if(f.id==='pl'&&f.n) li.appendChild(actBtn('ניקוי','clr','ניקוי רשימת ההשמעה',a=>armed(a,'בטוח?',()=>{ plClear(); renderBrowser(); toast('רשימת ההשמעה נוקתה'); })));
+        else if(f.id.startsWith('dev:')) li.appendChild(actBtn('הסתר','clr','הסתרת התיקייה מהרשימה',()=>{ DEVHIDE.push(f.id); try{ localStorage.setItem('cabinq.devhide',JSON.stringify(DEVHIDE)); }catch(_){} renderBrowser(); }));
         else if(f.id!=='pl'&&f.id!=='__test'&&f.id!=='__ses') li.appendChild(actBtn('×','del','הסרת התיקייה',a=>armed(a,'?',()=>{ folderRemove(f.id); renderBrowser(); toast('התיקייה הוסרה מהספרייה'); }))); }
-      ul.appendChild(li); });
-    if(!tracks.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לחץ על + כדי להוסיף שירים או תיקייה.'; ul.appendChild(e); }
+      ul.appendChild(li); };
+    sec('הספרייה שלי'); folders().forEach(foldRow);
+    if(DEV.state!=='none'){ sec('מוזיקה בטלפון');
+      if(DEV.state==='ok'){ const df=devFolders(); df.forEach(foldRow);
+        if(!df.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצאו קובצי שמע בטלפון'; ul.appendChild(e); }
+        if(BR.edit&&DEVHIDE.length){ const li=document.createElement('li'); li.className='row'; li.appendChild(actBtn('הצג תיקיות מוסתרות ('+DEVHIDE.length+')','clr','',()=>{ DEVHIDE=[]; try{ localStorage.setItem('cabinq.devhide','[]'); }catch(_){} renderBrowser(); })); ul.appendChild(li); } }
+      else { const li=document.createElement('li'); const b=document.createElement('button'); b.className='br-dev'; b.dir='rtl';
+        b.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/><circle cx="12" cy="10" r="3"/></svg><span>'+(DEV.state==='loading'?'סורק את הטלפון…':'הצג את כל המוזיקה שבטלפון')+'<small>'+(DEV.state==='denied'?'צריך לאשר גישה לקובצי שמע':'מסודר לפי תיקיות, כמו בדפדפן קבצים')+'</small></span>';
+        b.onclick=()=>scanDevice(true); li.appendChild(b); ul.appendChild(li); } }
   }
   else if(at==='__ses'){ SES.tabs.forEach((t,k)=>{ const li=document.createElement('li'); const b=document.createElement('button'); b.className=k===SES.cur?'cur':'';
       b.innerHTML=(k===SES.cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${k+1}</span>`)+'<span dir="auto"></span><small dir="ltr"></small>';
@@ -2663,6 +2702,7 @@ async function renderSession(){
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
 renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
+if(NATIVE&&NATIVE.deviceAudio) setTimeout(()=>scanDevice(false),600);
 fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{ const t=$('verTag'); t.textContent=(t.textContent?t.textContent+' · ':'')+'UI '+String(v.sha||'').slice(0,7); }).catch(()=>{});
 window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
