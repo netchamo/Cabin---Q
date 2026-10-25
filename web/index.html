@@ -204,6 +204,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx-ic svg{width:19px; height:19px; fill:none; stroke:var(--fxc); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .fx.off .fx-ic svg{stroke:var(--ink-3)}
 .fx-h b{font-size:12px; letter-spacing:.16em; color:var(--silk); font-weight:700; white-space:nowrap}
+.fx.tame-on .fx-sub{color:#7fe0a8}
 .fx-sub{flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .fx-h .pill{height:30px; padding:0 11px; flex:none}
 .fx-chev{width:30px; height:30px; flex:none; border:0; background:transparent; display:grid; place-items:center}
@@ -555,7 +556,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
   <div class="screen">
     <div class="rail" id="rail">
       <button class="chip" id="rangeBtn" title="טווח התצוגה">±12 dB</button>
-      <button class="chip ic" id="undoBtn" title="ביטול פעולה" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="chip ic" id="undoBtn" title="ביטול שינוי ב-EQ" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="chip ic redo" id="redoBtn" title="ביצוע מחדש" disabled><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
       <span class="sp"></span>
       <button class="chip" id="fitBtn" hidden>FIT</button>
@@ -856,7 +857,7 @@ function updateRouting(){
   out.gain.setTargetAtTime(10**(S.trim/20),t,.02);
   // move dyn offsets to the right place
   S.bands.forEach(b=>{ const a=A.get(b.id); if(!a) return; a.main.forEach((n,i)=>cfg(n,b,i,b.gain+(mp?a.d:0),true)); if(a.lpd) setP(a.lpd.gain, mp?0:a.d, true); });
-  $('latV').textContent=(latencyS()*1000).toFixed(1)+' ms';
+  $('latV').textContent=(latencyS()*1000+(tameLatMs||0)).toFixed(1)+' ms';
 }
 
 /* ---------- linear phase FIR ---------- */
@@ -1681,6 +1682,7 @@ const FX={
   tame:{on:false,mud:30,harsh:30,ess:25,att:15,rel:120,focus:'st',delta:false},
   open:{sat:false,wid:false,rev:false,tame:false}
 };
+var tameLatMs=0;  // declared with var: read by updateRouting, which can run before this line
 let tameNode=null, tameSp=null, tameRd=null, satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
 const fxBlocks={};
 function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.connect(o); wet.connect(o); wet.gain.value=0;
@@ -1771,8 +1773,9 @@ const segUI=[
 const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A800</b> שמן וחם יותר עם בס מודגש, <b>ATR-102</b> נקי ומדויק יותר. ב-<b>15 IPS</b> הבס מתנפח והגבוהים מתרככים, ב-<b>30 IPS</b> הצליל הדוק ופתוח. <b>Drive</b> מוסיף רוויה, <b>Wow</b> מוסיף את התנודה העדינה של הסליל.',
   ssl:'<b>SATURATOR</b>: רוויה הרמונית. <b>Character</b> שמאלה מוסיף הרמוניות זוגיות, חמות ועגולות, וימינה הרמוניות אי-זוגיות, חדות ונוכחות. <b>Tone</b> מטה את הצבע לכהה או בהיר, ו-<b>Mix</b> מאפשר רוויה מקבילית.'};
 function fxUI(){
-  { const T=FX.tame; $('tameSub').textContent='MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess+(T.focus!=='st'?' · '+T.focus.toUpperCase():'')+(T.delta?' · DELTA':'');
+  { const T=FX.tame; $('tameSub').textContent=T.on?'פועל · השהיה '+Math.round(2048/SR*1000)+' ms':'כבוי · MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess;
     $('tameDelta').classList.toggle('on',T.delta); $('tameDelta').setAttribute('aria-pressed',T.delta); }
+  $('fx_tame').classList.toggle('tame-on',FX.tame.on); tameLatMs=FX.tame.on&&tameNode?2048/SR*1000:0; $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
   for(const k of ['tame','sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
   const sv=FX.sat; $('satMach').hidden=$('satSpeed').hidden=sv.mode!=='tape';
   $('satSub').textContent= sv.mode==='tape'? 'TAPE · '+(sv.machine==='a800'?'A800':'ATR-102')+' · '+sv.speed+' IPS · DRIVE '+sgn(sv.drive) : 'SATURATOR · DRIVE +'+sv.drive.toFixed(1)+' · MIX '+sv.mix+'%';
@@ -1828,6 +1831,8 @@ let reelA=0, reelT=performance.now(), satShown=-60;
 const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
 function drawFx(now){
   const dt=Math.min(.1,(now-reelT)/1000); reelT=now;
+  { const T=FX.tame; if(T.on){ let mx=0; if(S.playing&&tameRd) for(const v of tameRd) if(v>mx) mx=v;
+      $('tameSub').textContent='פועל · '+(S.playing?'−'+mx.toFixed(1)+' dB':'מוכן')+' · השהיה '+Math.round(2048/SR*1000)+' ms'; } }
   if(FX.open.tame) drawTame();
   if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
     if(isTape()){ // tape deck with two spinning reels and a level needle
@@ -2872,15 +2877,17 @@ if(NATIVE&&NATIVE.deviceAudio) setTimeout(()=>scanDevice(false),600);
 fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{ const t=$('verTag'); t.textContent=(t.textContent?t.textContent+' · ':'')+'UI '+String(v.sha||'').slice(0,7); }).catch(()=>{});
 /* ---------- undo / redo of every sound setting ---------- */
 const HIST={undo:[],redo:[],cur:null,pending:null,quiet:0};
-const histSig=()=>{ const st=getState(); if(st.FX) delete st.FX.open; return JSON.stringify(st); };
+const histSig=()=>JSON.stringify(getState().bands);   // only the EQ curve: bands moved by accident while scrolling
 function histUI(){ $('undoBtn').disabled=!HIST.undo.length; $('redoBtn').disabled=!HIST.redo.length; }
 function histReset(){ HIST.undo=[]; HIST.redo=[]; HIST.cur=histSig(); HIST.pending=null; histUI(); }
 setInterval(()=>{ if(HIST.quiet>Date.now()) return; const sig=histSig(); if(HIST.cur===null){ HIST.cur=sig; return; }
   if(sig===HIST.cur){ HIST.pending=null; return; }
   if(HIST.pending!==sig){ HIST.pending=sig; return; }          // wait until the value stops moving
   HIST.undo.push(HIST.cur); if(HIST.undo.length>60) HIST.undo.shift(); HIST.redo=[]; HIST.cur=sig; HIST.pending=null; histUI(); },350);
-function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); const st=JSON.parse(from.pop()); const open=JSON.parse(JSON.stringify(FX.open));
-  if(st.FX) st.FX.open=open; HIST.quiet=Date.now()+500; applyState(st); HIST.cur=histSig(); HIST.pending=null; histUI(); }
+function applyBands(list){ const selSlot=(sel()||{}).slot; A.forEach(destroy); A.clear();
+  S.bands=list.map(o=>{ const b=mk(o.type,o.freq,o.gain,o.q,{slope:o.slope||24,on:o.on!==false,dyn:o.dyn}); b.slot=o.slot|0; return b; });
+  S.bands.forEach(build); const k=S.bands.find(b=>b.slot===selSlot)||S.bands[0]; S.sel=k?k.id:null; $('preset').value=''; structural(); }
+function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); HIST.quiet=Date.now()+500; applyBands(JSON.parse(from.pop())); HIST.cur=histSig(); HIST.pending=null; histUI(); }
 $('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
 $('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
 window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
