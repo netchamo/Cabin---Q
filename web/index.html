@@ -2729,9 +2729,13 @@ if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
   // a newer interface was downloaded in the background: use it right away if nothing is playing yet, otherwise offer a refresh
-  window.cabinWebUpdate=()=>{ if(!S.playing&&performance.now()<20000&&!RENDER.active&&!(SES&&SES.busy)){ saveState(); location.reload(); return; }
+  // Refresh at most once per update: right after a refresh the page already is the new version, so later calls are ignored.
+  window.cabinWebUpdate=()=>{ let last=0; try{ last=+sessionStorage.getItem('cq-upd')||0; }catch(_){}
+    if(Date.now()-last<10*60000) return;
+    const go=()=>{ try{ sessionStorage.setItem('cq-upd',String(Date.now())); }catch(_){} saveState(); location.reload(); };
+    if(!S.playing&&performance.now()<20000&&!RENDER.active&&!(SES&&SES.busy)){ go(); return; }
     $('updTxt').textContent='עדכון ממשק מוכן · בלי התקנה'; $('updLink').textContent='רענון'; $('updLink').hidden=false; $('updBar').hidden=false;
-    $('updLink').onclick=e=>{ e.preventDefault(); saveState(); location.reload(); }; };
+    $('updLink').onclick=e=>{ e.preventDefault(); go(); }; };
   // Android build check: at launch, whenever the app comes back to the front, and every 30 minutes
   let lastApkCheck=0;
   const apkCheck=()=>{ if(Date.now()-lastApkCheck<120000) return; lastApkCheck=Date.now();

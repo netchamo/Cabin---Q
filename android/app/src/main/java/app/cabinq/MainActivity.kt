@@ -413,7 +413,8 @@ class MainActivity : Activity() {
         fun ready() = runOnUiThread {
             jsReady = true
             pendingDevice?.let { web.evaluateJavascript("window.cabinDeviceAudio&&window.cabinDeviceAudio($it)", null); pendingDevice = null }
-            if (webUpdateReady) web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null)
+            // tell the page once; after it refreshes, it already is the new version
+            if (webUpdateReady) { webUpdateReady = false; web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null) }
             pending.forEach { web.evaluateJavascript("window.cabinAddTracks&&window.cabinAddTracks($it)", null) }
             pending.clear()
             loadLibrary()
@@ -659,7 +660,7 @@ class MainActivity : Activity() {
         File(dir, "index.html.tmp").renameTo(File(dir, "index.html"))
         File(dir, "version.json.tmp").renameTo(File(dir, "version.json"))
         webUpdateReady = true
-        runOnUiThread { if (jsReady) web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null) }
+        runOnUiThread { if (jsReady) { webUpdateReady = false; web.evaluateJavascript("window.cabinWebUpdate&&window.cabinWebUpdate()", null) } }
     }
 
     // ---------------------------------------------------------------- updates
