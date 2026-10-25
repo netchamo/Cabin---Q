@@ -5,3 +5,4 @@ android/.idea/
 *.iml
 .DS_Store
 web/version.json
+web/apk.json

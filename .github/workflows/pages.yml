@@ -27,6 +27,13 @@ jobs:
         run: |
           echo "{\"sha\":\"$GITHUB_SHA\",\"time\":$(git log -1 --format=%ct),\"minNative\":$(cat web/min-native.txt)}" > web/version.json
           cat web/version.json
+      - name: Publish the latest Android build number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh api repos/${{ github.repository }}/releases/tags/latest --jq '.body' | grep -o 'Build #[0-9]*' | grep -o '[0-9]*' || echo 0)
+          echo "{\"build\":${n:-0}}" > web/apk.json
+          cat web/apk.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: android-${{ github.ref }}
@@ -53,3 +54,8 @@ jobs:
             --title "Cabin Q · latest build" \
             --notes "Build #${{ github.run_number }} from ${GITHUB_SHA::7}. Download cabin-q.apk on your phone and install it." \
             --prerelease
+
+      - name: Tell the installed apps (via the web site) that a new build exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main -R ${{ github.repository }}

@@ -2676,7 +2676,9 @@ if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st
   let lastApkCheck=0;
   const apkCheck=()=>{ if(Date.now()-lastApkCheck<120000) return; lastApkCheck=Date.now();
     try{ const mine=+NATIVE.getVersion();
-      fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest',{cache:'no-store'}).then(r=>r.json()).then(r=>{
+      // the web site carries the latest build number; the GitHub API is only a fallback (it limits how often a phone may ask)
+      fetch('https://netchamo.github.io/Cabin---Q/apk.json?t='+Date.now(),{cache:'no-store'}).then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(j=>({body:'Build #'+(j.build||0)}))
+        .catch(()=>fetch('https://api.github.com/repos/netchamo/Cabin---Q/releases/tags/latest',{cache:'no-store'}).then(r=>r.json())).then(r=>{
         const m=/Build #(\d+)/.exec(r.body||''); const latest=m?+m[1]:0;
         if(latest>mine&&$('updLink').textContent!=='רענון'){ $('updTxt').textContent='גרסה חדשה זמינה (#'+latest+')'; $('updBar').hidden=false; } }).catch(()=>{}); }catch(_){} };
   try{ $('verTag').textContent='BUILD '+(+NATIVE.getVersion()); }catch(_){}
