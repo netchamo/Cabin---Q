@@ -206,12 +206,14 @@ class MainActivity : Activity() {
         getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(key, a.toString()).apply()
 
     /** Remember picked songs whose permission can be kept, so they are still there next time. */
-    private fun rememberPicked(items: List<JSONObject>) {
-        val saved = prefsArray("picked")
+    private var pickKind = "picked"
+
+    private fun rememberPicked(items: List<JSONObject>, key: String = "picked") {
+        val saved = prefsArray(key)
         val have = HashSet<String>()
         for (i in 0 until saved.length()) have.add(saved.getJSONObject(i).optString("uri"))
         items.forEach { if (it.optString("uri") !in have) saved.put(it) }
-        savePrefsArray("picked", saved)
+        savePrefsArray(key, saved)
     }
 
     private fun loadLibrary() = thread(name = "library") {
@@ -226,6 +228,17 @@ class MainActivity : Activity() {
             }
             savePrefsArray("picked", ok)
             if (ok.length() > 0) push(JSONObject().put("tracks", ok).put("quiet", true))
+        }
+        val refs = prefsArray("refs")
+        if (refs.length() > 0) {
+            val ok = JSONArray()
+            for (i in 0 until refs.length()) {
+                val o = refs.getJSONObject(i)
+                val readable = runCatching { contentResolver.openInputStream(Uri.parse(o.optString("uri")))?.close(); true }.getOrDefault(false)
+                if (readable) ok.put(o)
+            }
+            savePrefsArray("refs", ok)
+            if (ok.length() > 0) push(JSONObject().put("tracks", ok).put("folder", "בדיקות שמע").put("folderUri", "__ref").put("quiet", true))
         }
         val folders = prefsArray("folders")
         for (i in 0 until folders.length()) {
@@ -284,8 +297,12 @@ class MainActivity : Activity() {
                     if (persisted) keep.add(o)
                     o
                 }
-                if (keep.isNotEmpty()) rememberPicked(keep)
-                push(JSONObject().put("tracks", JSONArray(items)))
+                val ref = pickKind == "refs"
+                pickKind = "picked"
+                if (keep.isNotEmpty()) rememberPicked(keep, if (ref) "refs" else "picked")
+                val msg = JSONObject().put("tracks", JSONArray(items))
+                if (ref) msg.put("folder", "בדיקות שמע").put("folderUri", "__ref")
+                push(msg)
             }
             REQ_TREE -> {
                 val tree = data?.data ?: return
@@ -433,7 +450,33 @@ class MainActivity : Activity() {
         }.getOrDefault(0)
 
         @JavascriptInterface
+        fun pickRefs() = runOnUiThread {
+            pickKind = "refs"
+            runCatching {
+                @Suppress("DEPRECATION")
+                startActivityForResult(audioPicker(), REQ_PICK)
+            }
+        }
+
+        /** Forget one picked song or reference file (by the url the page knows it by). */
+        @JavascriptInterface
+        fun forgetPicked(url: String) {
+            for (key in listOf("picked", "refs")) {
+                val arr = prefsArray(key)
+                val left = JSONArray()
+                for (i in 0 until arr.length()) {
+                    val o = arr.getJSONObject(i)
+                    if (o.optString("url") == url) runCatching {
+                        contentResolver.releasePersistableUriPermission(Uri.parse(o.optString("uri")), Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    } else left.put(o)
+                }
+                savePrefsArray(key, left)
+            }
+        }
+
+        @JavascriptInterface
         fun pickFiles() = runOnUiThread {
+            pickKind = "picked"
             runCatching {
                 @Suppress("DEPRECATION")
                 startActivityForResult(audioPicker(), REQ_PICK)

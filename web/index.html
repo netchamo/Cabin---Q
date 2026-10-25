@@ -306,9 +306,31 @@ body.noscroll{overflow:hidden}
 .scrub-tip{position:absolute; top:-22px; transform:translateX(-50%); padding:2px 7px; border-radius:5px; background:#0b0d0f; border:1px solid var(--led); font-family:var(--f-mono); font-size:11px; color:var(--ink); pointer-events:none}
 .times{display:flex; justify-content:space-between; margin-top:-8px; font-family:var(--f-mono); font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums}
 .pl-ctl{display:flex; align-items:center; justify-content:space-between; gap:4px; padding:0 2px}
-.queue-h{display:flex; align-items:center; gap:8px; font-family:var(--f-he); font-size:13px; color:var(--ink-2); padding-top:2px}
-.queue-h .pill+.pill{margin-inline-start:0}
-.queue-h .pill.warn{color:#ff8a6a; border-color:rgba(255,106,74,.6)}
+.queue-h{display:flex; align-items:center; gap:6px; font-family:var(--f-he); font-size:13px; color:var(--ink-2); padding-top:2px; min-height:36px}
+.queue-h #qTitle{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14.5px; color:var(--ink)}
+.br-ib{flex:none; width:36px; height:34px; border-radius:9px; border:0; background:rgba(255,255,255,.06); display:grid; place-items:center; color:var(--ink-2); position:relative}
+.br-ib svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.br-ib.on{color:var(--led); background:rgba(255,154,60,.14)}
+.br-ib small{position:absolute; bottom:1px; left:0; right:0; text-align:center; font-family:var(--f-mono); font-size:8.5px; color:var(--led)}
+.br-menu{display:flex; gap:6px; flex-wrap:wrap}
+.br-menu .pill{font-family:var(--f-he); letter-spacing:0; text-transform:none; font-size:12.5px; height:32px}
+.br-search{height:36px; border-radius:10px; border:0; background:rgba(255,255,255,.07); color:var(--ink); padding:0 12px; font-family:var(--f-he); font-size:14px}
+.queue .fold{display:flex; align-items:center; gap:12px; padding:10px; border-radius:10px}
+.queue .fold .fi{width:40px; height:40px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--fc,#3a3f45)}
+.queue .fold .fi svg{width:21px; height:21px; fill:none; stroke:#fff; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.queue .fold .ft{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+.queue .fold .ft b{font-weight:500; font-size:15px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.queue .fold .ft em{font-style:normal; font-size:12px; color:var(--ink-3)}
+.queue .fold.now .ft em{color:var(--led)}
+.queue .row{display:flex; align-items:center; gap:4px}
+.queue .row>button:first-child{flex:1; min-width:0}
+.queue .act{flex:none; width:34px; height:34px; border-radius:8px; border:0; background:transparent; color:var(--ink-3); font-size:15px; padding:0; display:grid; place-items:center}
+.queue .act.in{color:var(--led)}
+.queue .act.del{color:#ff7a5a}
+.queue .act.clr{width:auto; padding:0 10px; font-family:var(--f-he); font-size:12.5px; color:#ff7a5a; border:1px solid rgba(255,106,74,.45)}
+.queue .act.clr.armed{background:#ff5a3c; color:#1a0905}
+.queue .sec{padding:10px 10px 4px; font-family:var(--f-he); font-size:12px; color:var(--ink-3)}
+.queue .gen-ic{width:46px; height:28px; flex:none; border-radius:7px; display:grid; place-items:center; background:rgba(127,224,168,.12); color:#7fe0a8; font-family:var(--f-mono); font-size:10px}
 .queue-h .pill{margin-inline-start:auto; font-family:var(--f-he); letter-spacing:0; font-size:12.5px; text-transform:none}
 .queue{list-style:none; margin:0; padding:4px; flex:1; min-height:60px; overflow:auto; border-radius:11px; background:var(--well); box-shadow:inset 0 1px 3px rgba(0,0,0,.7); overscroll-behavior:contain}
 .queue button{width:100%; display:flex; align-items:center; gap:10px; border:0; background:transparent; padding:9px 10px; border-radius:8px; text-align:start; color:var(--ink-2); font-family:var(--f-he); font-size:14px}
@@ -610,7 +632,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <div class="mini-seek dis" id="miniSeek" aria-label="מיקום בשיר"><div class="ms-track"><i id="miniProg"></i><b id="miniThumb"></b></div><span class="ms-tip" id="miniTip" hidden></span></div>
     <div class="mini" id="mini" role="button" tabindex="0" aria-label="פתיחת הנגן">
       <div class="art" id="art"><svg viewBox="0 0 24 24"><path d="M3 13c2 0 2.5-5 4.5-5S10 17 12 17s2.5-7 4.5-7 2 3 4.5 3"/></svg></div>
-      <div class="mini-t"><b id="npTitle" dir="auto">רעש ורוד לכיול</b><span id="npSub" dir="auto">Pink noise · ‎−18 dBFS</span></div>
+      <div class="mini-t"><b id="npTitle" dir="auto">רעש ורוד</b><span id="npSub" dir="auto">בדיקות שמע · ‎−18 dBFS</span></div>
       <button class="tb play" id="miniPlay" aria-label="נגן"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg></button>
       <button class="tb" id="miniNext" aria-label="הבא"><svg viewBox="0 0 16 16"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
     </div>
@@ -626,27 +648,19 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="tb ghost" id="fwd10" aria-label="10 שניות קדימה"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/><path d="M8.5 10v5"/><rect x="11" y="10" width="3.5" height="5" rx="1.75"/></svg></button>
         <button class="tb ghost" id="shufBtn" aria-label="ערבוב"><svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
       </div>
-      <div class="queue-h" dir="rtl"><span id="qTitle">הבאים בתור</span><button class="pill" id="libBtn">הוספת שירים</button><button class="pill" id="qClear">ניקוי רשימה</button></div>
+      <div class="queue-h" dir="rtl"><button class="br-ib" id="brBack" title="חזרה לתיקיות" hidden><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><span id="qTitle">ספרייה</span>
+        <button class="br-ib" id="brTimer" title="טיימר שינה"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/></svg><small id="brTimerTxt"></small></button>
+        <button class="br-ib" id="brAdd" title="הוספה"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="br-ib" id="brEdit" title="עריכה"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></button></div>
+      <div class="br-menu" id="brMenu" dir="rtl" hidden></div>
+      <input class="br-search" id="brSearch" type="search" dir="rtl" placeholder="חיפוש בכל הספרייה" hidden>
       <ul class="queue" id="queue" dir="rtl"></ul>
     </div>
   </section>
 
-  <div class="sheet" id="sheet" hidden>
-    <div class="sheet-h">LIBRARY <button class="pill" id="sheetClose">Close</button></div>
-    <div class="src-cards" dir="rtl">
-      <label class="src" id="srcFiles" for="fileIn" role="button" tabindex="0">
-        <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
-        <b>בחירת שירים</b><span>מכל אפליקציית קבצים או Drive</span></label>
-      <label class="src" id="srcFolder" for="dirIn" role="button" tabindex="0">
-        <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        <b>תיקיית מוזיקה</b><span id="srcFolderSub">כל השירים בתיקייה</span></label>
-      <input class="vh" type="file" id="fileIn" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.aiff">
-      <input class="vh" type="file" id="dirIn" multiple webkitdirectory>
-    </div>
-    <input class="lib-search" id="libSearch" type="search" dir="rtl" placeholder="חיפוש שיר" hidden>
-    <ul class="tracks" id="tracks"></ul>
-    <p class="note" dir="rtl" id="libNote">אפשר גם לפתוח שיר מאפליקציית הקבצים עם "פתח באמצעות" או "שתף", ולבחור ב-Cabin Q.</p>
-  </div>
+  <input class="vh" type="file" id="fileIn" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.aiff">
+  <input class="vh" type="file" id="dirIn" multiple webkitdirectory>
+  <input class="vh" type="file" id="refIn" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.aiff">
 
   <div class="toast" id="toast" dir="rtl"></div>
 </div>
@@ -2082,6 +2096,31 @@ cv.addEventListener('wheel',e=>{
 const aud=new Audio(); aud.preload='auto';
 const mes=ctx.createMediaElementSource(aud); mes.connect(input);
 let tracks=[], cur=-1, pinkNode=null, pinkBuf=null;
+/* fixed test-sound folder: generated signals (always there) plus the user's own reference files */
+const GENS=[
+  {id:'pink',name:'רעש ורוד',sub:'−18 dBFS · כיול כללי של המערכת',tag:'PINK'},
+  {id:'white',name:'רעש לבן',sub:'−18 dBFS · בדיקת גבוהים וצרימות',tag:'WHITE'},
+  {id:'sweep',name:'סוויפ \u206620 Hz – 20 kHz\u2069',sub:'20 שניות · מגלה רעשים ותהודות ברכב',tag:'SWP'},
+  {id:'t100',name:'טון \u2066100 Hz\u2069',sub:'−18 dBFS · בדיקת סאב ובס',tag:'100'},
+  {id:'t1k',name:'טון \u20661 kHz\u2069',sub:'−18 dBFS · רמת ייחוס',tag:'1K'},
+  {id:'lr',name:'בדיקת ערוצים',sub:'שמאל, ואז ימין',tag:'L/R'},
+  {id:'phase',name:'בדיקת פאזה',sub:'בפאזה, ואז הפוך: הפוך נשמע חלול ורחב',tag:'Ø'}];
+const GEN={kind:'pink'}, genBufs={};
+function genBuf(kind){ if(genBufs[kind]) return genBufs[kind]; const sr=ctx.sampleRate; let b;
+  const pinkCh=(d,lvl)=>{ let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,s=0; for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; const v=b0+b1+b2+b3+b4+b5+b6+w*.5362; b6=w*.115926; d[i]=v; s+=v*v; }
+    const k=lvl/Math.sqrt(s/d.length); for(let i=0;i<d.length;i++) d[i]*=k; };
+  const R18=10**(-18/20), A18=R18*Math.SQRT2;
+  if(kind==='pink'){ b=makePink(); }
+  else if(kind==='white'){ b=ctx.createBuffer(2,sr*6,sr); for(let c=0;c<2;c++){ const d=b.getChannelData(c), k=R18*Math.sqrt(3); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*k; } }
+  else if(kind==='t100'||kind==='t1k'){ const f=kind==='t100'?100:1000; b=ctx.createBuffer(2,sr*2,sr); for(let c=0;c<2;c++){ const d=b.getChannelData(c); for(let i=0;i<d.length;i++) d[i]=A18*Math.sin(2*Math.PI*f*i/sr); } }
+  else if(kind==='sweep'){ const T=20, N=sr*T, K=Math.log(1000); b=ctx.createBuffer(2,N+sr,sr); const L=b.getChannelData(0), R=b.getChannelData(1);
+    for(let i=0;i<N;i++){ const t=i/sr, ph=2*Math.PI*20*T/K*(Math.exp(t/T*K)-1), env=Math.min(1,t/.05,(T-t)/.05); L[i]=R[i]=A18*env*Math.sin(ph); } }
+  else if(kind==='lr'){ b=ctx.createBuffer(2,sr*4,sr); const tmp=new Float32Array(Math.floor(sr*1.5)); pinkCh(tmp,R18);
+    const L=b.getChannelData(0), R=b.getChannelData(1); for(let i=0;i<tmp.length;i++){ const e=Math.min(1,i/480,(tmp.length-i)/480); L[i]=tmp[i]*e; R[sr*2+i]=tmp[i]*e; } }
+  else if(kind==='phase'){ b=ctx.createBuffer(2,sr*8,sr); const tmp=new Float32Array(Math.floor(sr*3.5)); pinkCh(tmp,R18);
+    const L=b.getChannelData(0), R=b.getChannelData(1); for(let i=0;i<tmp.length;i++){ const e=Math.min(1,i/480,(tmp.length-i)/480), v=tmp[i]*e; L[i]=v; R[i]=v; L[sr*4+i]=v; R[sr*4+i]=-v; } }
+  genBufs[kind]=b; return b; }
+const genOf=k=>GENS.find(g=>g.id===k)||GENS[0];
 function makePink(){
   const len=SR*6, buf=ctx.createBuffer(2,len,SR);
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,s=0;
@@ -2093,7 +2132,7 @@ function unlock(){ try{ if(navigator.audioSession) navigator.audioSession.type='
 function stopPink(){ if(pinkNode){ try{pinkNode.stop();}catch(_){} pinkNode.disconnect(); pinkNode=null; } }
 const ICO_PLAY='<path d="M4 2l10 6-10 6z"/>', ICO_PAUSE='<path d="M3 2h4v12H3zM9 2h4v12H9z"/>';
 function mediaInfo(){ if(!('mediaSession' in navigator)) return; try{
-  const t=tracks[cur]; navigator.mediaSession.metadata=new MediaMetadata({title:t?t.name:'רעש ורוד לכיול',artist:t?(t.folder||'Cabin Q'):'Cabin Q',album:'Cabin Q',
+  const t=tracks[cur]; navigator.mediaSession.metadata=new MediaMetadata({title:t?t.name:genOf(GEN.kind).name,artist:t?(t.folder||'Cabin Q'):'Cabin Q',album:'Cabin Q',
     artwork:[{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'}]}); }catch(_){} }
 if('mediaSession' in navigator){ try{ const ms=navigator.mediaSession;
   ms.setActionHandler('play',()=>play()); ms.setActionHandler('pause',()=>pause());
@@ -2105,7 +2144,7 @@ function setPlaying(v){ S.playing=v; mediaInfo(); try{ navigator.mediaSession.pl
   document.querySelectorAll('.eqbars').forEach(e=>e.classList.toggle('paused',!v)); }
 function play(){
   unlock();
-  if(cur<0){ if(!pinkBuf) pinkBuf=makePink(); stopPink(); pinkNode=ctx.createBufferSource(); pinkNode.buffer=pinkBuf; pinkNode.loop=true; pinkNode.connect(input); pinkNode.start(); setPlaying(true); }
+  if(cur<0){ stopPink(); pinkNode=ctx.createBufferSource(); pinkNode.buffer=genBuf(GEN.kind); pinkNode.loop=true; pinkNode.connect(input); pinkNode.start(); setPlaying(true); }
   else { aud.play().then(()=>setPlaying(true)).catch(()=>toast('הקובץ לא נתמך בדפדפן הזה')); }
 }
 function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
@@ -2119,13 +2158,14 @@ function select(i,autoplay){
         .catch(()=>{ toast('לא הצלחתי לפתוח את הקובץ'); $('npTitle').textContent=t.name; });
       renderTracks(); return; }
     aud.src=t.blob||t.url; }
-  else { aud.removeAttribute('src'); $('npTitle').textContent='רעש ורוד לכיול'; $('npSub').textContent='Pink noise · ‎−18 dBFS'; $('scrub').classList.add('dis'); $('miniSeek').classList.add('dis'); $('tDur').textContent='LOOP'; $('tCur').textContent='0:00'; paintArt(''); setScrub(0); }
+  else { aud.removeAttribute('src'); const gg=genOf(GEN.kind); $('npTitle').textContent=gg.name; $('npSub').textContent='בדיקות שמע · '+gg.sub; $('scrub').classList.add('dis'); $('miniSeek').classList.add('dis'); $('tDur').textContent='LOOP'; $('tCur').textContent='0:00'; paintArt(''); setScrub(0); }
   renderTracks(); if(was) play();
 }
 const PL={rep:0,shuf:false};   // rep: 0 off, 1 all, 2 one
 /* the queue is the current track's folder (or all picked songs) */
-function queueIdx(){ const t=tracks[cur]; const f=t?t.folderUri||'':null;
-  return tracks.map((x,i)=>i).filter(i=> f===null? true : (tracks[i].folderUri||'')===f); }
+const PLAY={src:'pl'};
+function queueIdx(){ if(PLAY.src==='pl') return PLX.keys.map(k=>tracks.findIndex(t=>tKey(t)===k)).filter(i=>i>=0);
+  return tracks.map((x,i)=>i).filter(i=>(tracks[i].folderUri||'')===PLAY.src); }
 function stepIdx(dir,auto){
   const q=queueIdx(); if(!q.length) return -1;
   if(PL.shuf&&q.length>1){ let n; do{ n=q[Math.floor(Math.random()*q.length)]; }while(n===cur); return n; }
@@ -2141,7 +2181,7 @@ $('back10').onclick=()=>{ if(cur>=0) aud.currentTime=Math.max(0,aud.currentTime-
 $('fwd10').onclick=()=>{ if(cur>=0&&isFinite(aud.duration)) aud.currentTime=Math.min(aud.duration-.1,aud.currentTime+10); };
 $('repBtn').onclick=()=>{ PL.rep=(PL.rep+1)%3; $('repBtn').classList.toggle('on',PL.rep>0); $('repOne').hidden=PL.rep!==2; toast(['חזרה כבויה','חזרה על כל התיקייה','חזרה על השיר'][PL.rep]); };
 $('shufBtn').onclick=()=>{ PL.shuf=!PL.shuf; $('shufBtn').classList.toggle('on',PL.shuf); toast(PL.shuf?'ערבוב פעיל':'ערבוב כבוי'); };
-aud.addEventListener('ended',()=>{ if(RENDER.active){ renderTail(); return; } if(SES.on&&SES.tabs.length){ SES.preview=null; if(SES.cur<SES.tabs.length-1){ SES.tabs[SES.cur].pos=0; switchTab(SES.cur+1,{play:true,pos:SES.tabs[SES.cur+1].in||0,keepView:SES.view==='sum'}); } else setPlaying(false); return; } if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
+aud.addEventListener('ended',()=>{ if(RENDER.active){ renderTail(); return; } if(SLEEP.eos){ SLEEP.eos=false; updSleep(); setPlaying(false); toast('טיימר השינה עצר את הנגינה'); return; } if(SES.on&&SES.tabs.length){ SES.preview=null; if(SES.cur<SES.tabs.length-1){ SES.tabs[SES.cur].pos=0; switchTab(SES.cur+1,{play:true,pos:SES.tabs[SES.cur+1].in||0,keepView:SES.view==='sum'}); } else setPlaying(false); return; } if(PL.rep===2){ aud.currentTime=0; play(); return; } const n=stepIdx(1,true); if(n>=0) select(n,true); else setPlaying(false); });
 /* small generated cover: colour from the title */
 function paintArt(name){ let h=0; for(const ch of name) h=(h*31+ch.charCodeAt(0))>>>0;
   const a=h%360, b=(a+50+(h>>8)%80)%360; $('art').style.background=name?`linear-gradient(135deg,hsl(${a} 60% 42%),hsl(${b} 65% 28%))`:'linear-gradient(135deg,#7d5a8a,#3a3f6e)'; }
@@ -2161,24 +2201,7 @@ $('mini').onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); s
   $('plGrab').addEventListener('click',()=>{ if(moved){ moved=false; return; } setOpen(!player.classList.contains('open')); });
 }
 /* queue list */
-function renderQueue(scrollToCur){
-  const ul=$('queue'); if(!ul) return; ul.textContent='';
-  if(typeof SES!=='undefined'&&SES.on){ $('qTitle').textContent='כרטיסיות הסשן';
-    SES.tabs.forEach((t,k)=>{ const li=document.createElement('li'), b=document.createElement('button'); b.className=k===SES.cur?'cur':'';
-      b.innerHTML=(k===SES.cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${k+1}</span>`)+'<span></span><small dir="ltr"></small>';
-      b.children[1].textContent=t.name; const I=integrated(t.loud); b.children[2].textContent=I!=null?I.toFixed(1)+' LUFS':''; b.onclick=()=>switchTab(k,{play:true}); li.appendChild(b); ul.appendChild(li); });
-    return; }
-  const q=cur>=0? queueIdx() : tracks.map((x,i)=>i);
-  const t=tracks[cur];
-  $('qTitle').textContent= t&&t.folder? 'הבאים בתור · '+t.folder : tracks.length? 'הבאים בתור' : 'אין עדיין שירים';
-  const row=(i,name,meta,n)=>{ const li=document.createElement('li'), b=document.createElement('button'); b.className=i===cur?'cur':'';
-    b.innerHTML=(i===cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${n}</span>`)+'<span></span><small dir="ltr"></small>';
-    b.children[1].textContent=name; b.children[2].textContent=meta; b.onclick=()=>select(i,true); li.appendChild(b); ul.appendChild(li); return b; };
-  let curBtn=null;
-  q.forEach((i,k)=>{ const b=row(i,tracks[i].name,tracks[i].size?(tracks[i].size/1048576).toFixed(1)+' MB':'',k+1); if(i===cur) curBtn=b; });
-  const pb=row(-1,'רעש ורוד לכיול','CAL','·'); if(cur<0) curBtn=pb;
-  if(scrollToCur&&curBtn) requestAnimationFrame(()=>curBtn.scrollIntoView({block:'nearest'}));
-}
+function renderQueue(x){ renderBrowser(x); }
 const fmtT=s=>{ if(!isFinite(s)) return '0:00'; s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
 let seeking=false;
 function setScrub(f){ f=clamp(f,0,1); const pc=(f*100)+'%'; $('scrubFill').style.width=pc; $('scrubThumb').style.left=pc; $('miniProg').style.width=pc; $('miniThumb').style.left=pc; }
@@ -2203,70 +2226,179 @@ async function libSave(items){ const db=await libDb(); if(!db) return false;
 async function libLoad(){ const db=await libDb(); if(!db) return [];
   return new Promise(res=>{ try{ const rq=db.transaction('songs').objectStore('songs').getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>res([]); }catch(_){ res([]); } }); }
 async function libClear(){ const db=await libDb(); if(!db) return; try{ db.transaction('songs','readwrite').objectStore('songs').clear(); }catch(_){} }
-function addFiles(list,fromStore){
-  const fs=[...list].filter(f=>fromStore||f.type.startsWith('audio/')||AUDIO_EXT.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name));
+async function libDel(ids){ const db=await libDb(); if(!db||!ids.length) return; try{ const tx=db.transaction('songs','readwrite'); ids.forEach(id=>tx.objectStore('songs').delete(id)); }catch(_){} }
+
+/* ---------- library model ----------
+   folderUri ''      → songs picked one by one; they live in the playlist
+   folderUri '__ref' → reference files inside the fixed "בדיקות שמע" folder
+   anything else     → a music folder (Android folder, or a folder picked in the browser) */
+var PLX={keys:[]}; try{ const d=JSON.parse(localStorage.getItem('cabinq.pl')||'null'); if(d&&Array.isArray(d.keys)) PLX.keys=d.keys; }catch(_){}
+function plSave(){ try{ localStorage.setItem('cabinq.pl',JSON.stringify({keys:PLX.keys})); }catch(_){} }
+function plHas(t){ return PLX.keys.includes(tKey(t)); }
+function plEnsure(t){ if((t.folderUri||'')===''&&!plHas(t)){ PLX.keys.push(tKey(t)); plSave(); } }
+const fileKey=f=>f.id||((f.name||'')+'|'+(f.size||0)+'|'+(f.lastModified||0));
+function addFiles(list,fromStore,opt){ opt=opt||{};
+  const fs=[...list].filter(f=>fromStore||(f.type||'').startsWith('audio/')||AUDIO_EXT.test(f.name)).sort((a,b)=>(a.webkitRelativePath||a.name).localeCompare(b.webkitRelativePath||b.name));
   if(!fs.length){ if(!fromStore) toast('לא נמצאו קבצי שמע'); return; }
-  const start=tracks.length;
-  fs.forEach(f=>tracks.push({name:(f.name||'Track').replace(/\.[^.]+$/,''),url:URL.createObjectURL(f.blob||f),size:f.size||(f.blob&&f.blob.size)||0,saved:!NATIVE,key:f.id||((f.name||'')+'|'+(f.size||0)+'|'+(f.lastModified||0))}));
-  renderTracks(); if(cur<0&&!S.playing) select(start,false);
-  if(fromStore) return;
-  toast(fs.length+' קבצים נוספו');
+  const start=tracks.length, have=new Set(tracks.map(tKey));
+  const meta=f=>{ if(f.folderUri!==undefined) return {folder:f.folder||'',folderUri:f.folderUri||''};
+    if(opt.ref) return {folder:'בדיקות שמע',folderUri:'__ref'};
+    const rp=f.webkitRelativePath||''; if(rp.includes('/')){ const top=rp.split('/')[0]; return {folder:top,folderUri:'web:'+top}; }
+    return {folder:'',folderUri:''}; };
+  const added=[];
+  fs.forEach(f=>{ const k=fileKey(f); if(have.has(k)) return; have.add(k); const m=meta(f);
+    const t={name:(f.name||'Track').replace(/\.[^.]+$/,''),url:URL.createObjectURL(f.blob||f),size:f.size||(f.blob&&f.blob.size)||0,saved:!NATIVE,key:k,folder:m.folder,folderUri:m.folderUri};
+    tracks.push(t); plEnsure(t); added.push([f,m]); });
+  renderTracks();
+  if(fromStore||!added.length){ if(!fromStore) toast('השירים כבר בספרייה'); return; }
+  if(cur<0&&!S.playing){ const t=tracks[start]; if(t){ PLAY.src=(t.folderUri||'')===''?'pl':t.folderUri; select(start,false); } }
+  toast(added.length+' קבצים נוספו');
   if(!NATIVE){ // keep a copy on the phone so the songs are here next time
     try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(_){}
-    libSave(fs.map(f=>({id:f.name+'|'+f.size+'|'+(f.lastModified||0),name:f.name,size:f.size,blob:f,added:Date.now()})))
+    libSave(added.map(([f,m])=>({id:fileKey(f),name:f.name,size:f.size,blob:f,added:Date.now(),folder:m.folder,folderUri:m.folderUri})))
       .then(ok=>{ if(!ok) toast('אין מספיק מקום לשמור את השירים לפעם הבאה'); });
   }
 }
-if(!NATIVE) libLoad().then(items=>{ if(items.length) addFiles(items.sort((a,b)=>a.added-b.added||a.name.localeCompare(b.name)).map(it=>({name:it.name,size:it.size,blob:it.blob,id:it.id})),true); });
+if(!NATIVE) libLoad().then(items=>{ if(items.length) addFiles(items.sort((a,b)=>a.added-b.added||a.name.localeCompare(b.name)).map(it=>({name:it.name,size:it.size,blob:it.blob,id:it.id,folder:it.folder||'',folderUri:it.folderUri||''})),true); });
 $('fileIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
-/* tracks coming from the Android app: {folder, folderUri, tracks:[{name,url,size}], replace} */
+$('dirIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
+$('refIn').onchange=e=>{ addFiles(e.target.files,false,{ref:true}); e.target.value=''; };
+/* tracks coming from the Android app: {folder, folderUri, tracks:[{name,url,size}], replace, play, quiet} */
 window.cabinAddTracks=function(d){
   try{
     if(d.replace&&d.folderUri) tracks=tracks.filter(t=>t.folderUri!==d.folderUri||t===tracks[cur]);
-    const start=tracks.length;
-    (d.tracks||[]).forEach(t=>tracks.push({name:t.name.replace(/\.[^.]+$/,''),url:t.url,size:t.size||0,native:true,folder:d.folder||'',folderUri:d.folderUri||''}));
+    const have=new Set(tracks.map(tKey)), first=[];
+    (d.tracks||[]).forEach(t=>{ if(have.has(t.url)) { first.push(tracks.findIndex(x=>tKey(x)===t.url)); return; } have.add(t.url);
+      const n={name:t.name.replace(/\.[^.]+$/,''),url:t.url,size:t.size||0,native:true,folder:d.folder||'',folderUri:d.folderUri||''};
+      tracks.push(n); plEnsure(n); first.push(tracks.length-1); });
     renderTracks();
-    const added=tracks.length-start;
-    if(d.play&&added) { select(start,true); $('sheet').hidden=true; }
-    else if(cur<0&&!S.playing&&added) select(start,false);
-    if(added&&!d.quiet) toast(added+' שירים נוספו');
-    if(!added&&!d.quiet) toast('לא נמצאו קבצי שמע');
+    if(d.play&&first.length){ PLAY.src=(d.folderUri||'')===''?'pl':d.folderUri; select(first[0],true); }
+    else if(!d.quiet&&cur<0&&!S.playing&&first.length){ PLAY.src=(d.folderUri||'')===''?'pl':d.folderUri; select(first[0],false); }
+    if(!d.quiet) toast(first.length? first.length+' שירים נוספו' : 'לא נמצאו קבצי שמע');
   }catch(e){ console.warn(e); }
 };
-if(NATIVE){
-  $('srcFiles').removeAttribute('for'); $('srcFolder').removeAttribute('for');
-  $('srcFiles').onclick=e=>{ e.preventDefault(); try{ NATIVE.pickFiles(); }catch(_){} };
-  $('srcFolder').onclick=e=>{ e.preventDefault(); try{ NATIVE.pickFolder(); }catch(_){} };
-  $('srcFolderSub').textContent='נשמרת ונטענת בכל פתיחה';
-} else if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
-  $('srcFolder').hidden=true; $('srcFiles').querySelector('span').textContent='מאפליקציית הקבצים או iCloud';
-  $('libNote').textContent='באייפון בוחרים שירים מאפליקציית הקבצים או מ-iCloud, כמה יחד. השירים נשמרים באפליקציה לפעם הבאה.';
+const pickSongs=()=>{ if(NATIVE){ try{ NATIVE.pickFiles(); }catch(_){} } else $('fileIn').click(); };
+const pickFolder=()=>{ if(NATIVE){ try{ NATIVE.pickFolder(); }catch(_){} } else $('dirIn').click(); };
+const pickRefs=()=>{ if(NATIVE&&NATIVE.pickRefs){ try{ NATIVE.pickRefs(); }catch(_){} } else $('refIn').click(); };
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+
+/* forget songs: from the playlist, a folder, or a reference file */
+function forget(list){ if(!list.length) return; const keys=new Set(list.map(tKey));
+  if(cur>=0&&keys.has(tKey(tracks[cur]))){ pause(); select(-1,false); }
+  list.forEach(t=>{ if(t.url&&t.url.startsWith('blob:')) URL.revokeObjectURL(t.url); if(t.blob) URL.revokeObjectURL(t.blob);
+    if(NATIVE&&t.native&&(t.folderUri===''||t.folderUri==='__ref')){ try{ NATIVE.forgetPicked(t.url); }catch(_){} } });
+  if(!NATIVE) libDel(list.map(tKey));
+  const c=tracks[cur]; tracks=tracks.filter(t=>!keys.has(tKey(t))); cur=c?tracks.indexOf(c):-1;
+  PLX.keys=PLX.keys.filter(k=>!keys.has(k)); plSave(); }
+function plRemove(k){ const t=tracks.find(x=>tKey(x)===k);
+  if(t&&(t.folderUri||'')==='') forget([t]); else { PLX.keys=PLX.keys.filter(x=>x!==k); plSave(); } }
+function plClear(){ const own=tracks.filter(t=>(t.folderUri||'')===''&&plHas(t)); PLX.keys=[]; plSave(); forget(own); }
+function folderRemove(uri){ const list=tracks.filter(t=>t.folderUri===uri);
+  if(NATIVE&&!uri.startsWith('web:')){ try{ NATIVE.removeFolder(uri); }catch(_){} }
+  forget(list); if(PLAY.src===uri) PLAY.src='pl'; }
+
+/* ---------- the player's library browser ---------- */
+const BR={at:null,edit:false,menu:false,q:''};
+const FOLD_IC='<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+const PL_IC='<svg viewBox="0 0 24 24"><path d="M4 6h11M4 11h11M4 16h7"/><circle cx="18" cy="16" r="2.5"/><path d="M20.5 16V6l-3 1"/></svg>';
+const TEST_IC='<svg viewBox="0 0 24 24"><path d="M3 12h3l2-6 4 13 3-9 2 4h4"/></svg>';
+const SES_IC='<svg viewBox="0 0 24 24"><path d="M3 7h6l1.5-3h4L16 7h5v12H3z"/></svg>';
+function folders(){ const out=[]; const seen=new Map();
+  tracks.forEach(t=>{ const u=t.folderUri||''; if(u===''||u==='__ref') return; if(!seen.has(u)){ seen.set(u,{id:u,name:t.folder||'תיקייה',n:0}); } seen.get(u).n++; });
+  if(SES.on) out.push({id:'__ses',name:'כרטיסיות הסשן',n:SES.tabs.length,ic:SES_IC,fc:'#7a5a2c'});
+  out.push({id:'pl',name:'רשימת השמעה',n:PLX.keys.filter(k=>tracks.some(t=>tKey(t)===k)).length,ic:PL_IC,fc:'#c0602c'});
+  [...seen.values()].sort((a,b)=>a.name.localeCompare(b.name)).forEach(f=>out.push(Object.assign(f,{ic:FOLD_IC,fc:'#3d5a78'})));
+  out.push({id:'__test',name:'בדיקות שמע',n:GENS.length+tracks.filter(t=>t.folderUri==='__ref').length,ic:TEST_IC,fc:'#2f6b55'});
+  return out; }
+function folderName(id){ const f=folders().find(x=>x.id===id); return f?f.name:'ספרייה'; }
+function playFrom(src,i){ if(SES.on&&src!=='__ses'){ const first=!SES.tabs.length; addTab(i,first); toast('נוסף לסשן · '+SES.tabs.length+' שירים'); renderBrowser(); return; }
+  PLAY.src=src; select(i,true); }
+function songRow(ul,i,src,n,trail){ const t=tracks[i], li=document.createElement('li'); li.className='row';
+  const b=document.createElement('button'); b.className=i===cur?'cur':'';
+  b.innerHTML=(i===cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${n}</span>`)+'<span dir="auto"></span><small dir="ltr"></small>';
+  b.children[1].textContent=t.name; b.children[2].textContent=SES.on&&SES.tabs.some(x=>x.key===tKey(t))?'✓ בסשן':(t.size?(t.size/1048576).toFixed(1)+' MB':'');
+  b.onclick=()=>playFrom(src,i); li.appendChild(b); (trail||[]).forEach(x=>li.appendChild(x)); ul.appendChild(li); return b; }
+function actBtn(txt,cls,title,fn){ const a=document.createElement('button'); a.className='act '+cls; a.textContent=txt; a.title=title; a.onclick=e=>{ e.stopPropagation(); fn(a); }; return a; }
+function armed(a,label,fn){ if(a.classList.contains('armed')){ fn(); return; } a.classList.add('armed'); const o=a.textContent; a.textContent=label; setTimeout(()=>{ a.classList.remove('armed'); a.textContent=o; },2600); }
+function renderBrowser(scrollToCur){
+  const ul=$('queue'); if(!ul) return; ul.textContent=''; let curBtn=null;
+  const at=BR.at, q=BR.q.trim().toLowerCase();
+  $('brBack').hidden=at===null&&!q; $('qTitle').textContent= q? 'חיפוש' : at===null? 'ספרייה' : folderName(at);
+  $('brEdit').classList.toggle('on',BR.edit); $('brEdit').hidden= at!==null&&at!=='pl'&&at!=='__test';
+  $('brAdd').hidden= at!==null&&at!=='pl'&&at!=='__test';
+  $('brSearch').hidden= at!==null; if($('brSearch').value!==BR.q) $('brSearch').value=BR.q;
+  const sec=t=>{ const li=document.createElement('li'); li.className='sec'; li.dir='rtl'; li.textContent=t; ul.appendChild(li); };
+  if(q){ let n=0; tracks.forEach((t,i)=>{ if(!t.name.toLowerCase().includes(q)) return; const b=songRow(ul,i,(t.folderUri||'')===''?'pl':t.folderUri,++n); if(i===cur) curBtn=b; });
+    if(!n){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצא שיר בשם הזה'; ul.appendChild(e); } }
+  else if(at===null){
+    folders().forEach(f=>{ const li=document.createElement('li'); li.className='row'; const b=document.createElement('button');
+      const now=f.id===PLAY.src&&(cur>=0||f.id==='__test')&&S.playing || (f.id==='__test'&&cur<0&&S.playing) || (f.id==='__ses'&&SES.on&&S.playing);
+      b.className='fold'+(now?' now':''); b.style.setProperty('--fc',f.fc);
+      b.innerHTML='<span class="fi">'+f.ic+'</span><span class="ft"><b></b><em></em></span>';
+      b.querySelector('b').textContent=f.name; b.querySelector('em').textContent=(now?'מתנגן עכשיו · ':'')+f.n+(f.id==='__test'?' צלילים':' שירים');
+      b.onclick=()=>{ BR.at=f.id; BR.menu=false; renderBrowser(true); }; li.appendChild(b);
+      if(BR.edit){ if(f.id==='pl'&&f.n) li.appendChild(actBtn('ניקוי','clr','ניקוי רשימת ההשמעה',a=>armed(a,'בטוח?',()=>{ plClear(); renderBrowser(); toast('רשימת ההשמעה נוקתה'); })));
+        else if(f.id!=='pl'&&f.id!=='__test'&&f.id!=='__ses') li.appendChild(actBtn('×','del','הסרת התיקייה',a=>armed(a,'?',()=>{ folderRemove(f.id); renderBrowser(); toast('התיקייה הוסרה מהספרייה'); }))); }
+      ul.appendChild(li); });
+    if(!tracks.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לחץ על + כדי להוסיף שירים או תיקייה.'; ul.appendChild(e); }
+  }
+  else if(at==='__ses'){ SES.tabs.forEach((t,k)=>{ const li=document.createElement('li'); const b=document.createElement('button'); b.className=k===SES.cur?'cur':'';
+      b.innerHTML=(k===SES.cur?`<span class="eqbars${S.playing?'':' paused'}"><i></i><i></i><i></i></span>`:`<span class="num">${k+1}</span>`)+'<span dir="auto"></span><small dir="ltr"></small>';
+      b.children[1].textContent=t.name; const I=integrated(t.loud); b.children[2].textContent=I!=null?I.toFixed(1)+' LUFS':''; b.onclick=()=>switchTab(k,{play:true}); li.appendChild(b); ul.appendChild(li); if(k===SES.cur) curBtn=b; }); }
+  else if(at==='pl'){
+    const idx=PLX.keys.map(k=>tracks.findIndex(t=>tKey(t)===k)).filter(i=>i>=0);
+    idx.forEach((i,n)=>{ const k=tKey(tracks[i]); const tr=BR.edit?[
+        actBtn('▲','','למעלה',()=>{ const p=PLX.keys.indexOf(k); if(p>0){ [PLX.keys[p-1],PLX.keys[p]]=[PLX.keys[p],PLX.keys[p-1]]; plSave(); renderBrowser(); } }),
+        actBtn('▼','','למטה',()=>{ const p=PLX.keys.indexOf(k); if(p<PLX.keys.length-1){ [PLX.keys[p+1],PLX.keys[p]]=[PLX.keys[p],PLX.keys[p+1]]; plSave(); renderBrowser(); } }),
+        actBtn('×','del','הסרה מהרשימה',()=>{ plRemove(k); renderBrowser(); })]:[];
+      const b=songRow(ul,i,'pl',n+1,tr); if(i===cur&&PLAY.src==='pl') curBtn=b; });
+    if(!idx.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='רשימת ההשמעה ריקה. לחץ על + כדי לבחור שירים, או על + ליד שיר בתוך תיקייה.'; ul.appendChild(e); }
+    else if(BR.edit){ const li=document.createElement('li'); li.className='row'; li.appendChild(actBtn('ניקוי כל הרשימה','clr','',a=>armed(a,'לחץ שוב לניקוי',()=>{ plClear(); renderBrowser(); toast('רשימת ההשמעה נוקתה'); }))); ul.appendChild(li); }
+  }
+  else if(at==='__test'){
+    sec('צלילי בדיקה');
+    GENS.forEach(gx=>{ const li=document.createElement('li'); li.className='row'; const b=document.createElement('button'); const on=cur<0&&GEN.kind===gx.id;
+      b.className=on?'cur':''; b.innerHTML=(on&&S.playing?`<span class="eqbars"><i></i><i></i><i></i></span>`:`<span class="gen-ic">${gx.tag}</span>`)+'<span></span><small></small>';
+      b.children[1].textContent=gx.name; b.children[2].textContent=''; b.title=gx.sub;
+      b.onclick=()=>{ if(RENDER.active) return; GEN.kind=gx.id; const was=true; pause(); select(-1,was); renderBrowser(); };
+      li.appendChild(b); ul.appendChild(li); if(on) curBtn=b; });
+    const refs=tracks.map((t,i)=>i).filter(i=>tracks[i].folderUri==='__ref');
+    sec('קובצי רפרנס'+(refs.length?'':' · לחץ על + כדי להוסיף שיר שאתה מכיר היטב'));
+    refs.forEach((i,n)=>{ const tr=BR.edit?[actBtn('×','del','הסרה',()=>{ forget([tracks[i]]); renderBrowser(); })]:[]; const b=songRow(ul,i,'__ref',n+1,tr); if(i===cur) curBtn=b; });
+  }
+  else { // a music folder
+    tracks.forEach((t,i)=>{ if(t.folderUri!==at) return; const inPl=plHas(t);
+      const tr=[actBtn(inPl?'✓':'+',inPl?'in':'',inPl?'ברשימת ההשמעה':'הוספה לרשימת ההשמעה',a=>{ const k=tKey(t); if(plHas(t)){ PLX.keys=PLX.keys.filter(x=>x!==k); toast('הוסר מרשימת ההשמעה'); } else { PLX.keys.push(k); toast('נוסף לרשימת ההשמעה'); } plSave(); renderBrowser(); })];
+      const b=songRow(ul,i,at,ul.children.length+1,tr); if(i===cur) curBtn=b; });
+  }
+  renderMenu();
+  if(scrollToCur&&curBtn) requestAnimationFrame(()=>curBtn.scrollIntoView({block:'nearest'}));
 }
-$('libSearch').oninput=()=>renderTracks();
-$('dirIn').onchange=e=>{ addFiles(e.target.files); e.target.value=''; };
-function renderTracks(){
-  renderQueue(false);
-  const ul=$('tracks'); ul.textContent='';
-  const q=($('libSearch').value||'').trim().toLowerCase();
-  $('libSearch').hidden=tracks.length<8;
-  const row=(i,name,meta)=>{ if(SES.on&&i>=0&&SES.tabs.some(x=>x.key===tKey(tracks[i]))) meta='✓ בסשן';  const li=document.createElement('li'), b=document.createElement('button'); b.className=i===cur?'cur':'';
-    b.innerHTML=`<span class="led${i===cur?' lit':''}"></span><span></span><small>${meta}</small>`; b.children[1].textContent=name;
-    b.onclick=()=>{ if(SES.on&&i>=0){ const first=!SES.tabs.length; addTab(i,first); toast('נוסף לסשן · '+SES.tabs.length+' שירים'); renderTracks(); return; } select(i,true); if(i>=0) $('sheet').hidden=true; }; li.appendChild(b); ul.appendChild(li); };
-  if(!q) row(-1,'Pink noise · reference','CAL');
-  let lastF=null, shown=0;
-  tracks.forEach((t,i)=>{ if(q&&!t.name.toLowerCase().includes(q)) return;
-    const f=t.folder||'';
-    if(f!==lastF){ lastF=f; const li=document.createElement('li'); li.className='grp'; li.dir='rtl';
-      li.textContent=f? 'תיקייה: '+f : 'שירים שנבחרו';
-      if(!f&&t.saved){ const rm=document.createElement('button'); rm.textContent='נקה'; rm.onclick=()=>{ libClear(); tracks=tracks.filter(x=>!x.saved||x===tracks[cur]); renderTracks(); toast('הרשימה נוקתה'); }; li.appendChild(rm); }
-      if(f&&t.folderUri&&NATIVE){ const rm=document.createElement('button'); rm.textContent='הסר'; rm.onclick=()=>{ try{ NATIVE.removeFolder(t.folderUri); }catch(_){} tracks=tracks.filter(x=>x.folderUri!==t.folderUri||x===tracks[cur]); renderTracks(); }; li.appendChild(rm); }
-      ul.appendChild(li); }
-    row(i,t.name,t.size?(t.size/1048576).toFixed(1)+' MB':''); shown++; });
-  if(!tracks.length){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='עוד אין שירים. בחר שירים או תיקייה למעלה.'; ul.appendChild(e); }
-  else if(q&&!shown){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצא שיר בשם הזה'; ul.appendChild(e); }
-}
-$('libBtn').onclick=()=>{ $('sheet').hidden=false; };
-$('sheetClose').onclick=()=>{ $('sheet').hidden=true; };
+function renderMenu(){ const m=$('brMenu'); m.hidden=!BR.menu; if(!BR.menu) return; m.textContent='';
+  const add=(t,fn)=>{ const b=document.createElement('button'); b.className='pill'; b.textContent=t; b.onclick=()=>{ BR.menu=false; renderMenu(); fn(); }; m.appendChild(b); };
+  if(BR.menu==='timer'){ [['כבוי',0],['15 דק׳',15],['30 דק׳',30],['45 דק׳',45],['60 דק׳',60],['בסוף השיר',-1]].forEach(([t,v])=>add(t,()=>setSleep(v))); return; }
+  if(BR.at===null||BR.at==='pl') add('בחירת שירים לרשימת ההשמעה',pickSongs);
+  if(BR.at===null&&!IOS) add('הוספת תיקיית מוזיקה',pickFolder);
+  if(BR.at===null||BR.at==='__test') add('קובץ רפרנס לבדיקות שמע',pickRefs); }
+$('brBack').onclick=()=>{ BR.at=null; BR.q=''; BR.menu=false; renderBrowser(); };
+$('brEdit').onclick=()=>{ BR.edit=!BR.edit; renderBrowser(); };
+$('brAdd').onclick=()=>{ BR.menu=BR.menu==='add'?false:'add'; renderBrowser(); };
+$('brTimer').onclick=()=>{ BR.menu=BR.menu==='timer'?false:'timer'; renderMenu(); };
+$('brSearch').oninput=()=>{ BR.q=$('brSearch').value; renderBrowser(); };
+function renderTracks(){ renderBrowser(false); }
+
+/* ---------- sleep timer ---------- */
+const SLEEP={until:0,eos:false};
+function setSleep(v){ SLEEP.until=v>0?Date.now()+v*60000:0; SLEEP.eos=v===-1; updSleep(); toast(v===0?'טיימר השינה כבוי':v===-1?'הנגינה תיעצר בסוף השיר':'הנגינה תיעצר בעוד '+v+' דקות'); }
+function updSleep(){ const on=SLEEP.until>0||SLEEP.eos; $('brTimer').classList.toggle('on',on);
+  $('brTimerTxt').textContent=SLEEP.eos?'END':SLEEP.until?Math.max(1,Math.ceil((SLEEP.until-Date.now())/60000))+'′':''; }
+setInterval(()=>{ if(SLEEP.until&&Date.now()>=SLEEP.until){ SLEEP.until=0; pause(); updSleep(); toast('טיימר השינה עצר את הנגינה'); } else if(SLEEP.until) updSleep(); },5000);
+
+/* ---------- pick up where you left off ---------- */
+const RES0=(()=>{ try{ return JSON.parse(localStorage.getItem('cabinq.resume')||'null'); }catch(_){ return null; } })();
+setInterval(()=>{ try{ if(cur>=0&&!(typeof SES!=='undefined'&&SES.on)) localStorage.setItem('cabinq.resume',JSON.stringify({key:tKey(tracks[cur]),pos:aud.currentTime||0,src:PLAY.src})); }catch(_){} },3000);
+{ let tries=0; const tm=setInterval(()=>{ if(++tries>30||cur>=0||S.playing||!RES0||(typeof SES!=='undefined'&&SES.on)){ clearInterval(tm); return; }
+    const i=tracks.findIndex(t=>tKey(t)===RES0.key); if(i<0) return; clearInterval(tm); PLAY.src=RES0.src||'pl'; pendingSeek=RES0.pos||0; select(i,false); },500); }
 let toastT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1800); }
 
 /* ---------- Android: system-wide engine (native bridge) ---------- */
@@ -2378,7 +2510,7 @@ function renderSes(){
       x.onclick=()=>{ if(!x.classList.contains('armed')){ x.classList.add('armed'); setTimeout(()=>x.classList.remove('armed'),2500); toast('לחץ שוב כדי להסיר את הכרטיסייה'); return; } removeTab(k); };
       el.appendChild(x); }
   });
-  const add=document.createElement('button'); add.className='ses-tab add'; add.textContent='+ שיר'; add.onclick=()=>{ $('sheet').hidden=false; toast('בחר שיר, והוא ייפתח בכרטיסייה חדשה'); }; el.appendChild(add);
+  const add=document.createElement('button'); add.className='ses-tab add'; add.textContent='+ שיר'; add.onclick=()=>{ BR.at=null; setOpen(true); renderBrowser(); toast('בחר שיר מהספרייה, והוא ייפתח בכרטיסייה חדשה'); }; el.appendChild(add);
   const sm=document.createElement('button'); sm.className='ses-tab sum'+(SES.view==='sum'?' cur':''); sm.textContent='Σ סיכום'; sm.onclick=()=>showSum(true); el.appendChild(sm);
   const c=el.querySelector('.ses-tab.cur'); if(c) c.scrollIntoView({block:'nearest',inline:'nearest'});
 }
@@ -2531,20 +2663,6 @@ async function renderSession(){
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
 renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
-/* clear the list: the song list normally, the session's tabs in session mode (two taps, so nothing is lost by accident) */
-$('qClear').onclick=()=>{ const b=$('qClear'), ses=SES.on;
-  if(!(ses?SES.tabs.length:tracks.length)){ toast(ses?'הסשן כבר ריק':'הרשימה כבר ריקה'); return; }
-  if(b.dataset.armed!=='1'){ b.dataset.armed='1'; b.classList.add('warn'); b.textContent=ses?'לנקות את הסשן?':'לנקות הכל?';
-    setTimeout(()=>{ b.dataset.armed=''; b.classList.remove('warn'); updClear(); },3000); return; }
-  b.dataset.armed=''; b.classList.remove('warn');
-  if(ses){ pause(); SES.tabs=[]; SES.cur=-1; SES.preview=null; META.clear(); if(SES.view==='sum') renderSum(); renderSes(); sesSave(); renderQueue(false); renderTracks(); toast('הסשן נוקה'); }
-  else { if(RENDER.active) cancelRender(); select(-1,false); pause();
-    tracks.forEach(t=>{ if(t.url&&t.url.startsWith('blob:')) URL.revokeObjectURL(t.url); if(t.blob) URL.revokeObjectURL(t.blob); });
-    tracks=[]; if(NATIVE){ try{ NATIVE.clearLibrary(); }catch(_){} } else libClear();
-    renderTracks(); toast('הרשימה נוקתה'); }
-  updClear(); };
-function updClear(){ const b=$('qClear'); if(b.dataset.armed==='1') return; b.textContent=SES.on?'ניקוי הסשן':'ניקוי רשימה'; }
-const _rq=renderQueue; renderQueue=function(x){ _rq(x); updClear(); };
 window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
