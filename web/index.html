@@ -108,7 +108,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 
 /* screen */
 .screen{position:sticky; top:env(safe-area-inset-top,0px); z-index:15; flex:none; height:clamp(240px,46vh,520px); display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:6px;
-  padding:8px; border-radius:16px; border:7px solid transparent;
+  padding:8px; border-radius:16px; border:7px solid transparent; border-top-width:42px;
   background:
     linear-gradient(var(--bezel),var(--bezel)) padding-box,
     linear-gradient(180deg,rgba(255,225,180,.16),rgba(0,0,0,0) 30%,rgba(0,0,0,.25)) border-box,
@@ -120,8 +120,17 @@ select.pill option{background:#1f2226; color:var(--ink)}
   background:linear-gradient(160deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,0) 32%), repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
   box-shadow:inset 0 0 0 1px rgba(140,200,220,.06)}
 #cv{position:absolute; inset:0; width:100%; height:100%; touch-action:none; display:block}
-.ov{position:absolute; display:flex; gap:6px; z-index:2}
-.ov.tl{top:8px; left:8px}.ov.tr{top:8px; right:8px}
+.rail{position:absolute; top:-38px; left:-2px; right:-2px; height:32px; display:flex; align-items:center; gap:5px; z-index:4}
+.rail .sp{flex:1}
+.rail .chip{height:28px; padding:0 9px; border-radius:7px; border:1px solid rgba(0,0,0,.45); background:linear-gradient(180deg,rgba(20,12,6,.55),rgba(20,12,6,.75));
+  color:#f1dfc2; box-shadow:inset 0 1px 0 rgba(255,230,190,.12), 0 1px 0 rgba(255,220,170,.12); font-size:11px}
+.rail .chip[aria-pressed="true"]{color:#fff; border-color:rgba(255,210,150,.55)}
+.rail .chip.lit{color:#1a0f05; background:var(--led); border-color:var(--led)}
+.rail .chip.ic{width:30px; padding:0; display:grid; place-items:center}
+.rail .chip.ic svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.rail .chip:disabled{opacity:.35}
+.rail .chip.redo{display:none}
+.unit.fs .rail .chip.redo{display:grid}
 .chip{height:22px; padding:0 8px; border-radius:5px; border:1px solid rgba(160,210,230,.14); background:rgba(6,13,17,.7);
   color:#8fb3c2; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.04em}
 .chip[aria-pressed="true"]{color:var(--ink); border-color:rgba(160,210,230,.35)}
@@ -134,7 +143,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .clip.hot{background:#ff4a2e; box-shadow:0 0 6px #ff4a2e}
 
 /* band chips */
-.bands{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 2px}
+.bands{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 2px; margin-top:8px}
 .bchip{display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 10px 0 8px; border-radius:15px;
   border:1px solid #121416; background:linear-gradient(180deg,#33373c,#272a2f); color:var(--ink-2);
   font-family:var(--f-mono); font-size:11px; box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
@@ -176,7 +185,14 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .k-ptr{stroke:var(--ink); stroke-width:2.2; stroke-linecap:round}
 .knob.dis{opacity:.28; cursor:default}
 .knob.dis .k-arc{stroke:transparent}
-.g-dyn{flex-basis:100%; order:2}
+.g-dyn{flex-basis:100%; order:2; margin-top:6px; border-color:rgba(255,154,60,.22) !important; background:linear-gradient(180deg,rgba(255,154,60,.05),rgba(0,0,0,.1)) !important}
+.g-dyn .gt{cursor:pointer; flex-wrap:wrap}
+#dynBody{display:flex; flex-direction:column; gap:8px}
+#dynBody[hidden]{display:none}
+.g-dyn:not(.shut) .fx-chev svg{transform:rotate(180deg)}
+.g-dyn .gt .gr-read{margin-left:auto}
+.g-dyn .fx-chev{margin-left:4px}
+.g-dyn.shut .gt{margin:-2px 0}
 .g-out{order:5; flex:1 1 100% !important}
 .g-fx{flex-basis:100%; order:3; gap:8px; min-width:0}
 .g-fx .gt{flex-wrap:wrap}
@@ -198,6 +214,13 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx-disp{flex:1 1 230px; max-width:380px; height:124px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
 .fx-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
 .fx-row .knobs{flex:1 1 260px}
+.tame-disp{height:150px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
+.tame-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
+.knobs.tame-big{justify-content:space-around; padding:4px 0}
+.knob.big{width:100px}
+.knob.big svg{width:84px; height:84px}
+.knob.big .k-lab{font-size:12px}
+.knob.big .k-val{font-size:13px}
 .fx-segs{display:flex; gap:8px; flex-wrap:wrap}
 .fx-segs .seg button{height:26px; font-size:10px}
 .out-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
@@ -236,8 +259,9 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .dyn-help b{color:var(--ink-2); font-weight:500}
 .chip.lit{color:#1a0f05; background:var(--led); border-color:var(--led)}
 /* fullscreen analyzer */
-.unit.fs .screen{position:fixed; inset:0; z-index:40; border-radius:0; height:auto; border-width:0; background:var(--bezel);
-  padding:calc(env(safe-area-inset-top,0px) + 8px) max(8px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(8px, env(safe-area-inset-left,0px))}
+.unit.fs .screen{position:fixed; inset:0; z-index:40; border-radius:0; height:auto; border-width:44px 0 0 0;
+  padding:8px max(8px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(8px, env(safe-area-inset-left,0px))}
+.unit.fs .rail{left:max(8px, env(safe-area-inset-left,0px)); right:max(8px, env(safe-area-inset-right,0px)); top:-38px}
 .fsbar{position:absolute; left:8px; right:8px; bottom:8px; z-index:3; display:flex; align-items:center; gap:6px; flex-wrap:nowrap}
 .fsbar .chip{flex:none}
 .fs-read{flex:1 1 auto; min-width:0; text-overflow:ellipsis; display:inline-flex; align-items:center; gap:8px; height:30px; padding:0 10px; border-radius:6px;
@@ -298,6 +322,7 @@ body.noscroll{overflow:hidden}
 .player.open #miniPlay,.player.open #miniNext{display:none}
 .pl-full{flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; padding-top:6px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scrollbar-width:none}
 .pl-full::-webkit-scrollbar{display:none}
+.pl-full>*{flex-shrink:0}
 .player:not(.open) .pl-full{visibility:hidden}
 .scrub{position:relative; height:34px; touch-action:none; cursor:pointer; display:flex; align-items:center}
 .scrub-track{position:relative; flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,.1)}
@@ -309,6 +334,8 @@ body.noscroll{overflow:hidden}
 .pl-ctl{display:flex; align-items:center; justify-content:space-between; gap:4px; padding:0 2px}
 .queue-h{display:flex; align-items:center; gap:6px; font-family:var(--f-he); font-size:13px; color:var(--ink-2); padding:6px 0; min-height:44px; position:sticky; top:-6px; z-index:3; background:linear-gradient(180deg,#1b1e22 85%,rgba(27,30,34,0))}
 .queue-h #qTitle{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14.5px; color:var(--ink)}
+.br-ib#brBack{width:auto; padding:0 12px 0 10px; gap:4px; display:flex; align-items:center; background:linear-gradient(180deg,#ffb27a,#ff8a3d); color:#1d1006; font-family:var(--f-he); font-size:14px; font-weight:500}
+.br-ib#brBack svg{width:20px; height:20px}
 .br-ib{flex:none; width:36px; height:34px; border-radius:9px; border:0; background:rgba(255,255,255,.06); display:grid; place-items:center; color:var(--ink-2); position:relative}
 .br-ib svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
 .br-ib.on{color:var(--led); background:rgba(255,154,60,.14)}
@@ -334,7 +361,7 @@ body.noscroll{overflow:hidden}
 .queue .act.clr.armed{background:#ff5a3c; color:#1a0905}
 .br-quick{display:grid; grid-template-columns:1fr 1fr; gap:8px}
 .br-quick.one{grid-template-columns:1fr}
-.br-q{display:flex; align-items:center; gap:10px; min-height:58px; padding:10px 12px; border-radius:12px; border:0; text-align:start;
+.br-q{display:flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:6px 12px; border-radius:12px; border:0; text-align:start;
   background:linear-gradient(180deg,#ffb27a,#ff8a3d); color:#1d1006; font-family:var(--f-he); font-size:15px; font-weight:500; box-shadow:0 6px 16px rgba(255,138,61,.25)}
 .br-q.alt{background:rgba(255,255,255,.08); color:var(--ink); box-shadow:none}
 .br-q svg{width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
@@ -526,15 +553,18 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
   </div>
 
   <div class="screen">
+    <div class="rail" id="rail">
+      <button class="chip" id="rangeBtn" title="טווח התצוגה">±12 dB</button>
+      <button class="chip ic" id="undoBtn" title="ביטול פעולה" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="chip ic redo" id="redoBtn" title="ביצוע מחדש" disabled><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+      <span class="sp"></span>
+      <button class="chip" id="fitBtn" hidden>FIT</button>
+      <button class="chip" id="bypass" aria-pressed="false" title="עקיפת ה-EQ">BYPASS</button>
+      <button class="chip" id="preBtn" aria-pressed="true" title="הצגת הספקטרום לפני העיבוד">PRE</button>
+      <button class="chip he" id="fsBtn" title="מסך מלא">⤢ מסך מלא</button>
+    </div>
     <div class="glass" id="glass">
       <canvas id="cv" aria-label="Equalizer display. Drag points to set frequency and gain, pinch a point to set Q, pinch the background to zoom."></canvas>
-      <div class="ov tl"><button class="chip" id="rangeBtn" title="Display range">±12 dB</button></div>
-      <div class="ov tr">
-        <button class="chip" id="fitBtn" hidden>FIT</button>
-        <button class="chip" id="bypass" aria-pressed="false" title="עקיפת ה-EQ">BYPASS</button>
-        <button class="chip" id="preBtn" aria-pressed="true" title="Show input spectrum">PRE</button>
-        <button class="chip he" id="fsBtn" title="מסך מלא">⤢ מסך מלא</button>
-      </div>
       <div class="fsbar" id="fsbar" hidden>
         <span class="fs-read" id="fsRead"><span class="dot"></span><span id="fsTxt">—</span></span>
         <button class="chip" id="fsListen">LISTEN</button>
@@ -563,14 +593,18 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <div class="empty" id="emptyMsg" dir="rtl" hidden>אין נקודות. הקשה כפולה על המסך או ‎+ BAND‎ מוסיפים נקודה.</div>
     <div class="groups" id="groups">
       <div class="group g-band"><div class="gt">FILTER</div><div class="knobs" id="kBand"></div></div>
-      <div class="group g-dyn">
-        <div class="gt"><button class="pill" id="dynBtn" aria-pressed="false"><span class="led"></span>Dynamic</button>
+      <div class="group g-dyn shut" id="gDyn">
+        <div class="gt" id="dynHead"><button class="pill" id="dynBtn" aria-pressed="false"><span class="led"></span>Dynamic EQ</button>
           <span class="gt-band" id="dynBand"><span class="dot"></span><span id="dynBandTxt">—</span></span>
-          <span class="dyn-note" id="dynNote" dir="rtl" hidden>Dynamic זמין ל-Bell ול-Shelf</span></div>
+          <span class="dyn-note" id="dynNote" dir="rtl" hidden>Dynamic זמין ל-Bell ול-Shelf</span>
+          <span class="gr-read" id="dynGrTxt"></span>
+          <button class="fx-chev" id="dynChev" aria-label="פתיחה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+        <div id="dynBody" hidden>
         <div class="knobs wrap" id="kDyn"></div>
         <div class="dbus" id="dbus"></div>
         <div class="scope"><div class="scope-in"><canvas id="hc" aria-label="Band level, threshold and gain change over the last four seconds. Drag vertically to set the threshold."></canvas></div></div>
-        <p class="dyn-help" dir="rtl"><b>Threshold</b> הוא העוצמה שממנה הבנד מתחיל לזוז, הקו הכתום בגרף, ואפשר לגרור אותו. <b>Range</b> הוא כמה dB לכל היותר הבנד יזוז: ערך שלילי חותך רק כשהתדר מתחזק, למשל צרימה בשירה, וערך חיובי מגביר. <b>Listen</b> משמיע רק את אזור הבנד, כדי לשמוע מה הוא עושה.</p>
+        <p class="dyn-help" dir="rtl" style="margin-top:8px"><b>Threshold</b> הוא העוצמה שממנה הבנד מתחיל לזוז, הקו הכתום בגרף, ואפשר לגרור אותו. <b>Range</b> הוא כמה dB לכל היותר הבנד יזוז: ערך שלילי חותך רק כשהתדר מתחזק, למשל צרימה בשירה, וערך חיובי מגביר. <b>Listen</b> משמיע רק את אזור הבנד, כדי לשמוע מה הוא עושה.</p>
+        </div>
       </div>
       <div class="group g-comp">
         <div class="gt"><button class="pill on" id="compIn" aria-pressed="true"><span class="led"></span>Bus comp</button><span class="gr-read" id="compGr">GR 0.0 dB</span></div>
@@ -583,6 +617,19 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
       </div>
       <div class="group g-fx">
         <div class="gt">FX <span class="dyn-note" dir="rtl">לפני הלימיטר · לחיצה על פס פותחת אותו</span></div>
+        <div class="fx off" id="fx_tame" style="--fxc:#7fe0a8">
+          <div class="fx-h" data-fx="tame"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 14c3 0 3-4 5-4s2 6 4 6 2-11 4-11 2 9 4 9h3"/><path d="M13 3l3 3M16 3l-3 3" opacity=".7"/></svg></span><b>TAME</b><span class="fx-sub" id="tameSub"></span>
+            <button class="pill" id="tameOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="tame-disp"><canvas id="tameCv" aria-label="ספקטרום והורדת הרשים בזמן אמת"></canvas></div>
+            <div class="knobs tame-big" id="kTameBig"></div>
+            <div class="fx-row"><div class="knobs wrap" id="kTame"></div>
+              <div class="fx-segs"><div class="seg" id="tameFocus"><button data-v="st" aria-pressed="true">STEREO</button><button data-v="mid" aria-pressed="false">MID</button><button data-v="side" aria-pressed="false">SIDE</button></div>
+                <button class="pill he-pill" id="tameDelta" aria-pressed="false"><span class="led"></span>שמע רק מה שנחתך</button></div></div>
+            <p class="dyn-help" dir="rtl"><b>TAME</b> מזהה תדרים שבולטים מעל הסביבה שלהם ומוריד אותם רק ברגע שהם מופיעים. <b>MUD</b> מנקה את הבוץ באזור 250–500 Hz, <b>HARSH</b> את הצרימה המעייפת באזור 1–4 kHz, ו-<b>ESS</b> עובד כמו דה-אסר על השורקות. <b>Focus</b> קובע אם לעבוד על כל הסטריאו, רק על המרכז (שירה) או רק על הצדדים. השהיה: 43 ms.</p>
+          </div>
+        </div>
         <div class="fx off" id="fx_sat" style="--fxc:#ff8a5a">
           <div class="fx-h" data-fx="sat"><span class="fx-ic"><svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="4"/><circle cx="17" cy="12" r="4"/><path d="M7 16h10"/><circle cx="7" cy="12" r="1"/><circle cx="17" cy="12" r="1"/></svg></span><b>SATURATION</b><span class="fx-sub" id="satSub"></span>
             <button class="pill" id="satOn" aria-pressed="false"><span class="led"></span>On</button>
@@ -661,7 +708,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="tb ghost" id="fwd10" aria-label="10 שניות קדימה"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/><path d="M8.5 10v5"/><rect x="11" y="10" width="3.5" height="5" rx="1.75"/></svg></button>
         <button class="tb ghost" id="shufBtn" aria-label="ערבוב"><svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
       </div>
-      <div class="queue-h" id="brHead" dir="rtl"><button class="br-ib" id="brBack" title="חזרה לתיקיות" hidden><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><span id="qTitle">ספרייה</span>
+      <div class="queue-h" id="brHead" dir="rtl"><button class="br-ib" id="brBack" title="חזרה לתיקיות" hidden><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>חזרה</span></button><span id="qTitle">ספרייה</span>
         <button class="br-ib" id="brSize" title="הגדלה / הקטנה"><svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5"/></svg></button>
         <button class="br-ib" id="brTimer" title="טיימר שינה"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/></svg><small id="brTimerTxt"></small></button>
         <button class="br-ib" id="brAdd" title="הוספה"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -1129,6 +1176,7 @@ function setThr(e){ const b=sel(); const r=hc.getBoundingClientRect(); b.dyn.thr
 /* activity on band chips and dynamic bus */
 const chipEls=new Map(), busEls=new Map();
 function activity(){
+  { const b=sel(), a=b&&A.get(b.id); $('dynGrTxt').textContent= b&&b.dyn&&b.dyn.on&&a&&a.lpd&&S.playing? (Math.abs(a.d)>.05?(a.d<0?'−':'+')+Math.abs(a.d).toFixed(1)+' dB':'0.0 dB') : ''; }
   for(const b of S.bands){ const a=A.get(b.id); if(!a) continue; const act=b.on&&b.dyn.on&&Math.abs(a.d)>.4;
     const ch=chipEls.get(b.id); if(ch) ch.classList.toggle('act',act);
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
@@ -1444,7 +1492,69 @@ class CabinLoud extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('cabin-loud',CabinLoud);`;
+registerProcessor('cabin-loud',CabinLoud);
+
+/* Resonance cleaner: STFT (2048, hop 512). Each bin is compared with the smoothed spectrum around it; what sticks out
+   is pulled down, with depth set per region (mud / harsh / ess). Latency: 2048 samples. */
+class CabinTame extends AudioWorkletProcessor{
+  constructor(o){ super(); this.p={on:true,mud:.4,harsh:.4,ess:.3,att:15,rel:120,focus:'st',delta:false,sens:1};
+    if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
+    const N=2048; this.N=N; this.H=512; this.K=N/2+1;
+    this.win=new Float32Array(N); for(let i=0;i<N;i++) this.win[i]=Math.sqrt(.5-.5*Math.cos(2*Math.PI*i/N));
+    this.inM=new Float32Array(N); this.inS=new Float32Array(N); this.w=0; this.t=0;
+    this.acM=new Float32Array(2*N); this.acS=new Float32Array(2*N); this.dry=[new Float32Array(2*N),new Float32Array(2*N)];
+    this.re=[new Float64Array(N),new Float64Array(N)]; this.im=[new Float64Array(N),new Float64Array(N)];
+    this.P=new Float32Array(this.K); this.cs=new Float64Array(this.K+1); this.red=new Float32Array(this.K); this.g=new Float32Array(this.K);
+    this.wt=new Float32Array(this.K*3); const sr=sampleRate;
+    for(let k=0;k<this.K;k++){ const f=Math.max(1,k*sr/N), l=Math.log2;
+      this.wt[k*3]=f<90?0:Math.exp(-Math.pow(l(f/330)/.8,2));
+      this.wt[k*3+1]=Math.exp(-Math.pow(l(f/2100)/1.05,4));
+      this.wt[k*3+2]=Math.exp(-Math.pow(l(f/7200)/.75,4)); }
+    this.cnt=0; this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
+  fft(re,im){ const n=re.length;
+    for(let i=1,j=0;i<n;i++){ let bit=n>>1; for(;j&bit;bit>>=1) j^=bit; j^=bit; if(i<j){ let t=re[i];re[i]=re[j];re[j]=t; t=im[i];im[i]=im[j];im[j]=t; } }
+    for(let len=2;len<=n;len<<=1){ const ang=-2*Math.PI/len, wlr=Math.cos(ang), wli=Math.sin(ang), h=len>>1;
+      for(let i=0;i<n;i+=len){ let wr=1,wi=0; for(let j=0;j<h;j++){ const a=i+j,b=a+h, vr=re[b]*wr-im[b]*wi, vi=re[b]*wi+im[b]*wr;
+        re[b]=re[a]-vr; im[b]=im[a]-vi; re[a]+=vr; im[a]+=vi; const nw=wr*wlr-wi*wli; wi=wr*wli+wi*wlr; wr=nw; } } } }
+  frame(){ const N=this.N, K=this.K, p=this.p, w0=this.w, win=this.win, P=this.P;
+    const bufs=[this.inM,this.inS];
+    for(let c=0;c<2;c++){ const re=this.re[c], im=this.im[c], b=bufs[c]; for(let i=0;i<N;i++){ re[i]=b[(w0+i)%N]*win[i]; im[i]=0; } this.fft(re,im); }
+    const useM=p.focus!=='side', useS=p.focus!=='mid';
+    for(let k=0;k<K;k++){ let e=1e-12; if(useM) e+=this.re[0][k]*this.re[0][k]+this.im[0][k]*this.im[0][k]; if(useS) e+=this.re[1][k]*this.re[1][k]+this.im[1][k]*this.im[1][k]; P[k]=10*Math.log10(e); }
+    const cs=this.cs; cs[0]=0; for(let k=0;k<K;k++) cs[k+1]=cs[k]+P[k];
+    const fr=this.H/sampleRate, ka=1-Math.exp(-fr/Math.max(.001,p.att/1000)), kr=1-Math.exp(-fr/Math.max(.005,p.rel/1000));
+    for(let k=1;k<K;k++){ const hw=Math.max(3,Math.round(k*.14)), a=Math.max(1,k-hw), b=Math.min(K-1,k+hw);
+      const env=(cs[b+1]-cs[a]-P[k])/(b-a);  // local average without the bin itself
+      const amt=Math.max(p.mud*this.wt[k*3],p.harsh*this.wt[k*3+1],p.ess*this.wt[k*3+2]);
+      const ex=P[k]-env-2/p.sens; const tgt=ex>0? Math.min(ex*(.4+.6*amt)*amt*1.6, 18*amt) : 0;
+      const r=this.red[k]; this.red[k]= tgt>r? r+(tgt-r)*ka : r+(tgt-r)*kr; }
+    this.red[0]=0;
+    for(let k=0;k<K;k++){ const a=this.red[Math.max(0,k-1)], b=this.red[k], c=this.red[Math.min(K-1,k+1)]; this.g[k]=Math.pow(10,-(.25*a+.5*b+.25*c)/20); }
+    for(let c=0;c<2;c++){ const re=this.re[c], im=this.im[c], on=(c===0?useM:useS);
+      for(let k=0;k<K;k++){ const gk=on?this.g[k]:1; re[k]*=gk; im[k]*=gk; if(k>0&&k<N/2){ re[N-k]=re[k]; im[N-k]=-im[k]; } }
+      for(let i=0;i<N;i++) im[i]=-im[i]; this.fft(re,im); }
+    const t0=this.t-N, M2=2*N, sc=.5/N;
+    for(let i=0;i<N;i++){ const idx=((t0+i)%M2+M2)%M2; this.acM[idx]+=this.re[0][i]*win[i]*sc; this.acS[idx]+=this.re[1][i]*win[i]*sc; }
+    if(++this.cnt>=4){ this.cnt=0; const B=96, sp=new Float32Array(B), rd=new Float32Array(B);
+      for(let i=0;i<B;i++){ const f=20*Math.pow(1000,i/(B-1)), k=Math.min(K-1,Math.round(f*N/sampleRate)); sp[i]=P[k]; rd[i]=this.red[k]; }
+      this.port.postMessage({sp,rd},[sp.buffer,rd.buffer]); } }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const L=inp[0], R=inp[1]||inp[0], n=L.length, N=this.N, M2=2*N, p=this.p;
+    for(let i=0;i<n;i++){
+      const l=L[i], r=R[i]; this.inM[this.w]=(l+r)*.5; this.inS[this.w]=(l-r)*.5;
+      const di=this.t%M2; this.dry[0][di]=l; this.dry[1][di]=r;
+      this.w=(this.w+1)%N; this.t++;
+      if(this.t%this.H===0) this.frame();
+      const oi=((this.t-1-N)%M2+M2)%M2; const m=this.acM[oi], sd=this.acS[oi]; this.acM[oi]=0; this.acS[oi]=0;
+      let ol=m+sd, or=m-sd; const dl=this.dry[0][oi], dr=this.dry[1][oi];
+      if(!p.on){ ol=dl; or=dr; } else if(p.delta){ ol=dl-ol; or=dr-or; }
+      out[0][i]=ol; if(out[1]) out[1][i]=or;
+    }
+    return true;
+  }
+}
+registerProcessor('cabin-tame',CabinTame);`;
 function compParams(Cx){ const c=Cx||C, r=REL[c.rli]; return {on:c.on,thr:c.thr,ratio:RATIOS[c.ri],att:ATT[c.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:c.makeup,mix:c.mix/100,hpf:c.hpf}; }
 function sendComp(){
   const p=compParams();
@@ -1568,16 +1678,19 @@ const FX={
   sat:{on:false,mode:'tape',machine:'a800',speed:15,drive:4,wow:.3,char:0,tone:0,mix:100,out:0},
   wid:{on:false,width:120,mono:120},
   rev:{on:false,type:'hall',decay:2.2,pre:20,tone:.5,lowcut:250,mix:12},
-  open:{sat:false,wid:false,rev:false}
+  tame:{on:false,mud:30,harsh:30,ess:25,att:15,rel:120,focus:'st',delta:false},
+  open:{sat:false,wid:false,rev:false,tame:false}
 };
-let satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
+let tameNode=null, tameSp=null, tameRd=null, satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
 const fxBlocks={};
 function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.connect(o); wet.connect(o); wet.gain.value=0;
   return {i,o,dry,wet,set(on){ const t=ctx.currentTime; dry.gain.setTargetAtTime(on?0:1,t,.015); wet.gain.setTargetAtTime(on?1:0,t,.015); }}; }
 function fxInit(worklet){
   fxIn.disconnect();
-  const sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
-  fxIn.connect(sat.i); sat.o.connect(rev.i); rev.o.connect(wid.i); wid.o.connect(fxOut);
+  const tame=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
+  fxIn.connect(tame.i); tame.o.connect(sat.i); sat.o.connect(rev.i);
+  if(worklet){ tameNode=new AudioWorkletNode(ctx,'cabin-tame',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    tameNode.port.onmessage=e=>{ tameSp=e.data.sp; tameRd=e.data.rd; }; tame.i.connect(tameNode); tameNode.connect(tame.wet); } rev.o.connect(wid.i); wid.o.connect(fxOut);
   // saturation: worklet core + tape colour filters
   const f1=ctx.createBiquadFilter(), f2=ctx.createBiquadFilter(), f3=ctx.createBiquadFilter(), f4=ctx.createBiquadFilter();
   f1.type='peaking'; f2.type='peaking'; f3.type='highshelf'; f4.type='lowpass';
@@ -1593,7 +1706,7 @@ function fxInit(worklet){
   // width
   if(worklet){ widNode=new AudioWorkletNode(ctx,'cabin-width',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); widNode.port.onmessage=e=>{ widCorr=e.data; };
     wid.i.connect(widNode); widNode.connect(wid.wet); }
-  Object.assign(fxBlocks,{sat,rev,wid}); fxReady=true; fxWorklet=worklet;
+  Object.assign(fxBlocks,{tame,sat,rev,wid}); fxReady=true; fxWorklet=worklet;
   fxSend(); buildIR();
 }
 let fxWorklet=false;
@@ -1615,6 +1728,8 @@ function fxSend(){
     f2.gain.setTargetAtTime(0,t,.02); f3.frequency.setTargetAtTime(3500,t,.02); f3.gain.setTargetAtTime(sv.tone*4,t,.02); f4.frequency.setTargetAtTime(22000,t,.02); }
   if(satNode) satNode.port.postMessage({mode:sv.mode,drive:sv.mode==='tape'?sv.drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out});
   if(widNode) widNode.port.postMessage({width:FX.wid.width/100,mono:FX.wid.mono});
+  const T=FX.tame; if(tameNode) tameNode.port.postMessage({on:true,mud:T.mud/100,harsh:T.harsh/100,ess:T.ess/100,att:T.att,rel:T.rel,focus:T.focus,delta:T.delta});
+  B.tame.set(T.on&&!!tameNode);
   B.wid.set(FX.wid.on&&!!widNode);
   B.rev.pre.delayTime.setTargetAtTime(FX.rev.pre/1000,t,.02); B.rev.hp.frequency.setTargetAtTime(FX.rev.lowcut,t,.02);
   B.rev.set(FX.rev.on);
@@ -1639,14 +1754,15 @@ function makeIR(c,R){ const T=REVT[R.type], sr=c.sampleRate, len=Math.min(7,R.de
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<N;i++) d[i]*=sc; }
   let mx=0; for(const v of irEnv) if(v>mx) mx=v; for(let i=0;i<200;i++) irEnv[i]/=(mx||1);
   return {buf,env:irEnv}; }
-function fxApply(st){ for(const k of ['sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],st[k]); fxSend(); buildIR(); fxOpenUI(); }
+function fxApply(st){ for(const k of ['tame','sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],st[k]); fxSend(); buildIR(); fxOpenUI(); }
 
 /* strips */
-function fxOpenUI(){ for(const k of ['sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
+function fxOpenUI(){ for(const k of ['tame','sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
 document.querySelectorAll('.fx-h').forEach(h=>h.addEventListener('click',e=>{ if(e.target.closest('.pill')) return; const k=h.dataset.fx; FX.open[k]=!FX.open[k]; fxOpenUI(); knobs.forEach(x=>x.refresh()); }));
-for(const k of ['sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
+for(const k of ['tame','sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
 function segBind(id,get,set){ const el=$(id); el.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; set(b.dataset.v); fxSend(); }; return ()=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(get())===b.dataset.v)); }
 const segUI=[
+  segBind('tameFocus',()=>FX.tame.focus,v=>FX.tame.focus=v),
   segBind('satMode',()=>FX.sat.mode,v=>FX.sat.mode=v),
   segBind('satMach',()=>FX.sat.machine,v=>FX.sat.machine=v),
   segBind('satSpeed',()=>FX.sat.speed,v=>FX.sat.speed=+v),
@@ -1655,7 +1771,9 @@ const segUI=[
 const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A800</b> שמן וחם יותר עם בס מודגש, <b>ATR-102</b> נקי ומדויק יותר. ב-<b>15 IPS</b> הבס מתנפח והגבוהים מתרככים, ב-<b>30 IPS</b> הצליל הדוק ופתוח. <b>Drive</b> מוסיף רוויה, <b>Wow</b> מוסיף את התנודה העדינה של הסליל.',
   ssl:'<b>SATURATOR</b>: רוויה הרמונית. <b>Character</b> שמאלה מוסיף הרמוניות זוגיות, חמות ועגולות, וימינה הרמוניות אי-זוגיות, חדות ונוכחות. <b>Tone</b> מטה את הצבע לכהה או בהיר, ו-<b>Mix</b> מאפשר רוויה מקבילית.'};
 function fxUI(){
-  for(const k of ['sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
+  { const T=FX.tame; $('tameSub').textContent='MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess+(T.focus!=='st'?' · '+T.focus.toUpperCase():'')+(T.delta?' · DELTA':'');
+    $('tameDelta').classList.toggle('on',T.delta); $('tameDelta').setAttribute('aria-pressed',T.delta); }
+  for(const k of ['tame','sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
   const sv=FX.sat; $('satMach').hidden=$('satSpeed').hidden=sv.mode!=='tape';
   $('satSub').textContent= sv.mode==='tape'? 'TAPE · '+(sv.machine==='a800'?'A800':'ATR-102')+' · '+sv.speed+' IPS · DRIVE '+sgn(sv.drive) : 'SATURATOR · DRIVE +'+sv.drive.toFixed(1)+' · MIX '+sv.mix+'%';
   $('satHelp').innerHTML=SAT_HELP[sv.mode];
@@ -1684,11 +1802,33 @@ knob($('kRev'),fSpec({label:()=>'MIX', color:'#ffb347', get:()=>FX.rev.mix/50, s
 /* FX displays (drawn only while a strip is open) */
 function fxCanvas(id){ const c=$(id), o={c,g:c.getContext('2d'),w:200,h:110,d:1};
   new ResizeObserver(()=>{ o.d=Math.min(2,window.devicePixelRatio||1); o.w=Math.max(10,c.clientWidth); o.h=Math.max(10,c.clientHeight); c.width=Math.round(o.w*o.d); c.height=Math.round(o.h*o.d); }).observe(c); return o; }
+$('tameDelta').onclick=()=>{ FX.tame.delta=!FX.tame.delta; fxSend(); toast(FX.tame.delta?'שומעים רק את מה ש-TAME מוריד':'חזרה לצליל המלא'); };
+{ const kb=$('kTameBig'), mk=(key,lab,col)=>knob(kb,{label:()=>lab,color:col,enabled:()=>true,get:()=>FX.tame[key]/100,set:n=>{ FX.tame[key]=Math.round(n*100); fxSend(); },text:()=>FX.tame[key]+'%',reset:()=>{ FX.tame[key]=0; fxSend(); }});
+  mk('mud','MUD','#c9a466'); mk('harsh','HARSH','#ff8a5a'); mk('ess','ESS','#7fe0a8');
+  kb.querySelectorAll('.knob').forEach(k=>k.classList.add('big'));
+  knob($('kTame'),{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(FX.tame.att,1,100),set:n=>{ FX.tame.att=Math.round(unlg(n,1,100)); fxSend(); },text:()=>FX.tame.att+' ms',reset:()=>{ FX.tame.att=15; fxSend(); }});
+  knob($('kTame'),{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(FX.tame.rel,20,600),set:n=>{ FX.tame.rel=Math.round(unlg(n,20,600)); fxSend(); },text:()=>FX.tame.rel+' ms',reset:()=>{ FX.tame.rel=120; fxSend(); }}); }
+const tameC=fxCanvas('tameCv');
+function drawTame(){ const {g:c,w,h,d}=tameC; c.setTransform(d,0,0,d,0,0);
+  const bg=c.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#0b171c'); bg.addColorStop(1,'#060d11'); c.fillStyle=bg; c.fillRect(0,0,w,h);
+  const lx=f=>Math.log10(f/20)/3*w, regs=[[180,650,'#c9a466','MUD',FX.tame.mud],[1000,4500,'#ff8a5a','HARSH',FX.tame.harsh],[4500,12000,'#7fe0a8','ESS',FX.tame.ess]];
+  c.font='600 9.5px "Chakra Petch", sans-serif'; c.textBaseline='bottom'; c.textAlign='center';
+  for(const [a,b,col,lab,amt] of regs){ c.fillStyle=col+Math.round(8+amt*.3).toString(16).padStart(2,'0'); c.fillRect(lx(a),0,lx(b)-lx(a),h);
+    c.fillStyle=col; c.fillText(lab,(lx(a)+lx(b))/2,h-3); }
+  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.fillStyle='rgba(160,200,215,.45)'; c.font='9px "IBM Plex Mono", monospace'; c.textBaseline='top';
+  for(const f of [100,1000,10000]){ const x=Math.round(lx(f))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); c.fillText(f>=1000?f/1000+'k':f,x,3); }
+  const on=FX.tame.on&&S.playing&&tameSp; if(!on){ c.fillStyle='rgba(200,215,225,.55)'; c.font='12px Heebo, sans-serif'; c.textBaseline='middle'; c.fillText(FX.tame.on?'מתחיל לעבוד עם הנגינה':'TAME כבוי',w/2,h/2-8); return; }
+  const B=tameSp.length, X=i=>i/(B-1)*w, Y=v=>h-14-clamp((v+10)/60,0,1)*(h-30);
+  c.beginPath(); for(let i=0;i<B;i++){ const y=Y(tameSp[i]); i?c.lineTo(X(i),y):c.moveTo(X(i),y); } c.strokeStyle='rgba(170,220,240,.75)'; c.lineWidth=1.3; c.stroke();
+  c.beginPath(); c.moveTo(0,0); for(let i=0;i<B;i++) c.lineTo(X(i),Math.min(h,tameRd[i]/18*(h*.7))); c.lineTo(w,0); c.closePath();
+  const gr=c.createLinearGradient(0,0,0,h*.7); gr.addColorStop(0,'rgba(255,90,60,.85)'); gr.addColorStop(1,'rgba(255,90,60,.15)'); c.fillStyle=gr; c.fill();
+  let mx=0; for(const v of tameRd) if(v>mx) mx=v; c.fillStyle='#ffd1a6'; c.textAlign='right'; c.textBaseline='top'; c.font='500 10px "IBM Plex Mono", monospace'; c.fillText('−'+mx.toFixed(1)+' dB',w-6,16); }
 const satC=fxCanvas('satCv'), widC=fxCanvas('widCv'), revC=fxCanvas('revCv');
 let reelA=0, reelT=performance.now(), satShown=-60;
 const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
 function drawFx(now){
   const dt=Math.min(.1,(now-reelT)/1000); reelT=now;
+  if(FX.open.tame) drawTame();
   if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
     if(isTape()){ // tape deck with two spinning reels and a level needle
       c.fillStyle='#d9d4c7'; c.fillRect(0,0,w,h);
@@ -1746,7 +1886,7 @@ let WURL=null; const workletURL=()=>WURL||(WURL=URL.createObjectURL(new Blob([WO
 const isDynBand=b=>b.on&&b.dyn&&b.dyn.on&&(b.type==='bell'||b.type==='lowshelf'||b.type==='highshelf');
 function limWin(Lx,sr){ const ms=Lx.mode==='simple'?1.5:Lx.style===1?Math.min(Lx.look,1):Lx.style===2?.3:Lx.look; return Math.max(2,Math.round(ms*sr/1000)); }
 function chainLatency(st,sr){ const F=st.FX||FX;
-  return (st.mode==='lp'&&!st.bypass?RES[st.res||'med']/2:0)+(st.L&&st.L.on?limWin(st.L,sr)-1:0)+(F.sat&&F.sat.on&&F.sat.mode==='tape'?Math.round(.002*sr):0); }
+  return (F.tame&&F.tame.on?2048:0)+(st.mode==='lp'&&!st.bypass?RES[st.res||'med']/2:0)+(st.L&&st.L.on?limWin(st.L,sr)-1:0)+(F.sat&&F.sat.on&&F.sat.mode==='tape'?Math.round(.002*sr):0); }
 function buildOffline(oc,st){
   const sr=oc.sampleRate, Gn=()=>oc.createGain(), i=Gn(); let p=i;
   const W=(name,opt)=>new AudioWorkletNode(oc,name,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],processorOptions:opt});
@@ -1772,6 +1912,7 @@ function buildOffline(oc,st){
   }
   link(W('bus-comp',compParams(st.C||C)));
   const F=st.FX||FX;
+  if(F.tame&&F.tame.on){ const T=F.tame; link(W('cabin-tame',{on:true,mud:T.mud/100,harsh:T.harsh/100,ess:T.ess/100,att:T.att,rel:T.rel,focus:T.focus,delta:false})); }
   if(F.sat&&F.sat.on){ const sv=F.sat; link(W('cabin-sat',{mode:sv.mode,drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out}));
     const f=[0,1,2,3].map(()=>oc.createBiquadFilter()); f[1].type='peaking'; f[2].type='highshelf'; f[3].type='lowpass';
     if(sv.mode==='tape'){ const c=TAPE[sv.machine+sv.speed]; f[0].type='peaking'; f[0].frequency.value=c.b[0]; f[0].gain.value=c.b[1]; f[0].Q.value=c.b[2];
@@ -1991,6 +2132,11 @@ document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElemen
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.fs) setFs(false); });
 $('bandOn').onclick=()=>{ const b=sel(); if(!b) return; b.on=!b.on; structural(); };
 $('bandDel').onclick=()=>{ const b=sel(); if(b) removeBand(b.id); };
+/* dynamic EQ section: closed by default, remembered per phone */
+let dynOpen=false; try{ dynOpen=localStorage.getItem('cabinq.dynopen')==='1'; }catch(_){}
+function setDynOpen(o){ dynOpen=o; $('gDyn').classList.toggle('shut',!o); $('dynBody').hidden=!o; $('dynChev').setAttribute('aria-expanded',o); try{ localStorage.setItem('cabinq.dynopen',o?'1':'0'); }catch(_){} knobs.forEach(k=>k.refresh()); }
+$('dynHead').addEventListener('click',e=>{ if(e.target.closest('#dynBtn')) return; setDynOpen(!dynOpen); });
+setDynOpen(dynOpen);
 $('dynBtn').onclick=()=>{ const b=sel(); if(!b||!dynOk(b.type)) return; b.dyn.on=!b.dyn.on; computeStatic(); renderBus(); renderDeck(); };
 
 /* ---------- header controls ---------- */
@@ -2377,8 +2523,8 @@ function renderBrowser(scrollToCur){
     if(!n){ const e=document.createElement('li'); e.className='lib-empty'; e.dir='rtl'; e.textContent='לא נמצא שיר בשם הזה'; ul.appendChild(e); } }
   else if(at===null){
     const qk=$('brQuick'); qk.className='br-quick'+(IOS?' one':'');
-    qk.innerHTML='<button class="br-q" id="qSongs"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>בחירת שירים<small>'+(NATIVE?'מהטלפון, Drive או כל אפליקציה':IOS?'מאפליקציית הקבצים או iCloud':'מהמחשב')+'</small></span></button>'+
-      (IOS?'':'<button class="br-q alt" id="qFolder"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg><span>הוספת תיקייה<small>כל השירים שבה</small></span></button>');
+    qk.innerHTML='<button class="br-q" id="qSongs"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>בחירת שירים</span></button>'+
+      (IOS?'':'<button class="br-q alt" id="qFolder"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg><span>הוספת תיקייה</span></button>');
     qk.querySelector('#qSongs').onclick=pickSongs; const qf=qk.querySelector('#qFolder'); if(qf) qf.onclick=pickFolder;
     const foldRow=f=>{ const li=document.createElement('li'); li.className='row'; const b=document.createElement('button');
       const playing=S.playing&&(f.id==='__ses'?SES.on:f.id==='__test'?cur<0:(cur>=0&&PLAY.src===f.id));
@@ -2546,7 +2692,7 @@ function switchTab(k,o){ o=o||{};
   const was=S.playing||!!o.play;
   if(!o.fresh) saveCurTab(); pause(); SES.cur=k;
   if(!o.keepView&&SES.view==='sum') showSum(false);
-  applyState(tab.state);
+  applyState(tab.state); if(typeof histReset==='function') histReset();
   const idx=trackOf(tab);
   if(idx<0){ toast('השיר של הכרטיסייה לא נמצא בספרייה'); renderSes(); return; }
   pendingSeek=o.pos!=null? o.pos : (tab.pos||0);
@@ -2724,6 +2870,19 @@ if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom
 renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
 if(NATIVE&&NATIVE.deviceAudio) setTimeout(()=>scanDevice(false),600);
 fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{ const t=$('verTag'); t.textContent=(t.textContent?t.textContent+' · ':'')+'UI '+String(v.sha||'').slice(0,7); }).catch(()=>{});
+/* ---------- undo / redo of every sound setting ---------- */
+const HIST={undo:[],redo:[],cur:null,pending:null,quiet:0};
+const histSig=()=>{ const st=getState(); if(st.FX) delete st.FX.open; return JSON.stringify(st); };
+function histUI(){ $('undoBtn').disabled=!HIST.undo.length; $('redoBtn').disabled=!HIST.redo.length; }
+function histReset(){ HIST.undo=[]; HIST.redo=[]; HIST.cur=histSig(); HIST.pending=null; histUI(); }
+setInterval(()=>{ if(HIST.quiet>Date.now()) return; const sig=histSig(); if(HIST.cur===null){ HIST.cur=sig; return; }
+  if(sig===HIST.cur){ HIST.pending=null; return; }
+  if(HIST.pending!==sig){ HIST.pending=sig; return; }          // wait until the value stops moving
+  HIST.undo.push(HIST.cur); if(HIST.undo.length>60) HIST.undo.shift(); HIST.redo=[]; HIST.cur=sig; HIST.pending=null; histUI(); },350);
+function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); const st=JSON.parse(from.pop()); const open=JSON.parse(JSON.stringify(FX.open));
+  if(st.FX) st.FX.open=open; HIST.quiet=Date.now()+500; applyState(st); HIST.cur=histSig(); HIST.pending=null; histUI(); }
+$('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
+$('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
 window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
