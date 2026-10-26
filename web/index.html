@@ -86,8 +86,10 @@ button{cursor:pointer}
   box-shadow:0 0 14px rgba(255,154,60,.18), inset 0 1px 0 rgba(255,255,255,.09)}
 body:not(.phone) .ph-only{display:none !important}
 body.phone .pl-only{display:none !important}
-body:not(.phone) #sysBtn, body:not(.phone) #sysHint{display:none !important}
-.ph-line{flex-basis:100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:20px}
+#sysHint{display:none !important}
+#phSt{display:none}
+.ph-line{flex-basis:100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.ph-line.empty{display:none !important}
 .ph-st{font-family:var(--f-mono); font-size:10px; letter-spacing:.12em; color:var(--led)}
 .ph-note{flex:1 1 160px; min-width:0; font-family:var(--f-he); font-size:12px; line-height:1.35; color:var(--ink-3)}
 .ph-line .pill{height:28px}
@@ -131,6 +133,13 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .proc-btn[aria-pressed="true"] svg{filter:drop-shadow(0 0 6px var(--led-glow))}
 .proc-btn[aria-pressed="true"] b{color:#fff4e6}
 .proc-btn[aria-pressed="true"] small{color:var(--led)}
+.proc-btn{position:relative}
+.proc-chain{position:absolute; left:14px; top:50%; transform:translateY(-50%); font-family:var(--f-mono); font-size:9.5px; letter-spacing:.12em; line-height:1.55; text-align:left; color:var(--ink-3); opacity:.7}
+.sys-btn .proc-chain{font-family:var(--f-he); font-size:11px; letter-spacing:0; line-height:1.35}
+.proc-btn[aria-pressed="true"] .proc-chain{color:var(--led); opacity:.9}
+.sys-btn{flex-basis:100%}
+.sys-btn b{letter-spacing:.06em; font-size:16px}
+@media (max-width:360px){ .proc-chain{left:8px; font-size:8.5px} }
 .lm-btn{height:30px; font-size:12.5px !important}
 .lm-btn .lm-v{font-family:var(--f-mono); font-size:11px; color:var(--led); margin-inline-start:6px}
 .lm-btn .lm-v:empty{display:none}
@@ -187,7 +196,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .clip.hot{background:#ff4a2e; box-shadow:0 0 6px #ff4a2e}
 
 /* band chips */
-.bands{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 2px; margin-top:8px}
+.bands{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 2px; margin:20px 0 16px}
 .bchip{display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 10px 0 8px; border-radius:15px;
   border:1px solid #121416; background:linear-gradient(180deg,#33373c,#272a2f); color:var(--ink-2);
   font-family:var(--f-mono); font-size:11px; box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
@@ -622,7 +631,10 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="pill he-pill" id="presetDel" hidden>מחיקה</button>
         <button class="pill he-pill" id="presetCancel">ביטול</button>
       </div>
-      <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button><span class="sys-hint" id="sysHint" dir="rtl" hidden>ה-EQ על כל הצלילים בטלפון: ספוטיפיי, יוטיוב, ניווט</span>
+      <button class="proc-btn sys-btn" id="sysBtn" aria-pressed="false" hidden dir="rtl" title="העיבוד על כל הצלילים בטלפון">
+        <svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/><path d="M9 10c1 0 1-2 2-2s1 5 2 5 1-3 2-3"/></svg>
+        <span class="pt"><b dir="ltr">System EQ</b><small id="sysBtnSt">כבוי</small></span>
+        <span class="proc-chain">כל הצלילים<br>בטלפון</span></button><span class="sys-hint" id="sysHint" dir="rtl" hidden>ה-EQ על כל הצלילים בטלפון: ספוטיפיי, יוטיוב, ניווט</span>
       <div class="ph-line ph-only" id="phLine" dir="rtl"><span class="ph-st" id="phSt" dir="ltr"></span><span class="ph-note" id="phNote"></span><button class="pill he-pill" id="phMic" hidden>אישור</button></div>
     </div>
   </header>
@@ -649,6 +661,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <button class="proc-btn" id="procBtn" aria-pressed="true" title="הדלקה וכיבוי של כל העיבוד, כדי לשמוע את השיר כמו במקור">
       <svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
       <span class="pt"><b>עיבוד</b><small id="procSt">פעיל</small></span>
+      <span class="proc-chain" id="procChain" dir="ltr">EQ · COMP<br>FX · LIMITER</span>
     </button>
     <button class="pill he-pill lm-btn" id="lmBtn" aria-pressed="false" title="משווה את העוצמה עם העיבוד ובלעדיו, כדי שההשוואה תהיה רק על הצליל"><span class="led"></span>השוואת עוצמה<span class="lm-v" id="lmV" dir="ltr"></span></button>
   </div>
@@ -2920,7 +2933,7 @@ function systemCurve(){
 function pushSystem(){ if(!NATIVE||!SYS.on) return; clearTimeout(SYS.t); SYS.t=setTimeout(()=>{ try{ NATIVE.setCurve(JSON.stringify(systemCurve())); }catch(_){} },40); }
 function setSystem(on){
   SYS.on=on; try{ NATIVE.setSystemEq(on); }catch(_){}
-  const b=$('sysBtn'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on);
+  const b=$('sysBtn'); b.setAttribute('aria-pressed',on); $('sysBtnSt').textContent=on?'פעיל':'כבוי';
   if(on){ pushSystem(); toast('העיבוד פועל על כל הצלילים בטלפון'); }
   pollSys();
 }
@@ -2930,6 +2943,7 @@ function pollSys(){
   SYS.st=st;
   const was=SYS.globalOk; SYS.globalOk=SYS.on&&!!st.globalOk;
   const el=$('sysSt'); el.hidden=!SYS.on;
+  $('sysBtnSt').textContent= !SYS.on? 'כבוי' : st.globalOk? 'פעיל · כל האפליקציות' : st.sessions? 'פעיל · '+st.sessions+(st.sessions>1?' נגנים':' נגן') : 'פעיל · מחכה לנגן';
   if(SYS.on) el.textContent= st.globalOk? 'SYSTEM · ALL APPS' : st.sessions? 'SYSTEM · '+st.sessions+' PLAYER'+(st.sessions>1?'S':'') : 'SYSTEM · WAITING FOR A PLAYER';
   if(was!==SYS.globalOk) updateRouting();
   phStatus();
@@ -3075,7 +3089,7 @@ function phStatus(){
   else if(SCOPE.state==='denied'){ note='כדי לראות את גלי הקול צריך הרשאת "מיקרופון". שום דבר לא מוקלט.'; mic=true; }
   else if(SCOPE.state==='fail') note='הטלפון הזה לא מאפשר להציג את הצליל, אבל העיבוד עובד.';
   else if(!SYS.on) note='כבוי: הפעל כדי שהעיבוד יעבור על כל הצלילים בטלפון.';
-  $('phNote').textContent=note; $('phMic').hidden=!mic;
+  $('phNote').textContent=note; $('phMic').hidden=!mic; $('phLine').classList.toggle('empty',!note&&!mic);
 }
 $('phMic').onclick=()=>{ try{ NATIVE.scopeStart(); }catch(_){} };
 function scopeOn(on){ if(!NEWNAT) return; try{ on? NATIVE.scopeStart() : NATIVE.scopeStop(); }catch(_){} }
@@ -3084,7 +3098,7 @@ function setAppMode(m,quiet){
   APPM=m; document.body.classList.toggle('phone',m==='phone');
   document.querySelectorAll('#modeTabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===m));
   try{ localStorage.setItem('cabinq.appmode',m); }catch(_){}
-  scopeOn(m==='phone'); phStatus(); phUI(); try{ renderDeck(); }catch(_){}
+  scopeOn(m==='phone'); phStatus(); phUI(); $('procChain').innerHTML= m==='phone'? 'EQ · SMOOTH<br>GLUE' : 'EQ · COMP<br>FX · LIMITER'; try{ renderDeck(); }catch(_){}
   if(m==='phone'&&!quiet&&!SYS.on) toast('לחיצה על System EQ מפעילה את העיבוד');
   requestAnimationFrame(()=>{ try{ resize(); }catch(_){} knobs.forEach(x=>x.refresh()); });
 }
