@@ -63,7 +63,7 @@ button{cursor:pointer}
 .screw.tl{top:6px;left:6px}.screw.tr{top:6px;right:6px}.screw.bl{bottom:6px;left:6px}.screw.br{bottom:6px;right:6px}
 
 /* header */
-.head{display:flex; flex-direction:column; gap:10px; padding:2px 4px 0}
+.head{display:flex; flex-direction:column; gap:16px; padding:16px 4px 6px}
 .brand{display:flex; align-items:center; justify-content:center; gap:12px}
 .logo{width:62px; height:62px; flex:none; filter:drop-shadow(0 3px 10px rgba(201,164,102,.28))}
 .brand-t{display:flex; flex-direction:column; align-items:center; gap:3px; line-height:1.05}
@@ -74,6 +74,7 @@ button{cursor:pointer}
 .head-ctl{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px; border-radius:12px; background:var(--well);
   box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
 .head-ctl select.pill{flex:1 1 170px; max-width:none}
+.sys-hint{flex:1 1 140px; min-width:0; font-family:var(--f-he); font-size:12px; line-height:1.35; color:var(--ink-3)}
 .pill.he-pill{font-family:var(--f-he); letter-spacing:0; text-transform:none; font-size:13px; font-weight:500}
 .preset-row{flex-basis:100%; display:flex; gap:6px; flex-wrap:wrap; align-items:center}
 .preset-row input{flex:1 1 180px; min-width:0}
@@ -288,6 +289,11 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .bandbox #bbName{font-family:var(--f-mono); font-size:11.5px; color:#f1dfc2; margin:0 4px; white-space:nowrap}
 .bandbox .chip{height:24px !important; padding:0 7px !important; font-size:10px !important}
 .bandbox .chip.ic{width:26px !important}
+.bb-types{display:flex; gap:2px; padding:0 2px; border-left:1px solid rgba(255,255,255,.12); border-right:1px solid rgba(255,255,255,.12); margin:0 2px}
+.bb-types button{width:28px; height:24px; border:0; border-radius:5px; background:transparent; display:grid; place-items:center}
+.bb-types svg{width:20px; height:14px; fill:none; stroke:#bfae94; stroke-width:1.9; stroke-linecap:round}
+.bb-types button[aria-pressed="true"]{background:rgba(255,255,255,.12)}
+.bb-types button[aria-pressed="true"] svg{stroke:var(--c,#fff)}
 .fs-info{display:none; position:absolute; top:8px; left:12px; z-index:3; pointer-events:none; font-family:var(--f-mono); font-size:13px; color:#eef3f6; text-shadow:0 1px 3px #000, 0 0 10px rgba(0,0,0,.8); white-space:nowrap}
 .fs-info small{display:block; font-size:11px; color:#ffb070; margin-top:3px}
 .unit.fs .fs-info{display:block}
@@ -459,7 +465,7 @@ input[type=range]:disabled{opacity:.3}
 .tracks .grp button{width:auto; padding:2px 8px; margin-inline-start:auto; font-family:var(--f-he); font-size:11.5px; color:var(--ink-3); border:1px solid #2c3035; border-radius:6px}
 .lib-empty{padding:18px 12px; font-family:var(--f-he); font-size:13px; color:var(--ink-3); text-align:center}
 .head{position:relative}
-.ses-tog{position:absolute; top:4px; right:2px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 7px 4px; border-radius:10px;
+.ses-tog{position:absolute; top:12px; right:2px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 7px 4px; border-radius:10px;
   border:1px solid #121416; background:linear-gradient(180deg,#363b41,#272b30); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); color:var(--ink-2)}
 .ses-tog svg{width:22px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linejoin:round}
 .ses-tog span{font-family:var(--f-he); font-size:10.5px; line-height:1}
@@ -572,7 +578,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="pill he-pill" id="presetDel" hidden>מחיקה</button>
         <button class="pill he-pill" id="presetCancel">ביטול</button>
       </div>
-      <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button>
+      <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button><span class="sys-hint" id="sysHint" dir="rtl" hidden>ה-EQ על כל הצלילים בטלפון: ספוטיפיי, יוטיוב, ניווט</span>
     </div>
   </header>
 
@@ -598,6 +604,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <div class="rail" id="rail">
       <div class="bandbox" id="bandBox"><span class="dot"></span><span id="bbName">—</span>
         <button class="chip" id="fsOn" title="הפעלה וכיבוי של הבנד">ON</button><button class="chip" id="fsDyn" title="Dynamic EQ לבנד">DYN</button>
+        <span class="bb-types" id="bbTypes"></span>
         <button class="chip ic" id="fsListen" title="האזנה לאזור הבנד בלבד"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="2"/><rect x="16.5" y="14" width="4.5" height="7" rx="2"/></svg></button></div>
       <button class="chip" id="rangeBtn" title="טווח התצוגה">±12 dB</button>
       <button class="chip ic" id="undoBtn" title="ביטול שינוי ב-EQ" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
@@ -2271,6 +2278,8 @@ function drawVU(now){
 const typesEl=$('types');
 TYPES.forEach(t=>{ const b=document.createElement('button'); b.dataset.t=t; b.title=TYPE_LBL[t]; b.setAttribute('aria-label',TYPE_LBL[t]);
   b.innerHTML=`<svg viewBox="0 0 24 18"><path d="${ICONS[t]}"/></svg>`; b.onclick=()=>{ const s=sel(); if(s) setType(s,t); }; typesEl.appendChild(b); });
+TYPES.forEach(t=>{ const b=document.createElement('button'); b.dataset.t=t; b.title=TYPE_LBL[t]; b.setAttribute('aria-label',TYPE_LBL[t]);
+  b.innerHTML=`<svg viewBox="0 0 24 18"><path d="${ICONS[t]}"/></svg>`; b.onclick=()=>{ const s2=sel(); if(s2) setType(s2,t); }; $('bbTypes').appendChild(b); });
 function renderDeck(){
   const b=sel(); const deck=$('deck');
   $('emptyMsg').hidden=!!b; $('groups').style.opacity=b?1:.5;
@@ -2278,6 +2287,7 @@ function renderDeck(){
   if(b){ deck.style.setProperty('--c',COLORS[b.slot]); $('bandName').textContent='BAND '+(b.slot+1)+' · '+TYPE_LBL[b.type]; }
   else { deck.style.setProperty('--c','#6b737b'); $('bandName').textContent='NO BAND'; }
   typesEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', !!b&&x.dataset.t===b.type));
+  $('bbTypes').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', !!b&&x.dataset.t===b.type));
   $('bandOn').setAttribute('aria-pressed',!!b&&b.on); $('bandOn').classList.toggle('on',!!b&&b.on);
   const dOk=!!b&&dynOk(b.type);
   $('dynBtn').disabled=!dOk; $('dynBtn').setAttribute('aria-pressed',dOk&&b.dyn.on); $('dynBtn').classList.toggle('on',dOk&&b.dyn.on);
@@ -2839,7 +2849,7 @@ function pollSys(){
   if(was!==SYS.globalOk) updateRouting();
 }
 if(NATIVE){
-  $('sysBtn').hidden=false; $('sysBtn').onclick=()=>setSystem(!SYS.on);
+  $('sysBtn').hidden=false; $('sysHint').hidden=false; $('sysBtn').onclick=()=>setSystem(!SYS.on);
   setInterval(pollSys,2000);
 }
 /* remember the setup between launches */
