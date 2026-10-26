@@ -121,6 +121,8 @@ class MainActivity : Activity() {
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         if (prefs.getLong("webVersion", -1L) != ver) { web.clearCache(true); prefs.edit().putLong("webVersion", ver).apply() }
         web.addJavascriptInterface(Bridge(), "CabinNative")
+        Scope.sink = { json -> runOnUiThread { if (jsReady) web.evaluateJavascript("window.cabinScope&&window.cabinScope($json)", null) } }
+        EqEngine.onSessionsChanged = { main.post { Scope.retarget() } }
         setContentView(web)
         web.loadUrl("https://$HOST/index.html")
         handleOpenIntent(intent)
@@ -342,6 +344,12 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_MIC) {
+            val ok = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            val st = if (!ok) "denied" else { scopeWanted = true; Scope.start() }
+            scopeState(st)
+            return
+        }
         if (requestCode != REQ_AUDIO) return
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) scanDeviceAudio()
         else deliverDevice(JSONObject().put("denied", true).toString())
@@ -378,6 +386,24 @@ class MainActivity : Activity() {
             }
         }
         deliverDevice(JSONObject().put("items", items).toString())
+    }
+
+    // ---------------------------------------------------------------- phone sound scope (spectrum of what the phone plays)
+
+    @Volatile private var scopeWanted = false
+    private fun hasMic() = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    private fun scopeState(st: String) = runOnUiThread {
+        if (jsReady) web.evaluateJavascript("window.cabinScopeState&&window.cabinScopeState('$st')", null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Scope.stop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (scopeWanted && hasMic()) Scope.start()
     }
 
     // ---------------------------------------------------------------- screen
@@ -610,6 +636,22 @@ class MainActivity : Activity() {
             else EqService.stop(this@MainActivity)
         }
 
+        /** "ok" when the scope may run, "ask" when it still needs the microphone permission. */
+        @JavascriptInterface
+        fun micState(): String = if (hasMic()) "ok" else "ask"
+
+        /** Starts drawing the phone's sound. Frames arrive in window.cabinScope; returns "ok", "perm" (asking) or "fail". */
+        @JavascriptInterface
+        fun scopeStart(): String {
+            if (!hasMic()) { runOnUiThread { requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQ_MIC) }; return "perm" }
+            scopeWanted = true
+            runOnUiThread { scopeState(Scope.start()) }
+            return "ok"
+        }
+
+        @JavascriptInterface
+        fun scopeStop() { scopeWanted = false; runOnUiThread { Scope.stop() } }
+
         @JavascriptInterface
         fun setCurve(json: String) = EqEngine.setCurve(json, applicationContext)
 
@@ -711,6 +753,7 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         updateReceiver?.let { runCatching { unregisterReceiver(it) } }
+        Scope.stop(); Scope.sink = null; EqEngine.onSessionsChanged = null
         super.onDestroy()
     }
 
@@ -725,6 +768,7 @@ class MainActivity : Activity() {
         private const val REQ_PICK = 43
         private const val REQ_TREE = 44
         private const val REQ_AUDIO = 45
+        private const val REQ_MIC = 46
         private const val MAX_TRACKS = 3000
         private val AUDIO_EXT = Regex(".*\\.(mp3|m4a|aac|wav|flac|ogg|opus|aiff?|alac|wma)$", RegexOption.IGNORE_CASE)
     }

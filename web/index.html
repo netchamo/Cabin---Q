@@ -74,6 +74,28 @@ button{cursor:pointer}
 .head-ctl{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px; border-radius:12px; background:var(--well);
   box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
 .head-ctl select.pill{flex:1 1 170px; max-width:none}
+.mode-tabs{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.mode-tabs[hidden]{display:none}
+.mode-tabs button{display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; column-gap:10px; row-gap:1px; align-items:center; text-align:right;
+  padding:10px 12px; border-radius:12px; border:1px solid #121416; background:linear-gradient(180deg,#30353a,#23272b); color:var(--ink-2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 2px 6px rgba(0,0,0,.4); cursor:pointer; min-width:0}
+.mode-tabs svg{grid-row:1 / span 2; width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.mode-tabs b{font-family:var(--f-he); font-size:16px; font-weight:600; color:var(--ink)}
+.mode-tabs span{font-family:var(--f-he); font-size:11.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mode-tabs button[aria-pressed="true"]{border-color:rgba(255,154,60,.65); color:var(--led); background:linear-gradient(180deg,#3a3630,#2a2723);
+  box-shadow:0 0 14px rgba(255,154,60,.18), inset 0 1px 0 rgba(255,255,255,.09)}
+body:not(.phone) .ph-only{display:none !important}
+body.phone .pl-only{display:none !important}
+body:not(.phone) #sysBtn, body:not(.phone) #sysHint{display:none !important}
+.ph-line{flex-basis:100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:20px}
+.ph-st{font-family:var(--f-mono); font-size:10px; letter-spacing:.12em; color:var(--led)}
+.ph-note{flex:1 1 160px; min-width:0; font-family:var(--f-he); font-size:12px; line-height:1.35; color:var(--ink-3)}
+.ph-line .pill{height:28px}
+.g-smooth{flex-basis:100%; order:2; margin-top:6px; border-color:rgba(127,224,168,.25) !important; background:linear-gradient(180deg,rgba(127,224,168,.05),rgba(0,0,0,.1)) !important}
+.g-glue{flex-basis:100%; order:3; margin-top:6px; border-color:rgba(255,90,74,.25) !important; background:linear-gradient(180deg,rgba(255,90,74,.05),rgba(0,0,0,.1)) !important}
+.g-smooth,.g-glue{min-width:0}
+.g-smooth .tame-reg,.g-glue .gt .gr-read,.g-smooth .gt .gr-read{align-self:center}
+.g-smooth .gt .gr-read,.g-glue .gt .gr-read{margin-left:auto}
 .sys-hint{flex:1 1 140px; min-width:0; font-family:var(--f-he); font-size:12px; line-height:1.35; color:var(--ink-3)}
 .pill.he-pill{font-family:var(--f-he); letter-spacing:0; text-transform:none; font-size:13px; font-weight:500}
 .preset-row{flex-basis:100%; display:flex; gap:6px; flex-wrap:wrap; align-items:center}
@@ -255,7 +277,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .comp-body{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
 .vu{flex:1 1 230px; max-width:380px; height:128px; padding:6px; border-radius:10px; background:linear-gradient(180deg,#151719,#0b0c0e);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.07)}
-#vu{display:block; width:100%; height:100%; border-radius:5px}
+#vu,#glVu{display:block; width:100%; height:100%; border-radius:5px}
 .comp-body .knobs{flex:1 1 300px}
 .k-tick{stroke:var(--ink-3); stroke-width:1.6; stroke-linecap:round}
 .gt-band{display:inline-flex; align-items:center; gap:7px; font-family:var(--f-mono); font-size:11.5px; color:var(--ink); letter-spacing:.02em; text-transform:none}
@@ -552,7 +574,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <div class="update" id="updBar" dir="rtl" hidden><span id="updTxt">גרסה חדשה זמינה</span><a class="pill" id="updLink" href="https://github.com/netchamo/Cabin---Q/releases/download/latest/cabin-q.apk">עדכן</a></div>
   <header class="head">
-    <button class="ses-tog" id="sesTog" aria-pressed="false" title="סשן: כמה שירים בכרטיסיות, וחיבור לרצועה אחת">
+    <button class="ses-tog pl-only" id="sesTog" aria-pressed="false" title="סשן: כמה שירים בכרטיסיות, וחיבור לרצועה אחת">
       <svg viewBox="0 0 24 20"><path d="M2 6h6l1.5-3h5L16 6h6v12H2z"/><path d="M2 9h20"/></svg><span>סשן</span></button>
     <div class="brand">
       <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
@@ -569,6 +591,10 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
       </svg>
       <div class="brand-t"><b>CABIN <i>-</i> Q</b><span dir="rtl">ממשק שמע אולפני</span><small id="verTag"></small></div>
     </div>
+    <div class="mode-tabs" id="modeTabs" dir="rtl" role="group" aria-label="מצב" hidden>
+      <button data-v="player" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/></svg><b>נגן</b><span>שירים באפליקציה</span></button>
+      <button data-v="phone" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/><path d="M9 9.5c1 0 1-2 2-2s1 5 2 5 1-3 2-3" /></svg><b>טלפון</b><span>כל הצלילים בטלפון</span></button>
+    </div>
     <div class="head-ctl">
       <select class="pill" id="preset" aria-label="Preset"></select>
       <button class="pill he-pill" id="presetSave">שמור</button>
@@ -579,15 +605,16 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="pill he-pill" id="presetCancel">ביטול</button>
       </div>
       <button class="pill" id="sysBtn" aria-pressed="false" hidden title="Apply the EQ to every app on the phone"><span class="led"></span>System EQ</button><span class="sys-hint" id="sysHint" dir="rtl" hidden>ה-EQ על כל הצלילים בטלפון: ספוטיפיי, יוטיוב, ניווט</span>
+      <div class="ph-line ph-only" id="phLine" dir="rtl"><span class="ph-st" id="phSt" dir="ltr"></span><span class="ph-note" id="phNote"></span><button class="pill he-pill" id="phMic" hidden>אישור</button></div>
     </div>
   </header>
 
-  <nav class="ses-bar" id="sesBar" hidden aria-label="כרטיסיות הסשן">
+  <nav class="ses-bar pl-only" id="sesBar" hidden aria-label="כרטיסיות הסשן">
     <div class="ses-tabs" id="sesTabs"></div>
     <div class="ses-info" id="sesInfo"><span class="he" dir="rtl">עוצמה נמדדת בזמן הנגינה</span></div>
   </nav>
-  <section class="sum" id="sumPanel" hidden dir="rtl"></section>
-  <div class="modebar">
+  <section class="sum pl-only" id="sumPanel" hidden dir="rtl"></section>
+  <div class="modebar pl-only">
     <div class="seg" id="modeSeg" role="group" aria-label="Processing mode">
       <button data-m="mp" aria-pressed="true">ZERO LATENCY</button>
       <button data-m="lp" aria-pressed="false">LINEAR PHASE</button>
@@ -603,16 +630,16 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
   <div class="screen">
     <div class="rail" id="rail">
       <div class="bandbox" id="bandBox"><span class="dot"></span><span id="bbName">—</span>
-        <button class="chip" id="fsOn" title="הפעלה וכיבוי של הבנד">ON</button><button class="chip" id="fsDyn" title="Dynamic EQ לבנד">DYN</button>
+        <button class="chip" id="fsOn" title="הפעלה וכיבוי של הבנד">ON</button><button class="chip pl-only" id="fsDyn" title="Dynamic EQ לבנד">DYN</button>
         <span class="bb-types" id="bbTypes"></span>
-        <button class="chip ic" id="fsListen" title="האזנה לאזור הבנד בלבד"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="2"/><rect x="16.5" y="14" width="4.5" height="7" rx="2"/></svg></button></div>
+        <button class="chip ic pl-only" id="fsListen" title="האזנה לאזור הבנד בלבד"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="2"/><rect x="16.5" y="14" width="4.5" height="7" rx="2"/></svg></button></div>
       <button class="chip" id="rangeBtn" title="טווח התצוגה">±12 dB</button>
       <button class="chip ic" id="undoBtn" title="ביטול שינוי ב-EQ" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="chip ic redo" id="redoBtn" title="ביצוע מחדש" disabled><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
       <span class="sp"></span>
       <button class="chip" id="fitBtn" hidden>FIT</button>
       <button class="chip" id="bypass" aria-pressed="false" title="עקיפת ה-EQ">BYPASS</button>
-      <button class="chip" id="preBtn" aria-pressed="true" title="הצגת הספקטרום לפני העיבוד">PRE</button>
+      <button class="chip pl-only" id="preBtn" aria-pressed="true" title="הצגת הספקטרום לפני העיבוד">PRE</button>
       <button class="chip he" id="fsBtn" title="מסך מלא">⤢ מסך מלא</button>
     </div>
     <div class="glass" id="glass">
@@ -632,14 +659,30 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
       <span class="tag" id="bandTag"><span class="dot"></span><span id="bandName">BAND 1</span></span>
       <div class="types" id="types" role="group" aria-label="Filter shape"></div>
       <span class="spacer"></span>
-      <button class="pill" id="listenBtn" aria-pressed="false" title="Hear only this band's region"><span class="led"></span>Listen</button>
+      <button class="pill pl-only" id="listenBtn" aria-pressed="false" title="Hear only this band's region"><span class="led"></span>Listen</button>
       <button class="pill" id="bandOn" aria-pressed="true"><span class="led"></span>On</button>
       <button class="pill" id="bandDel">Remove</button>
     </div>
     <div class="empty" id="emptyMsg" dir="rtl" hidden>אין נקודות. הקשה כפולה על המסך או ‎+ BAND‎ מוסיפים נקודה.</div>
     <div class="groups" id="groups">
       <div class="group g-band"><div class="gt">FILTER</div><div class="knobs" id="kBand"></div></div>
-      <div class="group g-dyn shut" id="gDyn">
+      <div class="group g-smooth ph-only" id="gSmooth">
+        <div class="gt"><button class="pill" id="smOn" aria-pressed="false"><span class="led"></span>Smooth</button><span class="gr-read" id="smGr"></span></div>
+        <div class="tame-disp"><canvas id="smCv" aria-label="עוצמה והנחתה בשלושת האזורים"></canvas></div>
+        <div class="knobs tame-big" id="kSmBig"></div>
+        <div class="seg tame-reg" id="smReg"><button data-v="mud" style="--rc:#c9a466">MUD</button><button data-v="harsh" style="--rc:#ff8a5a">HARSH</button><button data-v="ess" style="--rc:#7fe0a8">ESS</button></div>
+        <div class="knobs wrap" id="kSm"></div>
+        <p class="dyn-help" dir="rtl"><b>SMOOTH</b> מוריד אזור רק ברגעים שהוא מתחזק מדי, על כל צליל שהטלפון מנגן. <b>MUD</b> הבוץ בנמוכים־אמצעיים, <b>HARSH</b> הצרימה ב־2–5 kHz, <b>ESS</b> השורקות. מתחת לנובים בוחרים אזור ומזיזים אותו: <b>FREQ</b> ו־<b>WIDTH</b> קובעים איפה, <b>ATTACK</b> ו־<b>RELEASE</b> כמה מהר. ההנחתה נראית גם על ה־EQ למעלה.</p>
+      </div>
+      <div class="group g-glue ph-only" id="gGlue">
+        <div class="gt"><button class="pill" id="glOn" aria-pressed="false"><span class="led"></span>Glue comp</button><span class="gr-read" id="glGr"></span></div>
+        <div class="comp-body">
+          <div class="vu"><canvas id="glVu" aria-label="מחוג הקומפרסור"></canvas></div>
+          <div class="knobs wrap" id="kGl"></div>
+        </div>
+        <p class="dyn-help" dir="rtl"><b>GLUE</b> מדביק את המיקס ומשווה בין שקט לרועש, מצוין לרכב. <b>INPUT</b> מכניס יותר או פחות צליל לעיבוד. <b>CEILING</b> היא התקרה: גם עם <b>MAKEUP</b> גבוה, הצליל לא עובר אותה.</p>
+      </div>
+      <div class="group g-dyn shut pl-only" id="gDyn">
         <div class="gt" id="dynHead"><button class="pill" id="dynBtn" aria-pressed="false"><span class="led"></span>Dynamic EQ</button>
           <span class="gt-band" id="dynBand"><span class="dot"></span><span id="dynBandTxt">—</span></span>
           <span class="dyn-note" id="dynNote" dir="rtl" hidden>Dynamic זמין ל-Bell ול-Shelf</span>
@@ -652,7 +695,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <p class="dyn-help" dir="rtl" style="margin-top:8px"><b>Threshold</b> הוא העוצמה שממנה הבנד מתחיל לזוז, הקו הכתום בגרף, ואפשר לגרור אותו. <b>Range</b> הוא כמה dB לכל היותר הבנד יזוז: ערך שלילי חותך רק כשהתדר מתחזק, למשל צרימה בשירה, וערך חיובי מגביר. <b>Listen</b> משמיע רק את אזור הבנד, כדי לשמוע מה הוא עושה.</p>
         </div>
       </div>
-      <div class="group g-comp">
+      <div class="group g-comp pl-only">
         <div class="gt"><button class="pill on" id="compIn" aria-pressed="true"><span class="led"></span>Bus comp</button><span class="gr-read" id="compGr">GR 0.0 dB</span></div>
         <div class="comp-body">
           <div class="vu"><canvas id="vu" aria-label="Gain reduction meter"></canvas></div>
@@ -661,7 +704,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <p class="dyn-help" id="compNote" dir="rtl" hidden>הדפדפן הזה לא תומך במנוע הקומפרסור המלא, אז הפילטר על הסייד-צ'יין כבוי. שאר הכפתורים עובדים.</p>
         <p class="dyn-help" dir="rtl"><b>SC HPF</b> קובע מאיזה תדר הקומפרסור מתחיל להגיב: בהגדרה גבוהה הבס כבר לא "מושך" את כל המיקס למטה. <b>Mix</b> מערבב בין האות המקורי לאות הדחוס, לקומפרסיה מקבילית.</p>
       </div>
-      <div class="group g-fx">
+      <div class="group g-fx pl-only">
         <div class="gt fx-title">FX</div>
         <div class="fx off" id="fx_tame" style="--fxc:#7fe0a8">
           <div class="fx-h" data-fx="tame"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 14c3 0 3-4 5-4s2 6 4 6 2-11 4-11 2 9 4 9h3"/><path d="M13 3l3 3M16 3l-3 3" opacity=".7"/></svg></span><b>TAME</b><span class="fx-sub" id="tameSub"></span>
@@ -723,7 +766,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
           </div>
         </div>
       </div>
-      <div class="group g-lim">
+      <div class="group g-lim pl-only">
         <div class="gt"><button class="pill on" id="limIn" aria-pressed="true"><span class="led"></span>Limiter</button>
           <div class="seg" id="limMode" role="group" aria-label="Limiter type"><button data-m="modern" aria-pressed="true">MODERN</button><button data-m="simple" aria-pressed="false">SIMPLE</button></div>
           <span class="gr-read" id="limGr">GR 0.0 dB</span></div>
@@ -734,7 +777,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <div class="seg" id="limStyle" role="group" aria-label="Limiter style"><button data-s="0" aria-pressed="true">TRANSPARENT</button><button data-s="1" aria-pressed="false">PUNCHY</button><button data-s="2" aria-pressed="false">AGGRESSIVE</button></div>
         <p class="dyn-help" dir="rtl" id="limHelp"></p>
       </div>
-      <div class="group g-out"><div class="gt">OUTPUT</div>
+      <div class="group g-out pl-only"><div class="gt">OUTPUT</div>
         <div class="out-row"><div class="knobs" id="kOut"></div>
           <div class="render" dir="rtl">
             <div class="render-row"><button class="pill he-pill" id="renderBtn"><span class="led"></span>רינדור השיר</button><button class="pill he-pill" id="renderCancel" hidden>ביטול</button></div>
@@ -752,7 +795,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     </div>
   </section>
 
-  <section class="player" id="player" aria-label="נגן">
+  <section class="player pl-only" id="player" aria-label="נגן">
     <div class="pl-grab" id="plGrab" title="פתיחה / סגירה"><span></span></div>
     <div class="mini-seek dis" id="miniSeek" aria-label="מיקום בשיר"><div class="ms-track"><i id="miniProg"></i><b id="miniThumb"></b></div><span class="ms-tip" id="miniTip" hidden></span></div>
     <div class="mini" id="mini" role="button" tabindex="0" aria-label="פתיחת הנגן">
@@ -831,7 +874,8 @@ const PRESETS={
 };
 var NATIVE=window.CabinNative||null;
 var SYS={on:false,globalOk:false,t:0};
-var SYS_BANDS=(()=>{ const n=48,f=[]; for(let i=0;i<n;i++) f.push(20*Math.pow(1000,(i+.5)/n)); return f; })();
+function sysBandsN(n){ const f=[]; for(let i=0;i<n;i++) f.push(20*Math.pow(1000,(i+.5)/n)); return f; }
+var SYS_BANDS=sysBandsN(48);
 const S={bands:[],sel:null,lo:LMIN,hi:LMAX,dbR:12,mode:'mp',res:'med',bypass:false,trim:0,pre:true,playing:false,solo:false,fs:false,rot:false};
 
 /* ---------- audio graph ---------- */
@@ -1035,11 +1079,13 @@ function sampleSpec(an,arr,outArr){
 let sPost=new Float32Array(1), sPre=new Float32Array(1), specLevel=0;
 function drawSpectrum(){
   if(sPost.length!==DF.length){ sPost=new Float32Array(DF.length); sPre=new Float32Array(DF.length); }
-  if(S.playing){ sampleSpec(postAn,specPost,sPost); if(S.pre) sampleSpec(preAn,specPre,sPre); specLevel=Math.min(1,specLevel+.08); }
+  const phone=APPM==='phone';
+  if(phone){ if(scopeLive()){ samplePhone(sPost); specLevel=Math.min(1,specLevel+.08); } else { specLevel=Math.max(0,specLevel-.04); if(specLevel<=0) return; } }
+  else if(S.playing){ sampleSpec(postAn,specPost,sPost); if(S.pre) sampleSpec(preAn,specPre,sPre); specLevel=Math.min(1,specLevel+.08); }
   else { specLevel=Math.max(0,specLevel-.04); if(specLevel<=0) return; }
   const n=DF.length, bot=H-PB;
   g.globalAlpha=specLevel;
-  if(S.pre){ g.beginPath(); for(let i=0;i<n;i++){ const x=i/(n-1)*W, y=clamp(specY(sPre[i]),PT,bot); i?g.lineTo(x,y):g.moveTo(x,y);} g.strokeStyle='rgba(255,170,100,.32)'; g.lineWidth=1; g.stroke(); }
+  if(S.pre&&!phone){ g.beginPath(); for(let i=0;i<n;i++){ const x=i/(n-1)*W, y=clamp(specY(sPre[i]),PT,bot); i?g.lineTo(x,y):g.moveTo(x,y);} g.strokeStyle='rgba(255,170,100,.32)'; g.lineWidth=1; g.stroke(); }
   g.beginPath(); g.moveTo(0,bot);
   for(let i=0;i<n;i++){ const x=i/(n-1)*W, y=clamp(specY(sPost[i]),PT,bot); g.lineTo(x,y); }
   g.lineTo(W,bot); g.closePath();
@@ -1062,14 +1108,14 @@ function computeLive(){
 let tip=null;
 function draw(){
   g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,W,H);
-  drawGrid(); drawSpectrum();
+  drawGrid(); drawSpectrum(); const PHM=APPM==='phone'; if(PHM) drawPhoneZones();
   const sb=S.bands.find(b=>b.id===S.sel);
   if(sb&&resp.get(sb.id)){ const r=resp.get(sb.id), n=r.length; const c=COLORS[sb.slot];
     g.beginPath(); g.moveTo(0,yDb(0)); for(let i=0;i<n;i++) g.lineTo(i/(n-1)*W, yDb(clamp(r[i],-S.dbR*1.6,S.dbR*1.6))); g.lineTo(W,yDb(0)); g.closePath();
     g.fillStyle=c+'2a'; g.fill(); pathCurve(r); g.strokeStyle=c+(sb.on?'aa':'55'); g.lineWidth=1.2; g.stroke(); }
   // dynamic zones: how far each dynamic band may move (static curve → curve at full range)
   const n=total.length, cy=v=>yDb(clamp(v,-S.dbR*1.6,S.dbR*1.6)), xi=i=>i/(n-1)*W;
-  for(const b of S.bands){ const gr=ghostR.get(b.id), r=resp.get(b.id); if(!gr||!r||!b.on) continue;
+  if(!PHM) for(const b of S.bands){ const gr=ghostR.get(b.id), r=resp.get(b.id); if(!gr||!r||!b.on) continue;
     const c=COLORS[b.slot], isSel=b.id===S.sel;
     g.beginPath(); for(let i=0;i<n;i++) i?g.lineTo(xi(i),cy(total[i])):g.moveTo(xi(i),cy(total[i]));
     for(let i=n-1;i>=0;i--) g.lineTo(xi(i),cy(total[i]-r[i]+gr[i])); g.closePath();
@@ -1091,7 +1137,7 @@ function draw(){
   // handles
   for(const b of S.bands){ const [x,y]=handlePos(b); if(x<-12||x>W+12) continue; const c=COLORS[b.slot], sel=b.id===S.sel, r=sel?11:9;
     const a=A.get(b.id);
-    if(b.on&&b.dyn.on&&a&&a.lpd){
+    if(!PHM&&b.on&&b.dyn.on&&a&&a.lpd){
       // range rail: static gain → maximum movement, with a live puck riding on it
       const ye=clamp(yDb(b.gain+b.dyn.range),PT,H-PB);
       g.strokeStyle=c+'88'; g.lineWidth=2; g.beginPath(); g.moveTo(x,y); g.lineTo(x,ye); g.stroke();
@@ -1111,11 +1157,11 @@ function draw(){
     g.beginPath(); g.arc(x,y,r,0,Math.PI*2);
     if(b.on){ g.fillStyle=c; g.shadowColor=c; g.shadowBlur=sel?14:6; g.fill(); g.shadowBlur=0; } else { g.fillStyle='rgba(6,13,17,.9)'; g.fill(); g.strokeStyle=c; g.lineWidth=2; g.stroke(); }
     if(sel){ g.beginPath(); g.arc(x,y,r+4,0,Math.PI*2); g.strokeStyle=c+'88'; g.lineWidth=1.5; g.stroke(); }
-    if(b.dyn.on&&dynOk(b.type)){ g.beginPath(); g.arc(x,y,r+(sel?8:5),-Math.PI*.8,-Math.PI*.2); g.strokeStyle=c; g.lineWidth=1.5; g.stroke(); }
+    if(!PHM&&b.dyn.on&&dynOk(b.type)){ g.beginPath(); g.arc(x,y,r+(sel?8:5),-Math.PI*.8,-Math.PI*.2); g.strokeStyle=c; g.lineWidth=1.5; g.stroke(); }
     g.fillStyle=b.on?'#0b1216':c; g.font='600 11px "Chakra Petch", sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(String(b.slot+1),x,y+.5);
   }
   // detector column on the main EQ: selected dynamic band's level against its threshold, right at its frequency
-  if(sb&&sb.on&&dynOk(sb.type)){
+  if(!PHM&&sb&&sb.on&&dynOk(sb.type)){
     const a=A.get(sb.id); const cg=colGeom(sb), hx=cg.hx;
     if(a&&a.sca&&hx>-20&&hx<W+20){
       const c=COLORS[sb.slot], bot=cg.bot, hgt=cg.hgt, top=cg.top, x=cg.x, bw=cg.bw;
@@ -1161,7 +1207,7 @@ function meterPos(db){ return clamp((db+60)/63,0,1); }
 let clipT={L:0,R:0};
 function meters(now){
   for(const [k,an] of [['L',anL],['R',anR]]){
-    const m=met[k]; const d=S.playing?peakDb(an):-120;
+    const m=met[k]; const d=APPM==='phone'? (scopeLive()? SCOPE.pk : -120) : S.playing?peakDb(an):-120;
     m.v = d>m.v? d : m.v-0.6;
     if(d>m.pk||now-m.pt>1200){ m.pk=Math.max(d,m.v); m.pt=now; }
     if(d>-0.1) clipT[k]=now;
@@ -1248,7 +1294,7 @@ function activity(){
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
 }
 function loop(now){
-  dynamics(now); computeLive(); draw(); drawHist(); drawVU(now); drawLim(); drawFx(now); if(SES.preview) previewTick(); activity(); meters(now); updateTime(); renderProgress();
+  dynamics(now); computeLive(); if(APPM==='phone') anyDynLive=false; draw(); phoneTick(now); drawHist(); drawVU(now); drawLim(); drawFx(now); if(SES.preview) previewTick(); activity(); meters(now); updateTime(); renderProgress();
   requestAnimationFrame(loop);
 }
 
@@ -2306,7 +2352,7 @@ function refreshDeck(){
     const p=[fmtHz(b.freq)]; if(!isCut(b.type)&&b.type!=='notch') p.push(sgn(b.gain)+' dB');
     if(isCut(b.type)) p.push(b.slope+' dB/oct'); else if(b.type==='bell'||b.type==='notch') p.push('Q '+b.q.toFixed(2));
     $('fsInfo').innerHTML=''; $('fsInfo').append(p.join('  ·  '));
-    if(b.dyn&&b.dyn.on&&dynOk(b.type)){ const sm=document.createElement('small'); sm.textContent='DYN · THR '+sgn(b.dyn.thresh)+' · RANGE '+sgn(b.dyn.range); $('fsInfo').append(sm); }
+    if(APPM!=='phone'&&b.dyn&&b.dyn.on&&dynOk(b.type)){ const sm=document.createElement('small'); sm.textContent='DYN · THR '+sgn(b.dyn.thresh)+' · RANGE '+sgn(b.dyn.range); $('fsInfo').append(sm); }
     $('fsOn').classList.toggle('lit',b.on); $('fsOn').textContent=b.on?'ON':'OFF'; }
   else { $('bbName').textContent='—'; $('fsInfo').textContent='הקשה כפולה מוסיפה בנד'; }
   const fd=$('fsDyn'); fd.disabled=!b||!dynOk(b.type); fd.classList.toggle('lit',!!b&&dynOk(b.type)&&b.dyn.on);
@@ -2832,26 +2878,218 @@ function systemCurve(){
   const n=SYS_BANDS.length, fr=new Float32Array(SYS_BANDS), m=new Float32Array(n), ph=new Float32Array(n), db=new Float32Array(n);
   if(!S.bypass) for(const b of S.bands){ if(!b.on) continue; for(const nd of A.get(b.id).disp){ nd.getFrequencyResponse(fr,m,ph); for(let i=0;i<n;i++) if(m[i]>0&&isFinite(m[i])) db[i]+=20*Math.log10(m[i]); } }
   const cutoffs=SYS_BANDS.map((f,i)=> i<n-1? Math.round(Math.sqrt(f*SYS_BANDS[i+1])) : 20000);
-  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:S.bypass?0:S.trim+(L.on?L.gain:0), lim:{on:L.on&&!S.bypass,ceil:L.ceil,rel:L.rel}};
+  const byp=S.bypass, P=PH;
+  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:byp?0:P.inp, lim:{on:true,ceil:P.ceil,rel:80},
+    smooth:{on:P.sm.on&&!byp, r:SMK.map(k=>smRegion(k))},
+    glue:{on:P.gl.on&&!byp, thr:P.gl.thr, ratio:P.gl.ratio, att:P.gl.att, rel:P.gl.rel, makeup:P.gl.makeup}};
 }
 function pushSystem(){ if(!NATIVE||!SYS.on) return; clearTimeout(SYS.t); SYS.t=setTimeout(()=>{ try{ NATIVE.setCurve(JSON.stringify(systemCurve())); }catch(_){} },40); }
 function setSystem(on){
   SYS.on=on; try{ NATIVE.setSystemEq(on); }catch(_){}
   const b=$('sysBtn'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on);
-  if(on){ pushSystem(); toast('ה-EQ פועל על כל האפליקציות'); }
+  if(on){ pushSystem(); toast('העיבוד פועל על כל הצלילים בטלפון'); }
   pollSys();
 }
 function pollSys(){
   if(!NATIVE) return; let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){}
+  if(st.bands&&st.bands!==SYS_BANDS.length){ SYS_BANDS=sysBandsN(st.bands); pushSystem(); }
+  SYS.st=st;
   const was=SYS.globalOk; SYS.globalOk=SYS.on&&!!st.globalOk;
   const el=$('sysSt'); el.hidden=!SYS.on;
   if(SYS.on) el.textContent= st.globalOk? 'SYSTEM · ALL APPS' : st.sessions? 'SYSTEM · '+st.sessions+' PLAYER'+(st.sessions>1?'S':'') : 'SYSTEM · WAITING FOR A PLAYER';
   if(was!==SYS.globalOk) updateRouting();
+  phStatus();
 }
 if(NATIVE){
   $('sysBtn').hidden=false; $('sysHint').hidden=false; $('sysBtn').onclick=()=>setSystem(!SYS.on);
   setInterval(pollSys,2000);
 }
+/* ---------- phone mode: process the whole phone's sound (Android) ----------
+   The phone's sound never passes through this page: the native engine (DynamicsProcessing) does the work,
+   so phone mode offers what that engine really does: the EQ curve, SMOOTH (3 dynamic regions) and GLUE (bus comp).
+   The spectrum and meters come from the native scope (Visualizer), 20 frames a second. */
+var SMK=['mud','harsh','ess'];
+var SMREG={mud:{lo:100,hi:900,def:300,col:'#c9a466'},harsh:{lo:1000,hi:6000,def:3000,col:'#ff8a5a'},ess:{lo:4000,hi:14000,def:7500,col:'#7fe0a8'}};
+function phDefault(){ return {inp:0,ceil:-1,
+  sm:{on:false,mud:0,harsh:0,ess:0,edit:'harsh',R:{mud:{f:300,w:1.3,att:20,rel:160},harsh:{f:3000,w:1.2,att:5,rel:90},ess:{f:7500,w:1,att:1,rel:50}}},
+  gl:{on:false,thr:-18,ratio:2,att:10,rel:200,makeup:3}}; }
+var PH=(()=>{ const d=phDefault(); try{ const o=JSON.parse(localStorage.getItem('cabinq.phone')||'null'); if(o){ Object.assign(d,o); d.sm=Object.assign(phDefault().sm,o.sm||{}); d.gl=Object.assign(phDefault().gl,o.gl||{}); } }catch(_){} return d; })();
+function phSave(){ try{ localStorage.setItem('cabinq.phone',JSON.stringify(PH)); }catch(_){} }
+function smEdges(k){ const r=PH.sm.R[k]; return [r.f/Math.pow(2,r.w/2), r.f*Math.pow(2,r.w/2)]; }
+/* amount 0–100 % → threshold and ratio of the region's compressor band */
+function smThr(k){ return -8-PH.sm[k]*.27; }
+function smRatio(k){ return 1+PH.sm[k]/100*5; }
+function smRegion(k){ const [lo,hi]=smEdges(k), r=PH.sm.R[k]; return {lo:Math.round(lo),hi:Math.round(hi),thr:+smThr(k).toFixed(1),ratio:+smRatio(k).toFixed(2),att:r.att,rel:r.rel}; }
+function phSend(){ phSave(); pushSystem(); phUI(); }
+var NEWNAT=!!(NATIVE&&typeof NATIVE.scopeStart==='function');
+var APPM='player';
+var SCOPE={t:0,sr:48000,bins:null,pk:-96,rms:-96,state:'',sess:0,lv:{mud:-90,harsh:-90,ess:-90},gr:{mud:0,harsh:0,ess:0},glGr:0,glLvl:-90,lt:0};
+const PH_CAL=-18;  /* Visualizer bins (8-bit, normalized) → roughly the analyser's dB scale */
+window.cabinScope=function(f){
+  try{
+    const now=performance.now(), d=f.d, n=d.length; SCOPE.sr=f.sr||48000; SCOPE.sess=f.s;
+    if(!SCOPE.bins||SCOPE.bins.length!==n) SCOPE.bins=new Float32Array(n);
+    const b=SCOPE.bins; for(let i=0;i<n;i++) b[i]=d[i]<=-239? -200 : d[i]/2;
+    SCOPE.pk=f.pk; SCOPE.rms=f.rms; SCOPE.t=now;
+    phDetect(now);
+  }catch(_){}
+};
+window.cabinScopeState=function(st){ SCOPE.state=st; phStatus(); };
+/* bins → level of a frequency range in dB (power sum) */
+function binLevel(lo,hi){ const b=SCOPE.bins; if(!b) return -120; const hz=SCOPE.sr/2/(b.length+1); let p=0;
+  for(let k=Math.max(0,Math.floor(lo/hz)-1);k<=Math.min(b.length-1,Math.ceil(hi/hz)-1);k++) if(b[k]>-150) p+=Math.pow(10,b[k]/10);
+  return p>0? 10*Math.log10(p) : -120; }
+/* what the engine is doing, estimated from the measured sound with the same thresholds, ratios and timing */
+function phDetect(now){
+  const dt=clamp((now-(SCOPE.lt||now))/1000,.01,.2); SCOPE.lt=now;
+  const k=tau=>1-Math.exp(-dt/Math.max(tau/1000,.001)), on=SYS.on&&!S.bypass;
+  for(const key of SMK){ const [lo,hi]=smEdges(key), r=PH.sm.R[key];
+    const lvl=binLevel(lo,hi)+PH.inp; SCOPE.lv[key]=lvl;
+    let tgt=0; if(on&&PH.sm.on&&PH.sm[key]>0){ const over=lvl-smThr(key); if(over>0) tgt=over*(1-1/smRatio(key)); }
+    const g=SCOPE.gr[key]; SCOPE.gr[key]=g+(tgt-g)*k(tgt>g?Math.max(r.att,40):r.rel); }
+  const G=PH.gl, lvl=SCOPE.rms+PH.inp; SCOPE.glLvl=lvl;
+  let tgt=0; if(on&&G.on){ const over=lvl-G.thr; if(over>0) tgt=over*(1-1/G.ratio); }
+  SCOPE.glGr+= (tgt-SCOPE.glGr)*k(tgt>SCOPE.glGr?Math.max(G.att,40):G.rel);
+}
+function scopeLive(){ return APPM==='phone'&&SCOPE.bins&&performance.now()-SCOPE.t<700; }
+/* spectrum on the EQ in phone mode: same grid as the in-app analyser */
+function samplePhone(outArr){
+  const b=SCOPE.bins, n=DF.length, hz=SCOPE.sr/2/(b.length+1), L=b.length-1;
+  for(let i=0;i<n;i++){ const lo=DF[i]/Math.pow(2,1/12), hi=DF[i]*Math.pow(2,1/12); let v=-200;
+    const kl=Math.floor(lo/hz)-1, kh=Math.ceil(hi/hz)-1;
+    if(kh<=kl+1){ const x=DF[i]/hz-1, f0=Math.floor(x), fr=x-f0; v=b[clamp(f0,0,L)]*(1-fr)+b[clamp(f0+1,0,L)]*fr; }
+    else for(let k2=Math.max(0,kl);k2<=Math.min(L,kh);k2++) if(b[k2]>v) v=b[k2];
+    const tgt=v+PH_CAL+4.5*Math.log2(DF[i]/1000);
+    outArr[i]= tgt>outArr[i]? tgt : outArr[i]+(tgt-outArr[i])*.35; }
+}
+/* SMOOTH regions on the main EQ: where they act, and how far they pull down right now */
+function drawPhoneZones(){
+  if(!PH.sm.on||S.bypass) return;
+  const bot=H-PB, y0=yDb(0);
+  for(const key of SMK){ if(PH.sm[key]<=0) continue; const [lo,hi]=smEdges(key), c=SMREG[key].col, x1=xF(lo), x2=xF(hi);
+    if(x2<0||x1>W) continue;
+    g.fillStyle=c+'14'; g.fillRect(x1,PT,x2-x1,bot-PT);
+    g.strokeStyle=c+'55'; g.lineWidth=1; g.setLineDash([3,4]); g.beginPath(); g.moveTo(x1+.5,PT); g.lineTo(x1+.5,bot); g.moveTo(x2-.5,PT); g.lineTo(x2-.5,bot); g.stroke(); g.setLineDash([]);
+    const gr=scopeLive()? SCOPE.gr[key] : 0;
+    if(gr>.05){ const yd=yDb(-Math.min(gr,S.dbR*1.5));
+      const gg=g.createLinearGradient(0,y0,0,yd); gg.addColorStop(0,c+'20'); gg.addColorStop(1,c+'cc');
+      g.fillStyle=gg; g.fillRect(x1+2,y0,x2-x1-4,yd-y0);
+      g.fillStyle=c; g.fillRect(x1+2,yd-1,x2-x1-4,2.5);
+      g.font='500 10px "IBM Plex Mono", monospace'; g.textAlign='center'; g.textBaseline='top'; g.fillText('−'+gr.toFixed(1),(x1+x2)/2,yd+4); }
+    g.font='600 9px "Chakra Petch", sans-serif'; g.fillStyle=c+'bb'; g.textAlign='center'; g.textBaseline='top'; g.fillText(key.toUpperCase(),(x1+x2)/2,PT+4);
+  }
+}
+/* SMOOTH panel display: each region's level against its threshold, and its gain reduction */
+const smC=fxCanvas('smCv');
+function drawSmooth(){ const {g:c,w,h,d}=smC; c.setTransform(d,0,0,d,0,0);
+  const bg=c.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#0b171c'); bg.addColorStop(1,'#060d11'); c.fillStyle=bg; c.fillRect(0,0,w,h);
+  const lx=f=>Math.log10(f/20)/3*w, live=scopeLive(), top=16, base=h-16, ly=v=>top+(-clamp(v,-60,0))/60*(base-top);
+  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.fillStyle='rgba(160,200,215,.45)'; c.font='9px "IBM Plex Mono", monospace'; c.textBaseline='top'; c.textAlign='center';
+  for(const f of [100,1000,10000]){ const x=Math.round(lx(f))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); c.fillText(f>=1000?f/1000+'k':f,x,3); }
+  // phone spectrum, faint, behind
+  if(live){ const b=SCOPE.bins, hz=SCOPE.sr/2/(b.length+1); c.beginPath(); let st=false;
+    for(let k2=0;k2<b.length;k2++){ const f=(k2+1)*hz; if(f<20) continue; const x=lx(f), y=ly(b[k2]+PH_CAL+4.5*Math.log2(f/1000)); st?c.lineTo(x,y):(c.moveTo(x,y),st=true); }
+    c.strokeStyle='rgba(170,220,240,.25)'; c.stroke(); }
+  for(const key of SMK){ const [lo,hi]=smEdges(key), col=SMREG[key].col, x1=lx(lo), x2=lx(hi), amt=PH.sm[key], selk=PH.sm.edit===key;
+    c.fillStyle=col+(selk?'26':'14'); c.fillRect(x1,top,x2-x1,base-top);
+    c.strokeStyle=col+(selk?'cc':'66'); c.lineWidth=selk?1.6:1; c.strokeRect(x1+.5,top+.5,x2-x1-1,base-top-1);
+    const on=PH.sm.on&&amt>0;
+    // level bar
+    const lv=live? SCOPE.lv[key] : -90, bw=Math.max(6,Math.min(18,(x2-x1)*.25)), bx=(x1+x2)/2-bw/2;
+    c.fillStyle=col+'55'; c.fillRect(bx,ly(lv),bw,base-ly(lv));
+    // threshold
+    if(on){ const ty=ly(smThr(key)); c.strokeStyle='#ff9a3c'; c.lineWidth=1.5; c.setLineDash([4,3]); c.beginPath(); c.moveTo(x1+2,ty); c.lineTo(x2-2,ty); c.stroke(); c.setLineDash([]); }
+    // gain reduction, hanging from the top
+    const gr=live? SCOPE.gr[key] : 0;
+    if(gr>.05){ const gh=Math.min(1,gr/12)*(base-top); c.fillStyle='rgba(255,154,60,.75)'; c.fillRect(x1+3,top,x2-x1-6,gh); }
+    c.font='600 10px "Chakra Petch", sans-serif'; c.fillStyle=on?col:col+'88'; c.textAlign='center'; c.textBaseline='bottom';
+    c.fillText(key.toUpperCase()+(gr>.05?' −'+gr.toFixed(1):''),(x1+x2)/2,h-2);
+  }
+  if(!live){ c.fillStyle='rgba(200,215,225,.6)'; c.font='12px Heebo, sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(phWhyQuiet(),w/2,h/2); }
+}
+/* GLUE needle (same face as the bus comp) */
+const glC=fxCanvas('glVu'); let glNeedle=0, glT=performance.now();
+function drawGlue(now){
+  const dt=Math.min(.1,(now-glT)/1000); glT=now;
+  const tgt=scopeLive()&&PH.gl.on? SCOPE.glGr : 0; glNeedle+=(tgt-glNeedle)*(1-Math.exp(-dt/(tgt>glNeedle?.06:.25)));
+  const {g:c,w,h,d}=glC; c.setTransform(d,0,0,d,0,0); const lit=PH.gl.on&&SYS.on;
+  const fg=c.createLinearGradient(0,0,0,h); fg.addColorStop(0,lit?'#f6ecd2':'#9d9483'); fg.addColorStop(1,lit?'#d9c9a3':'#7d7566'); c.fillStyle=fg; c.fillRect(0,0,w,h);
+  const px=w/2, py=h*1.32, R=Math.min(h*1.22,w*.9), P=(a,r)=>[px+r*Math.sin(a),py-r*Math.cos(a)];
+  c.strokeStyle='#26201a'; c.lineWidth=1.3; c.beginPath(); c.arc(px,py,R*.86,-Math.PI/2+vuAng(20),-Math.PI/2+vuAng(0)); c.stroke();
+  c.strokeStyle='#b8321f'; c.lineWidth=3; c.beginPath(); c.arc(px,py,R*.885,-Math.PI/2+vuAng(20),-Math.PI/2+vuAng(10)); c.stroke();
+  c.fillStyle='#26201a'; c.textAlign='center'; c.textBaseline='middle'; c.font='600 '+Math.round(h*.105)+'px "Chakra Petch", sans-serif';
+  for(const t of [0,1,2,3,4,6,8,10,12,14,16,20]){ const a=vuAng(t), major=[0,4,8,12,16,20].includes(t);
+    const [x1,y1]=P(a,R*.86), [x2,y2]=P(a,R*(major?.79:.82)); c.lineWidth=major?1.6:1; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+    if(major){ const [tx,ty]=P(a,R*.95); c.fillText(String(t),tx,ty); } }
+  c.font='600 '+Math.round(h*.085)+'px "Chakra Petch", sans-serif'; c.fillStyle='rgba(38,32,26,.75)'; c.fillText('GAIN REDUCTION · dB',px,h*.58);
+  const a=vuAng(glNeedle), [nx,ny]=P(a,R*.93), [bx,by]=P(a,R*.45);
+  c.save(); c.beginPath(); c.rect(0,0,w,h*.8); c.clip(); c.strokeStyle='#141210'; c.lineWidth=1.6; c.beginPath(); c.moveTo(bx,by); c.lineTo(nx,ny); c.stroke(); c.restore();
+  const hg2=c.createLinearGradient(0,h*.8,0,h); hg2.addColorStop(0,'#2a2622'); hg2.addColorStop(1,'#141210'); c.fillStyle=hg2; c.fillRect(0,h*.8,w,h*.2);
+  c.fillStyle=lit?'#ff9a3c':'#4a3a2c'; c.beginPath(); c.arc(w-12,h*.9,3,0,7); c.fill();
+}
+function phWhyQuiet(){
+  if(!NEWNAT) return 'גלי הקול דורשים עדכון של האפליקציה';
+  if(SCOPE.state==='denied') return 'אין הרשאת מיקרופון, אז אין גלי קול';
+  if(SCOPE.state==='fail') return 'הטלפון לא מאפשר להציג את הצליל';
+  return 'מחכה לצליל מהטלפון';
+}
+function phStatus(){
+  if(!NATIVE) return; const st=SYS.st||{};
+  $('phSt').textContent= !SYS.on? 'OFF' : st.globalOk? 'ON · ALL APPS' : st.sessions? 'ON · '+st.sessions+' PLAYER'+(st.sessions>1?'S':'') : 'ON · WAITING FOR A PLAYER';
+  let note='', mic=false;
+  if(!NEWNAT) note='SMOOTH, GLUE וגלי הקול יעבדו אחרי עדכון האפליקציה.';
+  else if(SCOPE.state==='denied'){ note='כדי לראות את גלי הקול צריך הרשאת "מיקרופון". שום דבר לא מוקלט.'; mic=true; }
+  else if(SCOPE.state==='fail') note='הטלפון הזה לא מאפשר להציג את הצליל, אבל העיבוד עובד.';
+  else if(!SYS.on) note='כבוי: הפעל כדי שהעיבוד יעבור על כל הצלילים בטלפון.';
+  $('phNote').textContent=note; $('phMic').hidden=!mic;
+}
+$('phMic').onclick=()=>{ try{ NATIVE.scopeStart(); }catch(_){} };
+function scopeOn(on){ if(!NEWNAT) return; try{ on? NATIVE.scopeStart() : NATIVE.scopeStop(); }catch(_){} }
+function setAppMode(m,quiet){
+  if(m==='phone'&&!NATIVE) m='player';
+  APPM=m; document.body.classList.toggle('phone',m==='phone');
+  document.querySelectorAll('#modeTabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===m));
+  try{ localStorage.setItem('cabinq.appmode',m); }catch(_){}
+  scopeOn(m==='phone'); phStatus(); phUI(); try{ renderDeck(); }catch(_){}
+  if(m==='phone'&&!quiet&&!SYS.on) toast('לחיצה על System EQ מפעילה את העיבוד');
+  requestAnimationFrame(()=>{ try{ resize(); }catch(_){} knobs.forEach(x=>x.refresh()); });
+}
+document.querySelectorAll('#modeTabs button').forEach(b=>b.onclick=()=>setAppMode(b.dataset.v));
+/* SMOOTH controls */
+$('smOn').onclick=()=>{ PH.sm.on=!PH.sm.on; phSend(); };
+$('glOn').onclick=()=>{ PH.gl.on=!PH.gl.on; phSend(); };
+document.querySelectorAll('#smReg button').forEach(b=>b.onclick=()=>{ PH.sm.edit=b.dataset.v; phUI(); knobs.forEach(x=>x.refresh()); });
+{ const kb=$('kSmBig'), mk=(key,col)=>knob(kb,{label:()=>key.toUpperCase(),color:col,enabled:()=>true,get:()=>PH.sm[key]/100,set:n=>{ PH.sm[key]=Math.round(n*100); if(PH.sm[key]>0&&!PH.sm.on) PH.sm.on=true; phSend(); },text:()=>PH.sm[key]+'%',reset:()=>{ PH.sm[key]=0; phSend(); }});
+  SMK.forEach(k=>mk(k,SMREG[k].col)); kb.querySelectorAll('.knob').forEach(k=>k.classList.add('big'));
+  const RG=()=>PH.sm.R[PH.sm.edit], RT=()=>SMREG[PH.sm.edit];
+  knob($('kSm'),{label:()=>'FREQ',color:'#e9eef2',enabled:()=>true,get:()=>lg(RG().f,RT().lo,RT().hi),set:n=>{ RG().f=Math.round(unlg(n,RT().lo,RT().hi)/10)*10; phSend(); },text:()=>fmtHz(RG().f),reset:()=>{ RG().f=RT().def; phSend(); }});
+  knob($('kSm'),{label:()=>'WIDTH',color:'#b38cff',enabled:()=>true,get:()=>lin(RG().w,.3,2.5),set:n=>{ RG().w=Math.round(unlin(n,.3,2.5)*10)/10; phSend(); },text:()=>RG().w.toFixed(1)+' oct',reset:()=>{ RG().w=1.2; phSend(); }});
+  knob($('kSm'),{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(RG().att,1,100),set:n=>{ RG().att=Math.round(unlg(n,1,100)); phSend(); },text:()=>RG().att+' ms',reset:()=>{ RG().att=10; phSend(); }});
+  knob($('kSm'),{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(RG().rel,20,800),set:n=>{ RG().rel=Math.round(unlg(n,20,800)); phSend(); },text:()=>RG().rel+' ms',reset:()=>{ RG().rel=120; phSend(); }}); }
+/* GLUE controls */
+{ const G=()=>PH.gl, kg=$('kGl'), RAT=[1.5,2,3,4,6,10];
+  knob(kg,{label:()=>'INPUT',bip:true,color:'#e9eef2',enabled:()=>true,get:()=>lin(PH.inp,-12,12),set:n=>{ PH.inp=Math.round(unlin(n,-12,12)*2)/2; phSend(); },text:()=>sgn(PH.inp)+' dB',reset:()=>{ PH.inp=0; phSend(); }});
+  knob(kg,{label:()=>'THRESH',color:'#ff5a4a',enabled:()=>true,get:()=>lin(G().thr,-40,0),set:n=>{ G().thr=Math.round(unlin(n,-40,0)*2)/2; phSend(); },text:()=>sgn(G().thr)+' dB',reset:()=>{ G().thr=-18; phSend(); }});
+  knob(kg,{label:()=>'RATIO',color:'#ff5a4a',ticks:6,enabled:()=>true,get:()=>Math.max(0,RAT.indexOf(G().ratio))/5,set:n=>{ G().ratio=RAT[Math.round(n*5)]; phSend(); },text:()=>G().ratio+':1',reset:()=>{ G().ratio=2; phSend(); }});
+  knob(kg,{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(G().att,.5,100),set:n=>{ G().att=Math.round(unlg(n,.5,100)*10)/10; phSend(); },text:()=>G().att+' ms',reset:()=>{ G().att=10; phSend(); }});
+  knob(kg,{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(G().rel,50,1500),set:n=>{ G().rel=Math.round(unlg(n,50,1500)); phSend(); },text:()=>G().rel+' ms',reset:()=>{ G().rel=200; phSend(); }});
+  knob(kg,{label:()=>'MAKEUP',color:'#c9a466',enabled:()=>true,get:()=>lin(G().makeup,0,15),set:n=>{ G().makeup=Math.round(unlin(n,0,15)*2)/2; phSend(); },text:()=>'+'+G().makeup+' dB',reset:()=>{ G().makeup=3; phSend(); }});
+  knob(kg,{label:()=>'CEILING',color:'#5aa9ff',enabled:()=>true,get:()=>lin(PH.ceil,-6,0),set:n=>{ PH.ceil=Math.round(unlin(n,-6,0)*10)/10; phSend(); },text:()=>PH.ceil.toFixed(1)+' dB',reset:()=>{ PH.ceil=-1; phSend(); }}); }
+function phUI(){
+  const b1=$('smOn'), b2=$('glOn');
+  b1.classList.toggle('on',PH.sm.on); b1.setAttribute('aria-pressed',PH.sm.on);
+  b2.classList.toggle('on',PH.gl.on); b2.setAttribute('aria-pressed',PH.gl.on);
+  document.querySelectorAll('#smReg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===PH.sm.edit));
+}
+function phoneTick(now){
+  if(APPM!=='phone') return;
+  drawSmooth(); drawGlue(now);
+  const live=scopeLive();
+  let mx=0; if(live&&PH.sm.on) for(const k2 of SMK) mx=Math.max(mx,SCOPE.gr[k2]);
+  $('smGr').textContent= live&&PH.sm.on? 'GR −'+mx.toFixed(1)+' dB' : '';
+  $('glGr').textContent= live&&PH.gl.on? 'GR −'+glNeedle.toFixed(1)+' dB' : '';
+}
+if(NATIVE){ $('modeTabs').hidden=false; phUI(); let m='player'; try{ m=localStorage.getItem('cabinq.appmode')||'player'; }catch(_){} setAppMode(m,true); }
 /* remember the setup between launches */
 function getState(){ return JSON.parse(JSON.stringify({bands:S.bands.map(b=>({type:b.type,freq:b.freq,gain:b.gain,q:b.q,slope:b.slope,on:b.on,dyn:b.dyn,slot:b.slot})),trim:S.trim,C,L,FX:typeof FX!=='undefined'?FX:undefined,mode:S.mode,res:S.res,bypass:S.bypass})); }
 function saveState(){ try{ const st=getState(); st.preset=presetSel.value; st.mode=S.mode; st.res=S.res; localStorage.setItem('cabinq.v1',JSON.stringify(st)); }catch(_){} }
@@ -3108,7 +3346,7 @@ function applyBands(list){ const selSlot=(sel()||{}).slot; A.forEach(destroy); A
 function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); HIST.quiet=Date.now()+500; applyBands(JSON.parse(from.pop())); HIST.cur=histSig(); HIST.pending=null; histUI(); }
 $('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
 $('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
-window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx});  // read-only peek, used by automated checks
+window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
