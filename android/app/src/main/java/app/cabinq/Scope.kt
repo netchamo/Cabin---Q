@@ -37,12 +37,12 @@ object Scope {
                 v.setScalingMode(Visualizer.SCALING_MODE_NORMALIZED)
                 v.setMeasurementMode(Visualizer.MEASUREMENT_MODE_PEAK_RMS)
                 v.setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
-                    override fun onWaveFormDataCapture(vz: Visualizer?, w: ByteArray?, rate: Int) {}
-                    override fun onFftDataCapture(vz: Visualizer?, fft: ByteArray?, rate: Int) {
-                        if (vz == null || fft == null) return
-                        frame(vz, fft, rate)
+                    override fun onWaveFormDataCapture(vz: Visualizer?, w: ByteArray?, rate: Int) {
+                        if (vz == null || w == null) return
+                        wave(vz, w, rate)
                     }
-                }, Visualizer.getMaxCaptureRate(), false, true)
+                    override fun onFftDataCapture(vz: Visualizer?, fft: ByteArray?, rate: Int) {}
+                }, Visualizer.getMaxCaptureRate(), true, false)
                 v.setEnabled(true)
                 vis = v; session = s
                 Log.i(TAG, "scope on session $s")
@@ -62,6 +62,19 @@ object Scope {
     /** Re-target when a player opens or closes its session. */
     fun retarget() { if (vis != null && session != EqEngine.lastPlayer) start() }
 
+    /** Sends the raw waveform (8-bit, centred on 128); the page runs its own windowed FFT, which is far cleaner
+     *  than the Visualizer's fixed-point 8-bit spectrum. */
+    private fun wave(v: Visualizer, w: ByteArray, rateHz: Int) {
+        val sb = StringBuilder(w.size * 4 + 64)
+        sb.append("{\"s\":").append(session).append(",\"sr\":").append(rateHz / 1000).append(",\"w\":[")
+        for (i in w.indices) { if (i > 0) sb.append(','); sb.append(w[i].toInt() and 0xff) }
+        var pk = -96.0; var rms = -96.0
+        runCatching { if (v.getMeasurementPeakRms(pr) == Visualizer.SUCCESS) { pk = pr.mPeak / 100.0; rms = pr.mRms / 100.0 } }
+        sb.append("],\"pk\":").append(pk).append(",\"rms\":").append(rms).append('}')
+        sink?.invoke(sb.toString())
+    }
+
+    @Suppress("unused")
     private fun frame(v: Visualizer, fft: ByteArray, rateHz: Int) {
         val n = fft.size              // capture size; bins = n/2
         val bins = n / 2

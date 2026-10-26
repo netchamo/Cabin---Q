@@ -544,7 +544,9 @@ input[type=range]:disabled{opacity:.3}
 .ses-tab.cur i{color:var(--led)}
 .ses-tab.miss span{text-decoration:line-through; opacity:.6}
 .ses-tab.add,.ses-tab.sum{color:var(--ink-2); font-weight:500}
-.ses-tab.sum{margin-inline-start:auto; white-space:nowrap; line-height:1}
+.ses-tab.sum{margin-inline-start:auto; white-space:nowrap; line-height:1; gap:6px; font-family:var(--f-he); flex-direction:row; flex-wrap:nowrap; max-width:none}
+.ses-tab.sum span{overflow:visible}
+.ses-tab.sum svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; flex:none}
 .ses-tab.sum.cur{color:var(--led)}
 .ses-x{flex:none; width:30px; height:40px; border-radius:9px; border:1px solid #121416; background:transparent; color:var(--ink-3); font-size:18px; line-height:1}
 .ses-x.armed{color:#ff6a4a; border-color:#ff6a4a}
@@ -568,7 +570,29 @@ input[type=range]:disabled{opacity:.3}
 .sum-wave{display:block; width:100%; height:64px; border-radius:7px; background:#0b171c; touch-action:none; cursor:ew-resize}
 .sum-times{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
 .sum-join{display:flex; align-items:center; justify-content:center; gap:8px; padding:5px 0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3)}
-.sum-join .pill{height:26px; font-size:12px}
+.sum-join .pill{height:30px; font-size:12px; gap:6px}
+.sum-join .jp{width:36px; padding:0; justify-content:center}
+.sum-join .je small{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-2)}
+.sum-join .je span{color:var(--led)}
+.sum-join.own .je small{color:var(--led)}
+.sum-top .ib.del{display:grid; place-items:center}
+.sum-top .ib.del svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.sum-top .ib.del.armed{color:#ff5a4a; border-color:rgba(255,90,74,.7); background:rgba(255,90,74,.12)}
+.xf{position:fixed; inset:0; z-index:55; display:flex; align-items:center; justify-content:center; padding:12px; background:rgba(0,0,0,.6); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
+.xf[hidden]{display:none}
+.xf-p{width:100%; max-width:760px; display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:16px; background:linear-gradient(180deg,#2c3035,#1d2024); border:1px solid var(--plate-edge); box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.xf-h{display:flex; align-items:center; gap:8px; font-family:var(--f-he); font-size:16px; color:var(--ink)}
+.xf-h .pill{margin-inline-start:auto}
+.xf-names{display:flex; justify-content:space-between; gap:10px; font-family:var(--f-he); font-size:12px}
+.xf-names span{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.xf-names .xa{color:#8fb3c2}.xf-names .xb{color:#ffbe82}
+#xfCv{display:block; width:100%; height:190px; border-radius:10px; touch-action:none; cursor:ew-resize; box-shadow:inset 0 2px 5px rgba(0,0,0,.9)}
+.xf-hint{font-family:var(--f-he); font-size:11.5px; color:var(--ink-3)}
+.xf-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:space-between}
+.xf-len{justify-content:center}
+.xf-len{flex-wrap:nowrap; gap:6px}
+.xf-len b{min-width:96px; white-space:nowrap; text-align:center; font-family:var(--f-mono); font-size:13px; color:var(--led)}
+.xf-len .pill{height:30px; padding:0 8px; font-size:11px}
 .sum-join:before,.sum-join:after{content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(255,154,60,.35),transparent)}
 .update{display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; background:rgba(255,154,60,.12); border:1px solid rgba(255,154,60,.45); font-family:var(--f-he); font-size:13.5px; color:var(--ink)}
 .update a{margin-inline-start:auto; text-decoration:none}
@@ -2999,9 +3023,20 @@ var SCOPE={t:0,sr:48000,bins:null,pk:-96,rms:-96,state:'',sess:0,lv:{mud:-90,har
 const PH_CAL=-18;  /* Visualizer bins (8-bit, normalized) → roughly the analyser's dB scale */
 window.cabinScope=function(f){
   try{
-    const now=performance.now(), d=f.d, n=d.length; SCOPE.sr=f.sr||48000; SCOPE.sess=f.s;
-    if(!SCOPE.bins||SCOPE.bins.length!==n) SCOPE.bins=new Float32Array(n);
-    const b=SCOPE.bins; for(let i=0;i<n;i++) b[i]=d[i]<=-239? -200 : d[i]/2;
+    const now=performance.now(); SCOPE.sr=f.sr||48000; SCOPE.sess=f.s;
+    let raw;
+    if(f.w){ // raw 8-bit waveform: Hann-windowed FFT here (clean, ~75 dB range)
+      const N=f.w.length, re=new Float64Array(N), im=new Float64Array(N); let ws=0;
+      for(let i=0;i<N;i++){ const w=.5-.5*Math.cos(2*Math.PI*i/(N-1)); ws+=w; re[i]=(f.w[i]-128)/128*w; }
+      fft(re,im,false); raw=new Float32Array(N/2-1); const sc=2/ws;
+      for(let k=1;k<N/2;k++){ const m=Math.hypot(re[k],im[k])*sc; raw[k-1]=m>1e-7? 20*Math.log10(m) : -140; }
+      SCOPE.cal=0;
+    } else { const d=f.d; raw=new Float32Array(d.length); for(let i=0;i<d.length;i++) raw[i]=d[i]<=-239? -140 : d[i]/2; SCOPE.cal=PH_CAL; }
+    const n=raw.length;
+    if(!SCOPE.bins||SCOPE.bins.length!==n){ SCOPE.bins=new Float32Array(n); SCOPE.pw=new Float32Array(n); }
+    // time smoothing in power (≈ 120 ms), so the display moves with the music instead of jumping frame to frame
+    const b=SCOPE.bins, pw=SCOPE.pw;
+    for(let i=0;i<n;i++){ const p=Math.pow(10,raw[i]/10); pw[i]=pw[i]*.55+p*.45; b[i]=pw[i]>1e-14? 10*Math.log10(pw[i]) : -140; }
     SCOPE.pk=f.pk; SCOPE.rms=f.rms; SCOPE.t=now;
     phDetect(now);
   }catch(_){}
@@ -3025,14 +3060,17 @@ function phDetect(now){
 }
 function scopeLive(){ return APPM==='phone'&&SCOPE.bins&&performance.now()-SCOPE.t<700; }
 /* spectrum on the EQ in phone mode: same grid as the in-app analyser */
+let phTmp=new Float32Array(1);
 function samplePhone(outArr){
-  const b=SCOPE.bins, n=DF.length, hz=SCOPE.sr/2/(b.length+1), L=b.length-1;
-  for(let i=0;i<n;i++){ const lo=DF[i]/Math.pow(2,1/12), hi=DF[i]*Math.pow(2,1/12); let v=-200;
-    const kl=Math.floor(lo/hz)-1, kh=Math.ceil(hi/hz)-1;
-    if(kh<=kl+1){ const x=DF[i]/hz-1, f0=Math.floor(x), fr=x-f0; v=b[clamp(f0,0,L)]*(1-fr)+b[clamp(f0+1,0,L)]*fr; }
-    else for(let k2=Math.max(0,kl);k2<=Math.min(L,kh);k2++) if(b[k2]>v) v=b[k2];
-    const tgt=v+PH_CAL+4.5*Math.log2(DF[i]/1000);
-    outArr[i]= tgt>outArr[i]? tgt : outArr[i]+(tgt-outArr[i])*.35; }
+  const b=SCOPE.pw, n=DF.length, hz=SCOPE.sr/2/(b.length+1), L=b.length-1, cal=SCOPE.cal||0;
+  if(phTmp.length!==n) phTmp=new Float32Array(n);
+  for(let i=0;i<n;i++){ const lo=DF[i]/Math.pow(2,1/12), hi=DF[i]*Math.pow(2,1/12);
+    const kl=lo/hz-1, kh=hi/hz-1; let p;
+    if(kh-kl<2){ const x=DF[i]/hz-1, f0=Math.floor(x), fr=x-f0; p=b[clamp(f0,0,L)]*(1-fr)+b[clamp(f0+1,0,L)]*fr; }
+    else { let s2=0,c=0; for(let k2=Math.max(0,Math.ceil(kl));k2<=Math.min(L,Math.floor(kh));k2++){ s2+=b[k2]; c++; } p=c?s2/c:0; }
+    phTmp[i]=(p>1e-14? 10*Math.log10(p) : -140)+cal+4.5*Math.log2(DF[i]/1000); }
+  for(let pass=0;pass<2;pass++) for(let i=1;i<n-1;i++) phTmp[i]=(phTmp[i-1]+2*phTmp[i]+phTmp[i+1])/4;
+  for(let i=0;i<n;i++){ const t=phTmp[i]; outArr[i]+= (t-outArr[i])*(t>outArr[i]?.45:.18); }
 }
 /* SMOOTH regions on the main EQ: where they act, and how far they pull down right now */
 function drawPhoneZones(){
@@ -3060,7 +3098,7 @@ function drawSmooth(){ const {g:c,w,h,d}=smC; c.setTransform(d,0,0,d,0,0);
   for(const f of [100,1000,10000]){ const x=Math.round(lx(f))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); c.fillText(f>=1000?f/1000+'k':f,x,3); }
   // phone spectrum, faint, behind
   if(live){ const b=SCOPE.bins, hz=SCOPE.sr/2/(b.length+1); c.beginPath(); let st=false;
-    for(let k2=0;k2<b.length;k2++){ const f=(k2+1)*hz; if(f<20) continue; const x=lx(f), y=ly(b[k2]+PH_CAL+4.5*Math.log2(f/1000)); st?c.lineTo(x,y):(c.moveTo(x,y),st=true); }
+    for(let k2=0;k2<b.length;k2++){ const f=(k2+1)*hz; if(f<20) continue; const x=lx(f), y=ly(b[k2]+(SCOPE.cal||0)+4.5*Math.log2(f/1000)); st?c.lineTo(x,y):(c.moveTo(x,y),st=true); }
     c.strokeStyle='rgba(170,220,240,.25)'; c.stroke(); }
   for(const key of SMK){ const [lo,hi]=smEdges(key), col=SMREG[key].col, x1=lx(lo), x2=lx(hi), amt=PH.sm[key], selk=PH.sm.edit===key;
     c.fillStyle=col+(selk?'26':'14'); c.fillRect(x1,top,x2-x1,base-top);
@@ -3295,7 +3333,9 @@ function renderSes(){
       el.appendChild(x); }
   });
   const add=document.createElement('button'); add.className='ses-tab add'; add.textContent='+ שיר'; add.onclick=()=>{ BR.at=null; setOpen(true); renderBrowser(); toast('בחר שיר מהספרייה, והוא ייפתח בכרטיסייה חדשה'); }; el.appendChild(add);
-  const sm=document.createElement('button'); sm.className='ses-tab sum'+(SES.view==='sum'?' cur':''); sm.textContent='Σ סיכום'; sm.onclick=()=>showSum(true); el.appendChild(sm);
+  const sm=document.createElement('button'); sm.className='ses-tab sum'+(SES.view==='sum'?' cur':''); sm.setAttribute('aria-pressed',SES.view==='sum');
+  sm.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"/></svg><span>'+(SES.view==='sum'?'סגירת הסיכום':'סיכום')+'</span>';
+  sm.onclick=()=>showSum(SES.view!=='sum'); el.appendChild(sm);
   const c=el.querySelector('.ses-tab.cur'); if(c) c.scrollIntoView({block:'nearest',inline:'nearest'});
 }
 function renderSesInfo(){ const t=curTab(); const I=t?integrated(t.loud):null;
@@ -3316,9 +3356,10 @@ function showSum(on){ SES.view=on?'sum':'tab'; $('unit').classList.toggle('sumvi
   if(on){ saveCurTab(); renderSum(); analyzeAll(); } renderSes(); renderSesInfo(); sesSave(); }
 const fmtS=s=>{ if(s==null||!isFinite(s)) return '—'; const m=Math.floor(s/60), r=s-m*60; return m+':'+(r<10?'0':'')+r.toFixed(1); };
 function tabLen(t){ if(t.dur==null) return null; return Math.max(0,(t.out??t.dur)-(t.in||0)); }
-function sesTotal(){ let tot=0, ok=true; const J=SES.join, n=SES.tabs.length;
+function jn(k){ const t=SES.tabs[k]; return (t&&t.join)||SES.join; }
+function sesTotal(){ let tot=0, ok=true; const n=SES.tabs.length;
   SES.tabs.forEach((t,k)=>{ const l=tabLen(t); if(l==null){ ok=false; return; } tot+=l;
-    if(k<n-1){ const l2=tabLen(SES.tabs[k+1])||0; tot+= J.mode==='gap'? J.sec : -Math.min(J.sec,l/2,l2/2); } });
+    if(k<n-1){ const J=jn(k), l2=tabLen(SES.tabs[k+1])||0; tot+= J.mode==='gap'? J.sec : -Math.min(J.sec,l/2,l2/2); } });
   return ok?tot:null; }
 const META=new Map();  // per tab: waveform peaks and 10 ms loudness map (not saved)
 async function analyzeTab(t){ if(META.has(t.id)) return META.get(t.id); const i=trackOf(t); if(i<0) return null;
@@ -3379,27 +3420,97 @@ function renderSum(){
   }
   function updJoin(){ $('joinMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SES.join.mode));
 
-    $('joinNote').textContent=SES.join.mode==='gap'?'שקט בין השירים':'השירים נכנסים זה בזה'; document.querySelectorAll('.sum-join small').forEach(x=>x.textContent=joinTxt()); }
+    $('joinNote').textContent=SES.join.mode==='gap'?'שקט בין השירים':'השירים נכנסים זה בזה'; document.querySelectorAll('.sum-join').forEach((x,i)=>x.querySelector('small').textContent=joinTxt(i)); }
   const list=$('sumList'); list.textContent='';
   if(!SES.tabs.length){ list.innerHTML='<div class="lib-empty">עוד אין שירים בסשן. לחץ על "+ שיר" כדי להוסיף.</div>'; }
   SES.tabs.forEach((t,k)=>{
-    if(k>0){ const j=document.createElement('div'); j.className='sum-join'; j.innerHTML='<button class="pill he-pill">▶ השמע מעבר</button><small dir="ltr"></small>';
-      j.querySelector('small').textContent=joinTxt(); j.querySelector('button').onclick=()=>previewJoin(k-1); list.appendChild(j); }
+    if(k>0){ const j=document.createElement('div'); j.className='sum-join'; j.innerHTML='<button class="pill he-pill jp">▶</button><button class="pill he-pill je"><small dir="ltr"></small><span>עריכה</span></button>';
+      j.querySelector('small').textContent=joinTxt(k-1); if(SES.tabs[k-1].join) j.classList.add('own');
+      j.querySelector('.jp').onclick=()=>previewJoin(k-1); j.querySelector('.je').onclick=()=>openXf(k-1); list.appendChild(j); }
     const row=document.createElement('div'); row.className='sum-row';
     row.innerHTML='<div class="sum-top"><b>'+(k+1)+'</b><span class="nm" dir="auto"></span><small class="lufs" dir="ltr"></small><small class="len" dir="ltr"></small>'+
-      '<button class="ib" data-a="up" title="למעלה">▲</button><button class="ib" data-a="dn" title="למטה">▼</button><button class="ib" data-a="go" title="פתיחת הכרטיסייה">✎</button></div>'+
+      '<button class="ib del" data-a="del" title="הסרה מהסשן"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg></button><button class="ib" data-a="up" title="למעלה">▲</button><button class="ib" data-a="dn" title="למטה">▼</button><button class="ib" data-a="go" title="פתיחת הכרטיסייה">✎</button></div>'+
       '<canvas class="sum-wave" dir="ltr"></canvas><div class="sum-times" dir="ltr"><span class="tin"></span><span class="tout"></span></div>';
     row.querySelector('.nm').textContent=t.name; const I=integrated(t.loud); row.querySelector('.lufs').textContent=I!=null?I.toFixed(1)+' LUFS':'';
     row.querySelector('[data-a=up]').disabled=k===0; row.querySelector('[data-a=dn]').disabled=k===SES.tabs.length-1;
     row.querySelector('[data-a=up]').onclick=()=>{ moveTab(k,-1); }; row.querySelector('[data-a=dn]').onclick=()=>{ moveTab(k,1); };
     row.querySelector('[data-a=go]').onclick=()=>switchTab(k,{force:k===SES.cur});
+    { const d=row.querySelector('[data-a=del]'); d.onclick=()=>{ if(!d.classList.contains('armed')){ d.classList.add('armed'); setTimeout(()=>d.classList.remove('armed'),2500); toast('לחץ שוב כדי להסיר את "'+t.name+'" מהסשן'); return; }
+      SES.view='sum'; const keep=SES.cur!==k; removeTab(k); if(!keep&&SES.view!=='sum') showSum(true); renderSum(); renderSes(); toast('השיר הוסר מהסשן'); }; }
     list.appendChild(row); const cv=row.querySelector('canvas'); updRow(row,t); requestAnimationFrame(()=>drawWave(cv,t)); bindWave(cv,t,row);
   });
   updJoin(); sumHead(); knobs.forEach(k=>k.refresh());
 }
-function joinTxt(){ const J=SES.join; return J.mode==='gap'? 'GAP '+J.sec.toFixed(1)+' s' : 'CROSSFADE '+J.sec.toFixed(1)+' s'; }
+function joinTxt(k){ const J=k==null?SES.join:jn(k); return (J.mode==='gap'? 'GAP ' : 'X-FADE ')+J.sec.toFixed(1)+' s'; }
 function moveTab(k,d){ const j=k+d; if(j<0||j>=SES.tabs.length) return; const c=SES.tabs[SES.cur];
   [SES.tabs[k],SES.tabs[j]]=[SES.tabs[j],SES.tabs[k]]; SES.cur=SES.tabs.indexOf(c); renderSum(); renderSes(); sesSave(); }
+/* ---------- transition editor: a zoomed view of the end of one song and the start of the next ---------- */
+const XF={k:-1,V:10,drag:null};
+function openXf(k){ const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b) return;
+  if(!META.has(a.id)||!META.has(b.id)||a.dur==null){ toast('עוד מנתח את השירים'); return; }
+  XF.k=k; let m=$('xfModal');
+  if(!m){ m=document.createElement('div'); m.id='xfModal'; m.className='xf'; m.dir='rtl'; m.innerHTML=`
+    <div class="xf-p">
+      <div class="xf-h"><b id="xfTitle"></b><button class="pill he-pill" id="xfClose">סיום</button></div>
+      <div class="xf-names" dir="ltr"><span class="xa" id="xfA"></span><span class="xb" id="xfB"></span></div>
+      <canvas id="xfCv" dir="ltr"></canvas>
+      <div class="xf-hint">גרירה על השיר העליון מזיזה את הסוף שלו. גרירה על השיר התחתון מזיזה אותו ומשנה את אורך המעבר.</div>
+      <div class="xf-row"><div class="seg" id="xfMode" dir="ltr"><button data-v="xfade">CROSSFADE</button><button data-v="gap">GAP</button></div>
+        <div class="seg" id="xfZoom" dir="ltr"><button data-v="5">5s</button><button data-v="10">10s</button><button data-v="20">20s</button></div></div>
+      <div class="xf-row xf-len" dir="ltr"><button class="pill" data-d="-0.5">−0.5</button><button class="pill" data-d="-0.1">−0.1</button><b id="xfLen"></b><button class="pill" data-d="0.1">+0.1</button><button class="pill" data-d="0.5">+0.5</button></div>
+      <div class="xf-row"><button class="pill he-pill" id="xfPlay">▶ השמע את המעבר</button><button class="pill he-pill" id="xfReset">כמו כל המעברים</button></div>
+    </div>`; document.body.appendChild(m);
+    m.addEventListener('click',e=>{ if(e.target===m) closeXf(); });
+    $('xfClose').onclick=closeXf; $('xfPlay').onclick=()=>previewJoin(XF.k);
+    $('xfReset').onclick=()=>{ delete SES.tabs[XF.k].join; xfChanged(); toast('המעבר חזר להגדרה של כל המעברים'); };
+    $('xfMode').onclick=e=>{ const b2=e.target.closest('button'); if(!b2) return; xfOwn().mode=b2.dataset.v; xfChanged(); };
+    $('xfZoom').onclick=e=>{ const b2=e.target.closest('button'); if(!b2) return; XF.V=+b2.dataset.v; xfDraw(); };
+    m.querySelector('.xf-len').onclick=e=>{ const b2=e.target.closest('button'); if(!b2) return; const J=xfOwn(); J.sec=clamp(Math.round((J.sec+ +b2.dataset.d)*10)/10,0,20); xfChanged(); };
+    const cv=$('xfCv');
+    cv.addEventListener('pointerdown',e=>{ const r=cv.getBoundingClientRect(), y=e.clientY-r.top; const a2=SES.tabs[XF.k];
+      XF.drag={lane:y<r.height/2?'a':'b', x0:e.clientX, out0:a2.out??a2.dur, sec0:jn(XF.k).sec, w:r.width}; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove',e=>{ const D=XF.drag; if(!D) return; const a2=SES.tabs[XF.k], dt=(e.clientX-D.x0)/D.w*2*XF.V;
+      if(D.lane==='a'){ a2.out=clamp(D.out0+dt,(a2.in||0)+1,a2.dur); }
+      else { const J=xfOwn(); J.sec=clamp(Math.round((J.mode==='gap'? D.sec0+dt : D.sec0-dt)*10)/10,0,20); }
+      xfDraw(); });
+    const up=()=>{ if(XF.drag){ XF.drag=null; xfChanged(); } }; cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
+  }
+  m.hidden=false; XF.c0=(a.out??a.dur); xfDraw();
+}
+function xfOwn(){ const t=SES.tabs[XF.k]; if(!t.join) t.join={mode:SES.join.mode,sec:SES.join.sec}; return t.join; }
+function xfChanged(){ xfDraw(); sumHead(); sesSave(); renderSum(); }
+function closeXf(){ const m=$('xfModal'); if(m) m.hidden=true; XF.k=-1; }
+function xfDraw(){ const k=XF.k, a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b) return; const J=jn(k);
+  $('xfTitle').textContent='מעבר '+(k+1)+' ← '+(k+2); $('xfA').textContent=(k+1)+' · '+a.name; $('xfB').textContent=(k+2)+' · '+b.name;
+  $('xfLen').textContent=(J.mode==='gap'?'GAP ':'X-FADE ')+J.sec.toFixed(1)+' s'+(a.join?'':' · כמו כולם');
+  $('xfMode').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===J.mode));
+  $('xfZoom').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===XF.V));
+  const cv=$('xfCv'), d=Math.min(2,window.devicePixelRatio||1), w=cv.clientWidth||320, h=cv.clientHeight||180;
+  cv.width=Math.round(w*d); cv.height=Math.round(h*d); const c=cv.getContext('2d'); c.setTransform(d,0,0,d,0,0);
+  c.fillStyle='#0b171c'; c.fillRect(0,0,w,h);
+  const outA=a.out??a.dur, inB=b.in||0, V=XF.V, c0=XF.drag&&XF.drag.lane==='a'? XF.c0 : (XF.c0=outA);
+  const X=tA=>(tA-(c0-V))/(2*V)*w;                         // time in song A → x
+  const bOff= J.mode==='gap'? outA+J.sec-inB : outA-J.sec-inB; // song B time + bOff = song A time
+  const lane=(t,ma,y0,hh,col,lo,hi,toA)=>{ const m=META.get(t.id); if(!m) return; const mid=y0+hh/2;
+    for(let x=0;x<w;x++){ const tA=c0-V+x/w*2*V, tt=tA-toA; if(tt<0||tt>t.dur) continue; const i=Math.floor(tt*100); const v=m.rms[clamp(i,0,m.rms.length-1)];
+      const amp=clamp((v+60)/60,0,1), on=tt>=lo&&tt<=hi; c.fillStyle=on?col:'rgba(120,130,140,.35)'; c.fillRect(x,mid-amp*hh*.45,1,Math.max(1,amp*hh*.9)); } };
+  const hh=h/2-8;
+  c.fillStyle='rgba(255,255,255,.03)'; c.fillRect(0,4,w,hh); c.fillRect(0,h/2+4,w,hh);
+  lane(a,null,4,hh,'rgba(143,179,194,.9)',a.in||0,outA,0);
+  lane(b,null,h/2+4,hh,'rgba(255,190,130,.9)',inB,b.out??b.dur,bOff);
+  // grid: one line per second
+  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; for(let s2=Math.ceil(c0-V);s2<=c0+V;s2++){ const x=Math.round(X(s2))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); }
+  // fades
+  if(J.mode==='xfade'&&J.sec>0){ const x1=X(outA-J.sec), x2=X(outA);
+    c.fillStyle='rgba(255,154,60,.12)'; c.fillRect(x1,0,x2-x1,h);
+    c.strokeStyle='#ff9a3c'; c.lineWidth=2; c.beginPath(); for(let i=0;i<=24;i++){ const u=i/24, x=x1+(x2-x1)*u; const y=4+hh*(1-Math.cos(u*Math.PI/2)); i?c.lineTo(x,y):c.moveTo(x,y); } c.stroke();
+    c.beginPath(); for(let i=0;i<=24;i++){ const u=i/24, x=x1+(x2-x1)*u; const y=h/2+4+hh*(1-Math.sin(u*Math.PI/2)); i?c.lineTo(x,y):c.moveTo(x,y); } c.stroke(); }
+  if(J.mode==='gap'&&J.sec>0){ c.fillStyle='rgba(90,169,255,.12)'; c.fillRect(X(outA),0,X(outA+J.sec)-X(outA),h); }
+  // markers
+  c.fillStyle='#ff9a3c'; c.fillRect(X(outA)-1,2,3,hh+4); c.fillRect(X(outA+bOff-outA+inB)-1,h/2+2,3,hh+4);
+  c.font='10px "IBM Plex Mono", monospace'; c.fillStyle='rgba(200,215,225,.75)'; c.textAlign='left';
+  c.fillText('סוף '+fmtS(outA),Math.min(w-70,X(outA)+5),14); c.fillText('התחלה '+fmtS(inB),Math.min(w-80,X(inB+bOff)+5),h/2+16);
+}
 /* listen to a transition: the last seconds of one song, then the start of the next (each with its own settings) */
 function previewJoin(k){ const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b||a.dur==null){ toast('עוד מנתח את השירים'); return; }
   const outA=a.out??a.dur; SES.preview={a:k,b:k+1,outA,stage:1};
@@ -3418,9 +3529,9 @@ async function renderSession(){
   try{
     for(const t of SES.tabs){ if(t.dur==null){ ui(0,'מנתח: '+t.name); await analyzeTab(t); } }
     const sr=ctx.sampleRate, J=SES.join, n=SES.tabs.length, len=SES.tabs.map(t=>Math.round(tabLen(t)*sr));
-    const ov=len.map((l,k)=>k<n-1&&J.mode==='xfade'? Math.min(Math.round(J.sec*sr),Math.floor(l/2),Math.floor(len[k+1]/2)) : 0);
-    const gap=J.mode==='gap'?Math.round(J.sec*sr):0;
-    const total=len.reduce((a,b)=>a+b,0)-ov.reduce((a,b)=>a+b,0)+gap*(n-1);
+    const ov=len.map((l,k)=>k<n-1&&jn(k).mode==='xfade'? Math.min(Math.round(jn(k).sec*sr),Math.floor(l/2),Math.floor(len[k+1]/2)) : 0);
+    const gaps=len.map((l,k)=>k<n-1&&jn(k).mode==='gap'? Math.round(jn(k).sec*sr) : 0);
+    const total=len.reduce((a,b)=>a+b,0)-ov.reduce((a,b)=>a+b,0)+gaps.reduce((a,b)=>a+b,0);
     const name='Cabin Q Session '+new Date().toISOString().slice(0,16).replace('T',' ').replace(':','-');
     wr=await makeWriter(OUT.fmt,name,total,sr); let carry=null;
     for(let k=0;k<n;k++){ if(SES.cancel) throw 'cancel';
@@ -3434,7 +3545,7 @@ async function renderSession(){
       if(k===n-1&&J.fout>0){ const F=Math.min(N,Math.round(J.fout*sr)); for(let x=0;x<F;x++){ const g=x/F; L[N-1-x]*=g; R[N-1-x]*=g; } }
       let start=0;
       if(k>0&&carry){ const O=carry.l.length; for(let x=0;x<O;x++){ const u=(x+.5)/O, gi=Math.sin(u*Math.PI/2), go=Math.cos(u*Math.PI/2); L[x]=L[x]*gi+carry.l[x]*go; R[x]=R[x]*gi+carry.r[x]*go; } }
-      if(k>0&&gap) await wr.silence(gap);
+      if(k>0&&gaps[k-1]) await wr.silence(gaps[k-1]);
       const O2=ov[k]; await wr.pcm(L,R,start,N-O2);
       carry=O2? {l:L.slice(N-O2),r:R.slice(N-O2)} : null;
     }
@@ -3466,7 +3577,7 @@ function applyBands(list){ const selSlot=(sel()||{}).slot; A.forEach(destroy); A
 function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); HIST.quiet=Date.now()+500; applyBands(JSON.parse(from.pop())); HIST.cur=histSig(); HIST.pending=null; histUI(); }
 $('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
 $('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
-window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend});  // read-only peek, used by automated checks
+window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend,addTab,showSum,openXf,sesToggle});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
