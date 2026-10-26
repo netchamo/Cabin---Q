@@ -205,7 +205,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx.off .fx-ic svg{stroke:var(--ink-3)}
 .fx-h b{font-size:12px; letter-spacing:.16em; color:var(--silk); font-weight:700; white-space:nowrap}
 .fx.tame-on .fx-sub{color:#7fe0a8}
-.fx-sub{flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.fx-sub{unicode-bidi:plaintext; flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .fx-h .pill{height:30px; padding:0 11px; flex:none}
 .fx-chev{width:30px; height:30px; flex:none; border:0; background:transparent; display:grid; place-items:center}
 .fx-chev svg{width:14px; height:14px; stroke:var(--ink-2); fill:none; stroke-width:2.2; stroke-linecap:round; transition:transform .2s}
@@ -218,6 +218,11 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .tame-disp{height:150px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
 .tame-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
 .knobs.tame-big{justify-content:space-around; padding:4px 0}
+.tame-edit{display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:11px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.05)}
+.tame-reg{align-self:center}
+.tame-reg button{min-width:76px}
+.tame-reg button[aria-pressed="true"]{color:#14100b; background:var(--rc)}
+.tame-reg button[aria-pressed="true"]::before{display:none}
 .knob.big{width:100px}
 .knob.big svg{width:84px; height:84px}
 .knob.big .k-lab{font-size:12px}
@@ -231,7 +236,10 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .render-bar{width:100%; max-width:320px; height:6px; border-radius:3px; background:#121518; overflow:hidden}
 .render-bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,#ff5a4a,#ff9a3c)}
 .pill.rec .led{background:#ff4a2e; box-shadow:0 0 8px #ff4a2e}
-.g-comp{flex-basis:100%; order:3}
+.g-comp{flex-basis:100%; order:3; margin-top:6px; border-color:rgba(255,90,74,.25) !important; background:linear-gradient(180deg,rgba(255,90,74,.05),rgba(0,0,0,.1)) !important}
+.g-fx{margin-top:6px; padding:10px !important; border-radius:13px; border:1px solid rgba(179,140,255,.25) !important; background:linear-gradient(180deg,rgba(179,140,255,.05),rgba(0,0,0,.1)) !important}
+.g-lim{margin-top:6px; border-color:rgba(90,169,255,.25) !important; background:linear-gradient(180deg,rgba(90,169,255,.05),rgba(0,0,0,.1)) !important}
+.g-out{margin-top:6px}
 .gt .gr-read{margin-left:auto; white-space:nowrap; font-family:var(--f-mono); font-size:11px; letter-spacing:.02em; color:var(--led); font-variant-numeric:tabular-nums}
 .comp-body{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
 .vu{flex:1 1 230px; max-width:380px; height:128px; padding:6px; border-radius:10px; background:linear-gradient(180deg,#151719,#0b0c0e);
@@ -243,7 +251,8 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .gt-band .dot{width:9px; height:9px; border-radius:50%; background:var(--c); box-shadow:0 0 8px var(--c)}
 .scope{height:124px; border-radius:9px; background:var(--bezel); padding:4px; box-shadow:inset 0 2px 5px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.06)}
 .scope-in{position:relative; height:100%; border-radius:6px; overflow:hidden; background:radial-gradient(120% 120% at 50% 0%, var(--glass-2), var(--glass))}
-#hc{position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:ns-resize; display:block}
+.scope-in #hc{position:absolute; inset:0; width:100%; height:100%; touch-action:pan-y; display:block}
+#hcGrab{position:absolute; top:0; bottom:0; right:0; width:110px; touch-action:none; cursor:ns-resize; border-left:1px dashed rgba(255,154,60,.25); background:linear-gradient(90deg,rgba(255,154,60,0),rgba(255,154,60,.06))}
 .dbus{display:flex; gap:6px; flex-wrap:wrap}
 .dbt{display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 8px; border-radius:7px; border:1px solid #121416;
   background:linear-gradient(180deg,#30343a,#25282c); font-family:var(--f-mono); font-size:11px; color:var(--ink-2); transition:box-shadow .12s}
@@ -340,6 +349,9 @@ body.noscroll{overflow:hidden}
 .br-ib{flex:none; width:36px; height:34px; border-radius:9px; border:0; background:rgba(255,255,255,.06); display:grid; place-items:center; color:var(--ink-2); position:relative}
 .br-ib svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
 .br-ib.on{color:var(--led); background:rgba(255,154,60,.14)}
+.br-play{flex:none; width:54px; height:34px; border-radius:10px; border:0; display:grid; place-items:center; background:linear-gradient(180deg,#ffb27a,#ff8a3d); box-shadow:0 4px 12px rgba(255,138,61,.3); animation:brIn .18s ease-out}
+.br-play svg{width:15px; height:15px; fill:#1d1006}
+@keyframes brIn{from{transform:scale(.6); opacity:0}to{transform:none; opacity:1}}
 #brSize svg{transition:transform .2s}
 .player.full #brSize svg{transform:rotate(180deg)}
 .br-ib small{position:absolute; bottom:1px; left:0; right:0; text-align:center; font-family:var(--f-mono); font-size:8.5px; color:var(--led)}
@@ -603,7 +615,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <div id="dynBody" hidden>
         <div class="knobs wrap" id="kDyn"></div>
         <div class="dbus" id="dbus"></div>
-        <div class="scope"><div class="scope-in"><canvas id="hc" aria-label="Band level, threshold and gain change over the last four seconds. Drag vertically to set the threshold."></canvas></div></div>
+        <div class="scope"><div class="scope-in"><div id="hcGrab" title="גרירה לשינוי ה-Threshold"></div><canvas id="hc" aria-label="Band level, threshold and gain change over the last four seconds. Drag vertically to set the threshold."></canvas></div></div>
         <p class="dyn-help" dir="rtl" style="margin-top:8px"><b>Threshold</b> הוא העוצמה שממנה הבנד מתחיל לזוז, הקו הכתום בגרף, ואפשר לגרור אותו. <b>Range</b> הוא כמה dB לכל היותר הבנד יזוז: ערך שלילי חותך רק כשהתדר מתחזק, למשל צרימה בשירה, וערך חיובי מגביר. <b>Listen</b> משמיע רק את אזור הבנד, כדי לשמוע מה הוא עושה.</p>
         </div>
       </div>
@@ -625,10 +637,22 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
           <div class="fx-b" hidden>
             <div class="tame-disp"><canvas id="tameCv" aria-label="ספקטרום והורדת הרשים בזמן אמת"></canvas></div>
             <div class="knobs tame-big" id="kTameBig"></div>
-            <div class="fx-row"><div class="knobs wrap" id="kTame"></div>
-              <div class="fx-segs"><div class="seg" id="tameFocus"><button data-v="st" aria-pressed="true">STEREO</button><button data-v="mid" aria-pressed="false">MID</button><button data-v="side" aria-pressed="false">SIDE</button></div>
-                <button class="pill he-pill" id="tameDelta" aria-pressed="false"><span class="led"></span>שמע רק מה שנחתך</button></div></div>
-            <p class="dyn-help" dir="rtl"><b>TAME</b> מזהה תדרים שבולטים מעל הסביבה שלהם ומוריד אותם רק ברגע שהם מופיעים. <b>MUD</b> מנקה את הבוץ באזור 250–500 Hz, <b>HARSH</b> את הצרימה המעייפת באזור 1–4 kHz, ו-<b>ESS</b> עובד כמו דה-אסר על השורקות. <b>Focus</b> קובע אם לעבוד על כל הסטריאו, רק על המרכז (שירה) או רק על הצדדים. השהיה: 43 ms.</p>
+            <div class="tame-edit">
+              <div class="seg tame-reg" id="tameReg"><button data-v="mud" style="--rc:#c9a466">MUD</button><button data-v="harsh" style="--rc:#ff8a5a">HARSH</button><button data-v="ess" style="--rc:#7fe0a8">ESS</button></div>
+              <div class="knobs wrap" id="kTame"></div>
+              <div class="fx-segs"><div class="seg" id="tameFocus"><button data-v="st" aria-pressed="true">STEREO</button><button data-v="mid" aria-pressed="false">MID</button><button data-v="side" aria-pressed="false">SIDE</button></div></div>
+            </div>
+            <button class="pill he-pill" id="tameDelta" aria-pressed="false"><span class="led"></span>שמע רק מה שנחתך</button>
+            <p class="dyn-help" dir="rtl"><b>TAME</b> מזהה תדרים שבולטים מעל הסביבה שלהם ומוריד אותם רק ברגע שהם מופיעים. <b>MUD</b> מנקה את הבוץ באזור 250–500 Hz, <b>HARSH</b> את הצרימה המעייפת באזור 1–4 kHz, ו-<b>ESS</b> עובד כמו דה-אסר על השורקות. מתחת לנובים בוחרים אזור ומכוונים לו: <b>FREQ</b> איפה הוא מתמקד, <b>WIDTH</b> מצר (רק סביב התדר) עד מלא (כל האזור), <b>Attack/Release</b> ו-STEREO, MID (שירה) או SIDE. השהיה: 43 ms.</p>
+          </div>
+        </div>
+        <div class="fx off" id="fx_low" style="--fxc:#c9a466">
+          <div class="fx-h" data-fx="low"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3.5-3 5-3"/><path d="M2 20h20" opacity=".5"/></svg></span><b>LOW</b><span class="fx-sub" id="lowSub"></span>
+            <button class="pill" id="lowOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="fx-row"><div class="fx-disp"><canvas id="lowCv" aria-label="עוצמת הסאב והשליטה בו"></canvas></div><div class="knobs wrap" id="kLow"></div></div>
+            <p class="dyn-help" dir="rtl"><b>LOW</b> מטפל רק בסאב, מתחת לתדר <b>CROSSOVER</b>. <b>LEVEL</b> מעלה או מוריד את כל הסאב. <b>CONTROL</b> שומר שהסאב לא יתנפח: כשהבס מתחזק מעבר לסף הוא נבלם, ובקטעים שקטים נשאר מלא. ברכב זה מונע את ה"בום" ואת הרעידות בדלתות. אין השהיה.</p>
           </div>
         </div>
         <div class="fx off" id="fx_sat" style="--fxc:#ff8a5a">
@@ -709,7 +733,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <button class="tb ghost" id="fwd10" aria-label="10 שניות קדימה"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/><path d="M8.5 10v5"/><rect x="11" y="10" width="3.5" height="5" rx="1.75"/></svg></button>
         <button class="tb ghost" id="shufBtn" aria-label="ערבוב"><svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
       </div>
-      <div class="queue-h" id="brHead" dir="rtl"><button class="br-ib" id="brBack" title="חזרה לתיקיות" hidden><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>חזרה</span></button><span id="qTitle">ספרייה</span>
+      <div class="queue-h" id="brHead" dir="rtl"><button class="br-play" id="brPlay" aria-label="נגן" hidden><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg></button><button class="br-ib" id="brBack" title="חזרה לתיקיות" hidden><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>חזרה</span></button><span id="qTitle">ספרייה</span>
         <button class="br-ib" id="brSize" title="הגדלה / הקטנה"><svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5"/></svg></button>
         <button class="br-ib" id="brTimer" title="טיימר שינה"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/></svg><small id="brTimerTxt"></small></button>
         <button class="br-ib" id="brAdd" title="הוספה"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -1158,7 +1182,8 @@ function drawHist(){
   const ty=HL(b.dyn.thresh);
   hg.setLineDash([6,4]); hg.strokeStyle='#ff9a3c'; hg.lineWidth=1.5; hg.beginPath(); hg.moveTo(0,ty); hg.lineTo(PW,ty); hg.stroke(); hg.setLineDash([]);
   hg.fillStyle='#ff9a3c'; hg.beginPath(); hg.moveTo(PW,ty-6); hg.lineTo(PW-8,ty); hg.lineTo(PW,ty+6); hg.fill();
-  hg.textAlign='right'; hg.fillText('THR '+sgn(b.dyn.thresh),PW-12,ty>18?ty-9:ty+10);
+  hg.textAlign='right'; const thrTxt='THR '+sgn(b.dyn.thresh); hg.fillText(thrTxt,PW-12,ty>18?ty-9:ty+10);
+  const gw=Math.round(HW-(PW-12-hg.measureText(thrTxt).width)+6); if(Math.abs(gw-(hcGrab.offsetWidth||0))>2) hcGrab.style.width=gw+'px';
   // live GR bar
   const bx=PW+10, bw=12, top=4, hgt=HH-8; hg.fillStyle='#0b0e10'; hg.fillRect(bx,top,bw,hgt);
   const fr=Math.min(1,Math.abs(a.d)/rng)*hgt*(rng/24);
@@ -1169,10 +1194,10 @@ function drawHist(){
   if(b.dyn.on){ hg.fillStyle='#ffb070'; hg.fillText('GR '+sgn(a.d)+' dB',120,12); }
   else { hg.fillStyle='rgba(200,215,225,.55)'; hg.font='12px Heebo, sans-serif'; hg.textAlign='right'; hg.fillText('Dynamic כבוי · הקו מראה את עוצמת הבנד',PW-8,HH-12); }
 }
-let hdrag=false;
-hc.addEventListener('pointerdown',e=>{ const b=sel(); if(!b||!dynOk(b.type)) return; hdrag=true; hc.setPointerCapture(e.pointerId); setThr(e); });
-hc.addEventListener('pointermove',e=>{ if(hdrag) setThr(e); });
-hc.addEventListener('pointerup',()=>hdrag=false); hc.addEventListener('pointercancel',()=>hdrag=false);
+let hdrag=false; const hcGrab=$('hcGrab');
+hcGrab.addEventListener('pointerdown',e=>{ const b=sel(); if(!b||!dynOk(b.type)) return; hdrag=true; hcGrab.setPointerCapture(e.pointerId); setThr(e); });
+hcGrab.addEventListener('pointermove',e=>{ if(hdrag) setThr(e); });
+hcGrab.addEventListener('pointerup',()=>hdrag=false); hcGrab.addEventListener('pointercancel',()=>hdrag=false);
 function setThr(e){ const b=sel(); const r=hc.getBoundingClientRect(); b.dyn.thresh=Math.round(lvlFromY(e.clientY-r.top)*2)/2; refreshDeck(); }
 /* activity on band chips and dynamic bus */
 const chipEls=new Map(), busEls=new Map();
@@ -1496,48 +1521,53 @@ class CabinLoud extends AudioWorkletProcessor{
 registerProcessor('cabin-loud',CabinLoud);
 
 /* Resonance cleaner: STFT (2048, hop 512). Each bin is compared with the smoothed spectrum around it; what sticks out
-   is pulled down, with depth set per region (mud / harsh / ess). Latency: 2048 samples. */
+   is pulled down. Three regions (mud / harsh / ess), each with its own depth, focus frequency, width, timing and
+   stereo focus (both channels, mid or side). Latency: 2048 samples. */
 class CabinTame extends AudioWorkletProcessor{
-  constructor(o){ super(); this.p={on:true,mud:.4,harsh:.4,ess:.3,att:15,rel:120,focus:'st',delta:false,sens:1};
+  constructor(o){ super(); this.p={on:true,delta:false,regions:[
+      {amt:.3,f:330,w:1,att:20,rel:150,focus:'st',full:.9},{amt:.3,f:2100,w:1,att:10,rel:120,focus:'st',full:1.15},{amt:.25,f:7200,w:1,att:3,rel:80,focus:'st',full:.75}]};
     if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
     const N=2048; this.N=N; this.H=512; this.K=N/2+1;
     this.win=new Float32Array(N); for(let i=0;i<N;i++) this.win[i]=Math.sqrt(.5-.5*Math.cos(2*Math.PI*i/N));
     this.inM=new Float32Array(N); this.inS=new Float32Array(N); this.w=0; this.t=0;
     this.acM=new Float32Array(2*N); this.acS=new Float32Array(2*N); this.dry=[new Float32Array(2*N),new Float32Array(2*N)];
     this.re=[new Float64Array(N),new Float64Array(N)]; this.im=[new Float64Array(N),new Float64Array(N)];
-    this.P=new Float32Array(this.K); this.cs=new Float64Array(this.K+1); this.red=new Float32Array(this.K); this.g=new Float32Array(this.K);
-    this.wt=new Float32Array(this.K*3); const sr=sampleRate;
-    for(let k=0;k<this.K;k++){ const f=Math.max(1,k*sr/N), l=Math.log2;
-      this.wt[k*3]=f<90?0:Math.exp(-Math.pow(l(f/330)/.8,2));
-      this.wt[k*3+1]=Math.exp(-Math.pow(l(f/2100)/1.05,4));
-      this.wt[k*3+2]=Math.exp(-Math.pow(l(f/7200)/.75,4)); }
-    this.cnt=0; this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
+    this.P=[new Float32Array(this.K),new Float32Array(this.K),new Float32Array(this.K)]; this.cs=new Float64Array(this.K+1); this.env=[new Float32Array(this.K),new Float32Array(this.K),new Float32Array(this.K)];
+    this.red=[new Float32Array(this.K),new Float32Array(this.K),new Float32Array(this.K)];
+    this.rM=new Float32Array(this.K); this.rS=new Float32Array(this.K); this.gM=new Float32Array(this.K); this.gS=new Float32Array(this.K);
+    this.wt=[new Float32Array(this.K),new Float32Array(this.K),new Float32Array(this.K)]; this.setW();
+    this.cnt=0; this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.setW(); }; }
+  setW(){ const sr=sampleRate, N=this.N;
+    this.p.regions.forEach((r,ri)=>{ const sp=.22+(r.full-.22)*Math.max(0,Math.min(1,r.w)), wt=this.wt[ri];
+      for(let k=0;k<this.K;k++){ const f=Math.max(1,k*sr/N); wt[k]=(f<60?0:1)*Math.exp(-Math.pow(Math.abs(Math.log2(f/r.f))/sp,4)); } }); }
   fft(re,im){ const n=re.length;
     for(let i=1,j=0;i<n;i++){ let bit=n>>1; for(;j&bit;bit>>=1) j^=bit; j^=bit; if(i<j){ let t=re[i];re[i]=re[j];re[j]=t; t=im[i];im[i]=im[j];im[j]=t; } }
     for(let len=2;len<=n;len<<=1){ const ang=-2*Math.PI/len, wlr=Math.cos(ang), wli=Math.sin(ang), h=len>>1;
       for(let i=0;i<n;i+=len){ let wr=1,wi=0; for(let j=0;j<h;j++){ const a=i+j,b=a+h, vr=re[b]*wr-im[b]*wi, vi=re[b]*wi+im[b]*wr;
         re[b]=re[a]-vr; im[b]=im[a]-vi; re[a]+=vr; im[a]+=vi; const nw=wr*wlr-wi*wli; wi=wr*wli+wi*wlr; wr=nw; } } } }
-  frame(){ const N=this.N, K=this.K, p=this.p, w0=this.w, win=this.win, P=this.P;
+  frame(){ const N=this.N, K=this.K, p=this.p, w0=this.w, win=this.win;
     const bufs=[this.inM,this.inS];
     for(let c=0;c<2;c++){ const re=this.re[c], im=this.im[c], b=bufs[c]; for(let i=0;i<N;i++){ re[i]=b[(w0+i)%N]*win[i]; im[i]=0; } this.fft(re,im); }
-    const useM=p.focus!=='side', useS=p.focus!=='mid';
-    for(let k=0;k<K;k++){ let e=1e-12; if(useM) e+=this.re[0][k]*this.re[0][k]+this.im[0][k]*this.im[0][k]; if(useS) e+=this.re[1][k]*this.re[1][k]+this.im[1][k]*this.im[1][k]; P[k]=10*Math.log10(e); }
-    const cs=this.cs; cs[0]=0; for(let k=0;k<K;k++) cs[k+1]=cs[k]+P[k];
-    const fr=this.H/sampleRate, ka=1-Math.exp(-fr/Math.max(.001,p.att/1000)), kr=1-Math.exp(-fr/Math.max(.005,p.rel/1000));
-    for(let k=1;k<K;k++){ const hw=Math.max(3,Math.round(k*.14)), a=Math.max(1,k-hw), b=Math.min(K-1,k+hw);
-      const env=(cs[b+1]-cs[a]-P[k])/(b-a);  // local average without the bin itself
-      const amt=Math.max(p.mud*this.wt[k*3],p.harsh*this.wt[k*3+1],p.ess*this.wt[k*3+2]);
-      const ex=P[k]-env-2/p.sens; const tgt=ex>0? Math.min(ex*(.4+.6*amt)*amt*1.6, 18*amt) : 0;
-      const r=this.red[k]; this.red[k]= tgt>r? r+(tgt-r)*ka : r+(tgt-r)*kr; }
-    this.red[0]=0;
-    for(let k=0;k<K;k++){ const a=this.red[Math.max(0,k-1)], b=this.red[k], c=this.red[Math.min(K-1,k+1)]; this.g[k]=Math.pow(10,-(.25*a+.5*b+.25*c)/20); }
-    for(let c=0;c<2;c++){ const re=this.re[c], im=this.im[c], on=(c===0?useM:useS);
-      for(let k=0;k<K;k++){ const gk=on?this.g[k]:1; re[k]*=gk; im[k]*=gk; if(k>0&&k<N/2){ re[N-k]=re[k]; im[N-k]=-im[k]; } }
+    const [Pst,Pm,Ps]=this.P;
+    for(let k=0;k<K;k++){ const em=this.re[0][k]*this.re[0][k]+this.im[0][k]*this.im[0][k]+1e-12, es=this.re[1][k]*this.re[1][k]+this.im[1][k]*this.im[1][k]+1e-12;
+      Pst[k]=10*Math.log10(em+es); Pm[k]=10*Math.log10(em); Ps[k]=10*Math.log10(es); }
+    const need={st:0,mid:1,side:2}, used=new Set(p.regions.map(r=>need[r.focus]||0));
+    for(const u of used){ const P=this.P[u], E=this.env[u], cs=this.cs; cs[0]=0; for(let k=0;k<K;k++) cs[k+1]=cs[k]+P[k];
+      for(let k=1;k<K;k++){ const hw=Math.max(3,Math.round(k*.14)), a=Math.max(1,k-hw), b=Math.min(K-1,k+hw); E[k]=(cs[b+1]-cs[a]-P[k])/(b-a); } }
+    const fr=this.H/sampleRate; this.rM.fill(0); this.rS.fill(0);
+    p.regions.forEach((r,ri)=>{ const u=need[r.focus]||0, P=this.P[u], E=this.env[u], wt=this.wt[ri], red=this.red[ri];
+      const ka=1-Math.exp(-fr/Math.max(.001,r.att/1000)), kr=1-Math.exp(-fr/Math.max(.005,r.rel/1000));
+      for(let k=1;k<K;k++){ const amt=r.amt*wt[k]; const ex=P[k]-E[k]-2;
+        const tgt= ex>0&&amt>0? Math.min(ex*(.4+.6*amt)*amt*1.6, 18*amt) : 0; const v=red[k]; red[k]= tgt>v? v+(tgt-v)*ka : v+(tgt-v)*kr;
+        if(r.focus!=='side'&&red[k]>this.rM[k]) this.rM[k]=red[k]; if(r.focus!=='mid'&&red[k]>this.rS[k]) this.rS[k]=red[k]; } });
+    for(const [R,G] of [[this.rM,this.gM],[this.rS,this.gS]]) for(let k=0;k<K;k++){ const a=R[Math.max(0,k-1)], b=R[k], c=R[Math.min(K-1,k+1)]; G[k]=Math.pow(10,-(.25*a+.5*b+.25*c)/20); }
+    for(let c=0;c<2;c++){ const re=this.re[c], im=this.im[c], G=c===0?this.gM:this.gS;
+      for(let k=0;k<K;k++){ re[k]*=G[k]; im[k]*=G[k]; if(k>0&&k<N/2){ re[N-k]=re[k]; im[N-k]=-im[k]; } }
       for(let i=0;i<N;i++) im[i]=-im[i]; this.fft(re,im); }
     const t0=this.t-N, M2=2*N, sc=.5/N;
     for(let i=0;i<N;i++){ const idx=((t0+i)%M2+M2)%M2; this.acM[idx]+=this.re[0][i]*win[i]*sc; this.acS[idx]+=this.re[1][i]*win[i]*sc; }
-    if(++this.cnt>=4){ this.cnt=0; const B=96, sp=new Float32Array(B), rd=new Float32Array(B);
-      for(let i=0;i<B;i++){ const f=20*Math.pow(1000,i/(B-1)), k=Math.min(K-1,Math.round(f*N/sampleRate)); sp[i]=P[k]; rd[i]=this.red[k]; }
+    if(++this.cnt>=4){ this.cnt=0; const B=96, sp=new Float32Array(B), rd=new Float32Array(B*3);
+      for(let i=0;i<B;i++){ const f=20*Math.pow(1000,i/(B-1)), k=Math.min(K-1,Math.round(f*N/sampleRate)); sp[i]=Pst[k]; for(let r=0;r<3;r++) rd[r*B+i]=this.red[r][k]; }
       this.port.postMessage({sp,rd},[sp.buffer,rd.buffer]); } }
   process(inputs,outputs){
     const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
@@ -1555,7 +1585,37 @@ class CabinTame extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('cabin-tame',CabinTame);`;
+registerProcessor('cabin-tame',CabinTame);
+
+/* LOW: splits off the sub (Linkwitz-Riley 24 dB/oct, so the two bands add back flat), sets its level and keeps it under
+   control with a compressor whose threshold follows the CONTROL amount. */
+class CabinLow extends AudioWorkletProcessor{
+  constructor(o){ super(); this.p={xo:100,level:0,control:.4,att:15,rel:150}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
+    this.z=[]; for(let c=0;c<2;c++) this.z.push([new Float64Array(4),new Float64Array(4),new Float64Array(4),new Float64Array(4)]);
+    this.env=-120; this.gr=0; this.cnt=0; this.mx=-120; this.mg=0; this.setF(); this.port.onmessage=e=>{ Object.assign(this.p,e.data); this.setF(); }; }
+  setF(){ const w=2*Math.PI*this.p.xo/sampleRate, c=Math.cos(w), s=Math.sin(w), al=s/(2*Math.SQRT1_2), a0=1+al;
+    this.lp=[(1-c)/2/a0,(1-c)/a0,(1-c)/2/a0,-2*c/a0,(1-al)/a0]; this.hp=[(1+c)/2/a0,-(1+c)/a0,(1+c)/2/a0,-2*c/a0,(1-al)/a0]; }
+  bq(k,z,x){ const y=k[0]*x+k[1]*z[0]+k[2]*z[1]-k[3]*z[2]-k[4]*z[3]; z[1]=z[0]; z[0]=x; z[3]=z[2]; z[2]=y; return y; }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
+    const n=inp[0].length, p=this.p, sr=sampleRate, lvl=Math.pow(10,p.level/20), thr=-6-p.control*26, ratio=4;
+    const ka=1-Math.exp(-1/(Math.max(1,p.att)/1000*sr)), kr=1-Math.exp(-1/(Math.max(5,p.rel)/1000*sr)), kd=1-Math.exp(-1/(.03*sr));
+    for(let i=0;i<n;i++){
+      const lo=[0,0], hi=[0,0];
+      for(let c=0;c<2;c++){ const x=(inp[c]||inp[0])[i], z=this.z[c];
+        lo[c]=this.bq(this.lp,z[1],this.bq(this.lp,z[0],x)); hi[c]=this.bq(this.hp,z[3],this.bq(this.hp,z[2],x)); }
+      const e=(lo[0]*lo[0]+lo[1]*lo[1])*.5; this.env+=(10*Math.log10(e+1e-12)+3-this.env)*kd;
+      const over=this.env-thr, tgt=over>0&&p.control>0? over*(1-1/ratio) : 0;
+      this.gr+= (tgt-this.gr)*(tgt>this.gr?ka:kr);
+      const g=lvl*Math.pow(10,-this.gr/20);
+      for(let c=0;c<out.length;c++) out[c][i]=lo[c<2?c:0]*g+hi[c<2?c:0];
+      if(this.env>this.mx) this.mx=this.env; if(this.gr>this.mg) this.mg=this.gr;
+    }
+    if(++this.cnt>=6){ this.port.postMessage({lvl:this.mx,gr:this.mg,thr}); this.cnt=0; this.mx=-120; this.mg=0; }
+    return true;
+  }
+}
+registerProcessor('cabin-low',CabinLow);`;
 function compParams(Cx){ const c=Cx||C, r=REL[c.rli]; return {on:c.on,thr:c.thr,ratio:RATIOS[c.ri],att:ATT[c.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:c.makeup,mix:c.mix/100,hpf:c.hpf}; }
 function sendComp(){
   const p=compParams();
@@ -1679,18 +1739,25 @@ const FX={
   sat:{on:false,mode:'tape',machine:'a800',speed:15,drive:4,wow:.3,char:0,tone:0,mix:100,out:0},
   wid:{on:false,width:120,mono:120},
   rev:{on:false,type:'hall',decay:2.2,pre:20,tone:.5,lowcut:250,mix:12},
-  tame:{on:false,mud:30,harsh:30,ess:25,att:15,rel:120,focus:'st',delta:false},
-  open:{sat:false,wid:false,rev:false,tame:false}
+  tame:{on:false,mud:30,harsh:30,ess:25,delta:false,edit:'harsh',R:{mud:{f:330,w:1,att:20,rel:150,focus:'st'},harsh:{f:2100,w:1,att:10,rel:120,focus:'st'},ess:{f:7200,w:1,att:3,rel:80,focus:'st'}}},
+  low:{on:false,xo:100,level:0,control:40,att:15,rel:150},
+  open:{sat:false,wid:false,rev:false,tame:false,low:false}
 };
-var tameLatMs=0;  // declared with var: read by updateRouting, which can run before this line
+var tameLatMs=0;
+const TREG={mud:{lo:150,hi:800,full:.9,col:'#c9a466',def:330},harsh:{lo:800,hi:5000,full:1.15,col:'#ff8a5a',def:2100},ess:{lo:4000,hi:14000,full:.75,col:'#7fe0a8',def:7200}};
+function tameParams(T){ const R=T.R||FX.tame.R; return {on:true,delta:!!T.delta,regions:['mud','harsh','ess'].map(k=>({amt:(T[k]||0)/100,f:R[k].f,w:R[k].w,att:R[k].att,rel:R[k].rel,focus:R[k].focus,full:TREG[k].full}))}; }
+let lowNode=null, lowLvl=-120, lowGr=0, lowThr=-16; const LOWH=200, lowHist={l:new Float32Array(LOWH).fill(-120),g:new Float32Array(LOWH),i:0};  // declared with var: read by updateRouting, which can run before this line
 let tameNode=null, tameSp=null, tameRd=null, satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
 const fxBlocks={};
 function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.connect(o); wet.connect(o); wet.gain.value=0;
   return {i,o,dry,wet,set(on){ const t=ctx.currentTime; dry.gain.setTargetAtTime(on?0:1,t,.015); wet.gain.setTargetAtTime(on?1:0,t,.015); }}; }
 function fxInit(worklet){
   fxIn.disconnect();
-  const tame=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
-  fxIn.connect(tame.i); tame.o.connect(sat.i); sat.o.connect(rev.i);
+  const tame=fxBlock(), low=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
+  fxIn.connect(tame.i); tame.o.connect(low.i); low.o.connect(sat.i); sat.o.connect(rev.i);
+  if(worklet){ lowNode=new AudioWorkletNode(ctx,'cabin-low',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    lowNode.port.onmessage=e=>{ lowLvl=e.data.lvl; lowGr=e.data.gr; lowThr=e.data.thr; lowHist.l[lowHist.i]=lowLvl; lowHist.g[lowHist.i]=lowGr; lowHist.i=(lowHist.i+1)%LOWH; };
+    low.i.connect(lowNode); lowNode.connect(low.wet); }
   if(worklet){ tameNode=new AudioWorkletNode(ctx,'cabin-tame',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     tameNode.port.onmessage=e=>{ tameSp=e.data.sp; tameRd=e.data.rd; }; tame.i.connect(tameNode); tameNode.connect(tame.wet); } rev.o.connect(wid.i); wid.o.connect(fxOut);
   // saturation: worklet core + tape colour filters
@@ -1708,7 +1775,7 @@ function fxInit(worklet){
   // width
   if(worklet){ widNode=new AudioWorkletNode(ctx,'cabin-width',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); widNode.port.onmessage=e=>{ widCorr=e.data; };
     wid.i.connect(widNode); widNode.connect(wid.wet); }
-  Object.assign(fxBlocks,{tame,sat,rev,wid}); fxReady=true; fxWorklet=worklet;
+  Object.assign(fxBlocks,{tame,low,sat,rev,wid}); fxReady=true; fxWorklet=worklet;
   fxSend(); buildIR();
 }
 let fxWorklet=false;
@@ -1730,7 +1797,8 @@ function fxSend(){
     f2.gain.setTargetAtTime(0,t,.02); f3.frequency.setTargetAtTime(3500,t,.02); f3.gain.setTargetAtTime(sv.tone*4,t,.02); f4.frequency.setTargetAtTime(22000,t,.02); }
   if(satNode) satNode.port.postMessage({mode:sv.mode,drive:sv.mode==='tape'?sv.drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out});
   if(widNode) widNode.port.postMessage({width:FX.wid.width/100,mono:FX.wid.mono});
-  const T=FX.tame; if(tameNode) tameNode.port.postMessage({on:true,mud:T.mud/100,harsh:T.harsh/100,ess:T.ess/100,att:T.att,rel:T.rel,focus:T.focus,delta:T.delta});
+  const T=FX.tame; if(tameNode) tameNode.port.postMessage(tameParams(T));
+  const LW=FX.low; if(lowNode) lowNode.port.postMessage({xo:LW.xo,level:LW.level,control:LW.control/100,att:LW.att,rel:LW.rel}); B.low.set(LW.on&&!!lowNode);
   B.tame.set(T.on&&!!tameNode);
   B.wid.set(FX.wid.on&&!!widNode);
   B.rev.pre.delayTime.setTargetAtTime(FX.rev.pre/1000,t,.02); B.rev.hp.frequency.setTargetAtTime(FX.rev.lowcut,t,.02);
@@ -1756,15 +1824,16 @@ function makeIR(c,R){ const T=REVT[R.type], sr=c.sampleRate, len=Math.min(7,R.de
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<N;i++) d[i]*=sc; }
   let mx=0; for(const v of irEnv) if(v>mx) mx=v; for(let i=0;i<200;i++) irEnv[i]/=(mx||1);
   return {buf,env:irEnv}; }
-function fxApply(st){ for(const k of ['tame','sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],st[k]); fxSend(); buildIR(); fxOpenUI(); }
+function fxApply(st){ for(const k of ['tame','low','sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],JSON.parse(JSON.stringify(st[k]))); if(!FX.tame.R||!FX.tame.R.mud) FX.tame.R={mud:{f:330,w:1,att:20,rel:150,focus:'st'},harsh:{f:2100,w:1,att:10,rel:120,focus:'st'},ess:{f:7200,w:1,att:3,rel:80,focus:'st'}}; if(!FX.tame.edit) FX.tame.edit='harsh'; fxSend(); buildIR(); fxOpenUI(); }
 
 /* strips */
-function fxOpenUI(){ for(const k of ['tame','sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
+function fxOpenUI(){ for(const k of ['tame','low','sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
 document.querySelectorAll('.fx-h').forEach(h=>h.addEventListener('click',e=>{ if(e.target.closest('.pill')) return; const k=h.dataset.fx; FX.open[k]=!FX.open[k]; fxOpenUI(); knobs.forEach(x=>x.refresh()); }));
-for(const k of ['tame','sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
+for(const k of ['tame','low','sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
 function segBind(id,get,set){ const el=$(id); el.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; set(b.dataset.v); fxSend(); }; return ()=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(get())===b.dataset.v)); }
 const segUI=[
-  segBind('tameFocus',()=>FX.tame.focus,v=>FX.tame.focus=v),
+  segBind('tameFocus',()=>FX.tame.R[FX.tame.edit].focus,v=>FX.tame.R[FX.tame.edit].focus=v),
+  segBind('tameReg',()=>FX.tame.edit,v=>FX.tame.edit=v),
   segBind('satMode',()=>FX.sat.mode,v=>FX.sat.mode=v),
   segBind('satMach',()=>FX.sat.machine,v=>FX.sat.machine=v),
   segBind('satSpeed',()=>FX.sat.speed,v=>FX.sat.speed=+v),
@@ -1775,8 +1844,9 @@ const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A
 function fxUI(){
   { const T=FX.tame; $('tameSub').textContent=T.on?'פועל · השהיה '+Math.round(2048/SR*1000)+' ms':'כבוי · MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess;
     $('tameDelta').classList.toggle('on',T.delta); $('tameDelta').setAttribute('aria-pressed',T.delta); }
-  $('fx_tame').classList.toggle('tame-on',FX.tame.on); tameLatMs=FX.tame.on&&tameNode?2048/SR*1000:0; $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
-  for(const k of ['tame','sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
+  $('fx_tame').classList.toggle('tame-on',FX.tame.on); $('fx_low').classList.toggle('tame-on',FX.low.on); tameLatMs=FX.tame.on&&tameNode?2048/SR*1000:0; $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
+  { const LW=FX.low; if(!LW.on) $('lowSub').textContent='כבוי · < '+LW.xo+' Hz · CONTROL '+LW.control+'%'+(LW.level?' · '+sgn(LW.level)+' dB':''); }
+  for(const k of ['tame','low','sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
   const sv=FX.sat; $('satMach').hidden=$('satSpeed').hidden=sv.mode!=='tape';
   $('satSub').textContent= sv.mode==='tape'? 'TAPE · '+(sv.machine==='a800'?'A800':'ATR-102')+' · '+sv.speed+' IPS · DRIVE '+sgn(sv.drive) : 'SATURATOR · DRIVE +'+sv.drive.toFixed(1)+' · MIX '+sv.mix+'%';
   $('satHelp').innerHTML=SAT_HELP[sv.mode];
@@ -1809,31 +1879,54 @@ $('tameDelta').onclick=()=>{ FX.tame.delta=!FX.tame.delta; fxSend(); toast(FX.ta
 { const kb=$('kTameBig'), mk=(key,lab,col)=>knob(kb,{label:()=>lab,color:col,enabled:()=>true,get:()=>FX.tame[key]/100,set:n=>{ FX.tame[key]=Math.round(n*100); fxSend(); },text:()=>FX.tame[key]+'%',reset:()=>{ FX.tame[key]=0; fxSend(); }});
   mk('mud','MUD','#c9a466'); mk('harsh','HARSH','#ff8a5a'); mk('ess','ESS','#7fe0a8');
   kb.querySelectorAll('.knob').forEach(k=>k.classList.add('big'));
-  knob($('kTame'),{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(FX.tame.att,1,100),set:n=>{ FX.tame.att=Math.round(unlg(n,1,100)); fxSend(); },text:()=>FX.tame.att+' ms',reset:()=>{ FX.tame.att=15; fxSend(); }});
-  knob($('kTame'),{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(FX.tame.rel,20,600),set:n=>{ FX.tame.rel=Math.round(unlg(n,20,600)); fxSend(); },text:()=>FX.tame.rel+' ms',reset:()=>{ FX.tame.rel=120; fxSend(); }}); }
+  const RG=()=>FX.tame.R[FX.tame.edit], RT=()=>TREG[FX.tame.edit], col=()=>RT().col;
+  knob($('kTame'),{label:()=>'FREQ',color:'#e9eef2',enabled:()=>true,get:()=>lg(RG().f,RT().lo,RT().hi),set:n=>{ RG().f=Math.round(unlg(n,RT().lo,RT().hi)/10)*10; fxSend(); },text:()=>fmtHz(RG().f),reset:()=>{ RG().f=RT().def; fxSend(); }});
+  knob($('kTame'),{label:()=>'WIDTH',color:'#b38cff',enabled:()=>true,get:()=>RG().w,set:n=>{ RG().w=Math.round(n*100)/100; fxSend(); },text:()=>RG().w<.05?'NARROW':RG().w>.95?'FULL':Math.round(RG().w*100)+'%',reset:()=>{ RG().w=1; fxSend(); }});
+  knob($('kTame'),{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(RG().att,1,100),set:n=>{ RG().att=Math.round(unlg(n,1,100)); fxSend(); },text:()=>RG().att+' ms',reset:()=>{ RG().att=10; fxSend(); }});
+  knob($('kTame'),{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(RG().rel,20,600),set:n=>{ RG().rel=Math.round(unlg(n,20,600)); fxSend(); },text:()=>RG().rel+' ms',reset:()=>{ RG().rel=120; fxSend(); }}); }
 const tameC=fxCanvas('tameCv');
 function drawTame(){ const {g:c,w,h,d}=tameC; c.setTransform(d,0,0,d,0,0);
   const bg=c.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#0b171c'); bg.addColorStop(1,'#060d11'); c.fillStyle=bg; c.fillRect(0,0,w,h);
-  const lx=f=>Math.log10(f/20)/3*w, regs=[[180,650,'#c9a466','MUD',FX.tame.mud],[1000,4500,'#ff8a5a','HARSH',FX.tame.harsh],[4500,12000,'#7fe0a8','ESS',FX.tame.ess]];
-  c.font='600 9.5px "Chakra Petch", sans-serif'; c.textBaseline='bottom'; c.textAlign='center';
-  for(const [a,b,col,lab,amt] of regs){ c.fillStyle=col+Math.round(8+amt*.3).toString(16).padStart(2,'0'); c.fillRect(lx(a),0,lx(b)-lx(a),h);
-    c.fillStyle=col; c.fillText(lab,(lx(a)+lx(b))/2,h-3); }
-  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.fillStyle='rgba(160,200,215,.45)'; c.font='9px "IBM Plex Mono", monospace'; c.textBaseline='top';
+  const lx=f=>Math.log10(f/20)/3*w, keys=['mud','harsh','ess'], T=FX.tame;
+  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.fillStyle='rgba(160,200,215,.45)'; c.font='9px "IBM Plex Mono", monospace'; c.textBaseline='top'; c.textAlign='center';
   for(const f of [100,1000,10000]){ const x=Math.round(lx(f))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); c.fillText(f>=1000?f/1000+'k':f,x,3); }
-  const on=FX.tame.on&&S.playing&&tameSp; if(!on){ c.fillStyle='rgba(200,215,225,.55)'; c.font='12px Heebo, sans-serif'; c.textBaseline='middle'; c.fillText(FX.tame.on?'מתחיל לעבוד עם הנגינה':'TAME כבוי',w/2,h/2-8); return; }
+  keys.forEach(k=>{ const r=T.R[k], cfg=TREG[k], sp=.22+(cfg.full-.22)*r.w, amt=T[k]/100, selk=T.edit===k, base=h-14;
+    c.beginPath(); c.moveTo(0,base); for(let x=0;x<=w;x+=2){ const f=20*Math.pow(1000,x/w), wt=f<60?0:Math.exp(-Math.pow(Math.abs(Math.log2(f/r.f))/sp,4)); c.lineTo(x,base-wt*(h*.42)*(.25+.75*amt)); } c.lineTo(w,base); c.closePath();
+    c.fillStyle=cfg.col+(selk?'40':'1c'); c.fill(); if(selk){ c.strokeStyle=cfg.col; c.lineWidth=1.2; c.stroke(); }
+    c.fillStyle=cfg.col; c.font='600 9.5px "Chakra Petch", sans-serif'; c.textBaseline='bottom'; c.fillText(k.toUpperCase(),clamp(lx(r.f),18,w-18),h-2); });
+  const on=T.on&&S.playing&&tameSp; if(!on){ c.fillStyle='rgba(200,215,225,.55)'; c.font='12px Heebo, sans-serif'; c.textBaseline='middle'; c.textAlign='center'; c.fillText(T.on?'מתחיל לעבוד עם הנגינה':'TAME כבוי',w/2,h/2-8); return; }
   const B=tameSp.length, X=i=>i/(B-1)*w, Y=v=>h-14-clamp((v+10)/60,0,1)*(h-30);
   c.beginPath(); for(let i=0;i<B;i++){ const y=Y(tameSp[i]); i?c.lineTo(X(i),y):c.moveTo(X(i),y); } c.strokeStyle='rgba(170,220,240,.75)'; c.lineWidth=1.3; c.stroke();
-  c.beginPath(); c.moveTo(0,0); for(let i=0;i<B;i++) c.lineTo(X(i),Math.min(h,tameRd[i]/18*(h*.7))); c.lineTo(w,0); c.closePath();
-  const gr=c.createLinearGradient(0,0,0,h*.7); gr.addColorStop(0,'rgba(255,90,60,.85)'); gr.addColorStop(1,'rgba(255,90,60,.15)'); c.fillStyle=gr; c.fill();
-  let mx=0; for(const v of tameRd) if(v>mx) mx=v; c.fillStyle='#ffd1a6'; c.textAlign='right'; c.textBaseline='top'; c.font='500 10px "IBM Plex Mono", monospace'; c.fillText('−'+mx.toFixed(1)+' dB',w-6,16); }
+  let mx=0;
+  keys.forEach((k,ri)=>{ c.beginPath(); c.moveTo(0,0); for(let i=0;i<B;i++){ const v=tameRd[ri*B+i]; if(v>mx) mx=v; c.lineTo(X(i),Math.min(h,v/18*(h*.7))); } c.lineTo(w,0); c.closePath();
+    c.fillStyle=TREG[k].col+'b0'; c.fill(); });
+  c.fillStyle='#ffd1a6'; c.textAlign='right'; c.textBaseline='top'; c.font='500 10px "IBM Plex Mono", monospace'; c.fillText('−'+mx.toFixed(1)+' dB',w-6,16); }
+/* LOW display: sub level against the control threshold, and how much it is held back */
+const lowC=fxCanvas('lowCv');
+function drawLow(){ const {g:c,w,h,d}=lowC; c.setTransform(d,0,0,d,0,0); c.fillStyle='#0b171c'; c.fillRect(0,0,w,h);
+  const PW=w-40, Y=v=>4+(-clamp(v,-60,0))/60*(h-8), xi=i=>i/(LOWH-1)*PW, idx=i=>(lowHist.i+i)%LOWH;
+  c.strokeStyle='rgba(150,200,220,.07)'; for(const v of [-12,-24,-36,-48]){ const y=Math.round(Y(v))+.5; c.beginPath(); c.moveTo(0,y); c.lineTo(PW,y); c.stroke(); }
+  c.beginPath(); c.moveTo(0,h); for(let i=0;i<LOWH;i++) c.lineTo(xi(i),Y(lowHist.l[idx(i)])); c.lineTo(PW,h); c.closePath(); c.fillStyle='rgba(201,164,102,.45)'; c.fill();
+  c.beginPath(); c.moveTo(0,0); for(let i=0;i<LOWH;i++) c.lineTo(xi(i),Math.min(h,lowHist.g[idx(i)]/12*(h*.5))); c.lineTo(PW,0); c.closePath(); c.fillStyle='rgba(255,90,60,.55)'; c.fill();
+  const ty=Y(-6-FX.low.control/100*26); c.setLineDash([5,4]); c.strokeStyle='#ff9a3c'; c.lineWidth=1.3; c.beginPath(); c.moveTo(0,ty); c.lineTo(PW,ty); c.stroke(); c.setLineDash([]);
+  const gr=FX.low.on&&S.playing?lowGr:0, bx=PW+12; c.fillStyle='#121518'; c.fillRect(bx,4,14,h-8); c.fillStyle='#ff6a4a'; c.fillRect(bx,4,14,Math.min(h-8,gr/12*(h-8)));
+  c.fillStyle='rgba(200,215,225,.7)'; c.font='9px "IBM Plex Mono", monospace'; c.textAlign='left'; c.textBaseline='top'; c.fillText('SUB < '+FX.low.xo+' Hz',6,6); c.fillStyle='#ff9a3c'; c.fillText('CONTROL',6,Math.max(16,ty-12)); }
+{ const kl2=$('kLow'), LWs=()=>FX.low;
+  knob(kl2,{label:()=>'CROSSOVER',color:'#c9a466',enabled:()=>true,get:()=>lg(LWs().xo,40,200),set:n=>{ LWs().xo=Math.round(unlg(n,40,200)); fxSend(); },text:()=>LWs().xo+' Hz',reset:()=>{ LWs().xo=100; fxSend(); }});
+  knob(kl2,{label:()=>'LEVEL',color:'#e9eef2',bip:true,enabled:()=>true,get:()=>lin(LWs().level,-12,6),set:n=>{ LWs().level=Math.round(unlin(n,-12,6)*2)/2; fxSend(); },text:()=>sgn(LWs().level)+' dB',reset:()=>{ LWs().level=0; fxSend(); }});
+  knob(kl2,{label:()=>'CONTROL',color:'#ff9a3c',enabled:()=>true,get:()=>LWs().control/100,set:n=>{ LWs().control=Math.round(n*100); fxSend(); },text:()=>LWs().control+'%',reset:()=>{ LWs().control=40; fxSend(); }});
+  knob(kl2,{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(LWs().att,1,100),set:n=>{ LWs().att=Math.round(unlg(n,1,100)); fxSend(); },text:()=>LWs().att+' ms',reset:()=>{ LWs().att=15; fxSend(); }});
+  knob(kl2,{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(LWs().rel,20,800),set:n=>{ LWs().rel=Math.round(unlg(n,20,800)); fxSend(); },text:()=>LWs().rel+' ms',reset:()=>{ LWs().rel=150; fxSend(); }}); }
 const satC=fxCanvas('satCv'), widC=fxCanvas('widCv'), revC=fxCanvas('revCv');
 let reelA=0, reelT=performance.now(), satShown=-60;
 const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
 function drawFx(now){
   const dt=Math.min(.1,(now-reelT)/1000); reelT=now;
   { const T=FX.tame; if(T.on){ let mx=0; if(S.playing&&tameRd) for(const v of tameRd) if(v>mx) mx=v;
-      $('tameSub').textContent='פועל · '+(S.playing?'−'+mx.toFixed(1)+' dB':'מוכן')+' · השהיה '+Math.round(2048/SR*1000)+' ms'; } }
+      $('tameSub').textContent='פועל · '+(S.playing?'\u2066−'+mx.toFixed(1)+' dB\u2069':'מוכן')+' · השהיה \u2066'+Math.round(2048/SR*1000)+' ms\u2069'; } }
+  { const LW=FX.low; if(LW.on) $('lowSub').textContent='פועל · '+(S.playing?'\u2066GR −'+lowGr.toFixed(1)+' dB\u2069':'מוכן')+' · \u2066< '+LW.xo+' Hz\u2069'; }
   if(FX.open.tame) drawTame();
+  if(FX.open.low) drawLow();
   if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
     if(isTape()){ // tape deck with two spinning reels and a level needle
       c.fillStyle='#d9d4c7'; c.fillRect(0,0,w,h);
@@ -1917,7 +2010,8 @@ function buildOffline(oc,st){
   }
   link(W('bus-comp',compParams(st.C||C)));
   const F=st.FX||FX;
-  if(F.tame&&F.tame.on){ const T=F.tame; link(W('cabin-tame',{on:true,mud:T.mud/100,harsh:T.harsh/100,ess:T.ess/100,att:T.att,rel:T.rel,focus:T.focus,delta:false})); }
+  if(F.tame&&F.tame.on){ const tp=tameParams(F.tame); tp.delta=false; link(W('cabin-tame',tp)); }
+  if(F.low&&F.low.on){ const LW=F.low; link(W('cabin-low',{xo:LW.xo,level:LW.level,control:LW.control/100,att:LW.att,rel:LW.rel})); }
   if(F.sat&&F.sat.on){ const sv=F.sat; link(W('cabin-sat',{mode:sv.mode,drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out}));
     const f=[0,1,2,3].map(()=>oc.createBiquadFilter()); f[1].type='peaking'; f[2].type='highshelf'; f[3].type='lowpass';
     if(sv.mode==='tape'){ const c=TAPE[sv.machine+sv.speed]; f[0].type='peaking'; f[0].frequency.value=c.b[0]; f[0].gain.value=c.b[1]; f[0].Q.value=c.b[2];
@@ -2306,7 +2400,7 @@ if('mediaSession' in navigator){ try{ const ms=navigator.mediaSession;
   ms.setActionHandler('previoustrack',()=>{ const n=stepIdx(-1,false); if(n>=0) select(n,true); });
   ms.setActionHandler('seekto',d=>{ if(cur>=0&&d.seekTime!=null) aud.currentTime=d.seekTime; }); }catch(_){} }
 function setPlaying(v){ S.playing=v; mediaInfo(); try{ navigator.mediaSession.playbackState=v?'playing':'paused'; }catch(_){}
-  for(const id of ['playBtn','miniPlay']){ const b=$(id); b.classList.toggle('on',v); b.setAttribute('aria-label',v?'השהה':'נגן'); b.querySelector('svg').innerHTML=v?ICO_PAUSE:ICO_PLAY; }
+  for(const id of ['playBtn','miniPlay','brPlay']){ const b=$(id); b.classList.toggle('on',v); b.setAttribute('aria-label',v?'השהה':'נגן'); b.querySelector('svg').innerHTML=v?ICO_PAUSE:ICO_PLAY; }
   document.querySelectorAll('.eqbars').forEach(e=>e.classList.toggle('paused',!v)); }
 function play(){
   unlock();
@@ -2340,7 +2434,7 @@ function stepIdx(dir,auto){
   if(n<0) n=q.length-1;
   return q[n];
 }
-$('playBtn').onclick=$('miniPlay').onclick=e=>{ e.stopPropagation(); S.playing?pause():play(); };
+$('playBtn').onclick=$('miniPlay').onclick=$('brPlay').onclick=e=>{ e.stopPropagation(); S.playing?pause():play(); };
 $('nextBtn').onclick=$('miniNext').onclick=e=>{ e.stopPropagation(); if(SES.on&&SES.tabs.length){ switchTab((SES.cur+1)%SES.tabs.length,{}); return; } const n=stepIdx(1,false); if(n>=0) select(n,false); };
 $('prevBtn').onclick=()=>{ if(cur>=0&&aud.currentTime>3){ aud.currentTime=0; return; } if(SES.on&&SES.tabs.length){ switchTab((SES.cur-1+SES.tabs.length)%SES.tabs.length,{}); return; } const n=stepIdx(-1,false); if(n>=0) select(n,false); };
 $('back10').onclick=()=>{ if(cur>=0) aud.currentTime=Math.max(0,aud.currentTime-10); };
@@ -2360,6 +2454,8 @@ function setOpen(o,size){ size=o?(size||(plSize==='full'?'full':'half')):'mini';
   player.classList.toggle('open',o); player.classList.toggle('full',size==='full');
   document.documentElement.style.setProperty('--plh',size==='full'?'calc(100vh - 70px)':size==='half'?'min(58vh,580px)':'92px');
   $('mini').setAttribute('aria-expanded',o); if(o) renderQueue(true); }
+/* when the big play button scrolls out of sight, a small one appears in the library header; it goes away when the big one is back */
+new IntersectionObserver(es=>{ for(const e of es) $('brPlay').hidden=e.isIntersecting||!player.classList.contains('open'); },{root:$('plFull'),threshold:.35}).observe($('playBtn'));
 function growPlayer(){ if(plSize!=='full') setOpen(true,'full'); }
 $('mini').onclick=()=>setOpen(!player.classList.contains('open'));
 setOpen(false);
