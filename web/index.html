@@ -206,7 +206,7 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx-ic{width:32px; height:32px; flex:none; border-radius:9px; display:grid; place-items:center; background:var(--well); box-shadow:inset 0 1px 2px rgba(0,0,0,.7)}
 .fx-ic svg{width:19px; height:19px; fill:none; stroke:var(--fxc); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .fx.off .fx-ic svg{stroke:var(--ink-3)}
-.fx-h b{font-size:12px; letter-spacing:.16em; color:var(--silk); font-weight:700; white-space:nowrap}
+.fx-h b{font-size:12px; letter-spacing:.12em; color:var(--silk); font-weight:700; white-space:nowrap}
 .fx.tame-on .fx-sub{color:#7fe0a8}
 .fx-sub{unicode-bidi:plaintext; flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .fx-h .pill{height:30px; padding:0 11px; flex:none}
@@ -218,11 +218,16 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx-disp{flex:1 1 230px; max-width:380px; height:124px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
 .fx-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
 .fx-row .knobs{flex:1 1 260px}
+.low-disp .low-in{position:relative; height:100%}
+.low-disp canvas{touch-action:pan-y}
+#lowGrab{position:absolute; left:0; top:0; width:92px; height:42px; touch-action:none; cursor:ns-resize; border-radius:6px; background:linear-gradient(90deg,rgba(255,154,60,.1),rgba(255,154,60,0))}
 .tame-disp{height:150px; padding:5px; border-radius:10px; background:var(--bezel); box-shadow:inset 0 2px 5px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)}
 .tame-disp canvas{display:block; width:100%; height:100%; border-radius:6px}
 .knobs.tame-big{justify-content:space-around; padding:4px 0}
-.tame-edit{display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:11px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.05)}
+.tame-edit{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:10px; border-radius:11px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.05)}
 .tame-reg{align-self:center}
+.tame-edit .knobs{justify-content:center}
+.tame-edit .fx-segs{justify-content:center}
 .tame-reg button{min-width:76px}
 .tame-reg button[aria-pressed="true"]{color:#14100b; background:var(--rc)}
 .tame-reg button[aria-pressed="true"]::before{display:none}
@@ -232,8 +237,10 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .knob.big .k-val{font-size:13px}
 .fx-segs{display:flex; gap:8px; flex-wrap:wrap}
 .fx-segs .seg button{height:26px; font-size:10px}
-.out-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
-.render{flex:1 1 220px; display:flex; flex-direction:column; gap:7px; align-items:flex-start}
+.g-out>.gt{justify-content:center; letter-spacing:.3em}
+.out-row{display:flex; align-items:flex-start; gap:12px; flex-wrap:nowrap}
+.out-row>#kOut{flex:none; padding-top:6px}
+.render{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:7px; align-items:flex-start}
 .render-row{display:flex; gap:8px; flex-wrap:wrap}
 .render-txt{font-family:var(--f-he); font-size:12.5px; color:var(--ink-3); line-height:1.5}
 .render-bar{width:100%; max-width:320px; height:6px; border-radius:3px; background:#121518; overflow:hidden}
@@ -660,8 +667,9 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
               <div class="seg tame-reg" id="tameReg"><button data-v="mud" style="--rc:#c9a466">MUD</button><button data-v="harsh" style="--rc:#ff8a5a">HARSH</button><button data-v="ess" style="--rc:#7fe0a8">ESS</button></div>
               <div class="knobs wrap" id="kTame"></div>
               <div class="fx-segs"><div class="seg" id="tameFocus"><button data-v="st" aria-pressed="true">STEREO</button><button data-v="mid" aria-pressed="false">MID</button><button data-v="side" aria-pressed="false">SIDE</button></div></div>
+              <div class="fx-segs"><button class="pill he-pill" id="tameDelta" aria-pressed="false"><span class="led"></span>שמע רק מה שנחתך</button>
+                <button class="pill he-pill" id="tameTypical" title="מחזיר את שלושת האזורים לנקודות שבדרך כלל מכאיבות לאוזן">מקם על נקודות הכאב</button></div>
             </div>
-            <button class="pill he-pill" id="tameDelta" aria-pressed="false"><span class="led"></span>שמע רק מה שנחתך</button>
             <p class="dyn-help" dir="rtl"><b>TAME</b> מזהה תדרים שבולטים מעל הסביבה שלהם ומוריד אותם רק ברגע שהם מופיעים. <b>MUD</b> מנקה את הבוץ באזור 250–500 Hz, <b>HARSH</b> את הצרימה המעייפת באזור 1–4 kHz, ו-<b>ESS</b> עובד כמו דה-אסר על השורקות. מתחת לנובים בוחרים אזור ומכוונים לו: <b>FREQ</b> איפה הוא מתמקד, <b>WIDTH</b> מצר (רק סביב התדר) עד מלא (כל האזור), <b>Attack/Release</b> ו-STEREO, MID (שירה) או SIDE. השהיה: 43 ms.</p>
           </div>
         </div>
@@ -670,8 +678,8 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
             <button class="pill" id="lowOn" aria-pressed="false"><span class="led"></span>On</button>
             <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
           <div class="fx-b" hidden>
-            <div class="fx-row"><div class="fx-disp"><canvas id="lowCv" aria-label="עוצמת הסאב והשליטה בו"></canvas></div><div class="knobs wrap" id="kLow"></div></div>
-            <p class="dyn-help" dir="rtl"><b>LOW</b> מטפל רק בסאב, מתחת לתדר <b>CROSSOVER</b>. <b>LEVEL</b> מעלה או מוריד את כל הסאב. <b>CONTROL</b> שומר שהסאב לא יתנפח: כשהבס מתחזק מעבר לסף הוא נבלם, ובקטעים שקטים נשאר מלא. ברכב זה מונע את ה"בום" ואת הרעידות בדלתות. אין השהיה.</p>
+            <div class="fx-row"><div class="fx-disp low-disp"><div class="low-in"><canvas id="lowCv" aria-label="עוצמת הסאב והשליטה בו"></canvas><div id="lowGrab" title="גרירה לשינוי ה-CONTROL"></div></div></div><div class="knobs wrap" id="kLow"></div></div>
+            <p class="dyn-help" dir="rtl">בגרף: הקו הדק הוא הסאב שנכנס, והשטח המלא הוא הסאב שיוצא אחרי LEVEL ו-CONTROL. את קו ה-CONTROL אפשר לגרור מהכיתוב שלו. <b>LOW</b> מטפל רק בסאב, מתחת לתדר <b>CROSSOVER</b>. <b>LEVEL</b> מעלה או מוריד את כל הסאב. <b>CONTROL</b> שומר שהסאב לא יתנפח: כשהבס מתחזק מעבר לסף הוא נבלם, ובקטעים שקטים נשאר מלא. ברכב זה מונע את ה"בום" ואת הרעידות בדלתות. אין השהיה.</p>
           </div>
         </div>
         <div class="fx off" id="fx_sat" style="--fxc:#ff8a5a">
@@ -1636,7 +1644,7 @@ class CabinLow extends AudioWorkletProcessor{
       for(let c=0;c<out.length;c++) out[c][i]=lo[c<2?c:0]*g+hi[c<2?c:0];
       if(this.env>this.mx) this.mx=this.env; if(this.gr>this.mg) this.mg=this.gr;
     }
-    if(++this.cnt>=6){ this.port.postMessage({lvl:this.mx,gr:this.mg,thr}); this.cnt=0; this.mx=-120; this.mg=0; }
+    if(++this.cnt>=6){ this.port.postMessage({lvl:this.mx,gr:this.mg,thr,out:this.mx+p.level-this.mg}); this.cnt=0; this.mx=-120; this.mg=0; }
     return true;
   }
 }
@@ -1771,7 +1779,7 @@ const FX={
 var tameLatMs=0;
 const TREG={mud:{lo:150,hi:800,full:.9,col:'#c9a466',def:330},harsh:{lo:800,hi:5000,full:1.15,col:'#ff8a5a',def:2100},ess:{lo:4000,hi:14000,full:.75,col:'#7fe0a8',def:7200}};
 function tameParams(T){ const R=T.R||FX.tame.R; return {on:true,delta:!!T.delta,regions:['mud','harsh','ess'].map(k=>({amt:(T[k]||0)/100,f:R[k].f,w:R[k].w,att:R[k].att,rel:R[k].rel,focus:R[k].focus,full:TREG[k].full}))}; }
-let lowNode=null, lowLvl=-120, lowGr=0, lowThr=-16; const LOWH=200, lowHist={l:new Float32Array(LOWH).fill(-120),g:new Float32Array(LOWH),i:0};  // declared with var: read by updateRouting, which can run before this line
+let lowNode=null, lowLvl=-120, lowGr=0, lowThr=-16; const LOWH=200, lowHist={o:new Float32Array(LOWH).fill(-120),l:new Float32Array(LOWH).fill(-120),g:new Float32Array(LOWH),i:0};  // declared with var: read by updateRouting, which can run before this line
 let tameNode=null, tameSp=null, tameRd=null, satNode=null, widNode=null, recNode=null, satLvl=-120, widCorr=1, fxReady=false;
 const fxBlocks={};
 function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.connect(o); wet.connect(o); wet.gain.value=0;
@@ -1781,7 +1789,7 @@ function fxInit(worklet){
   const tame=fxBlock(), low=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
   fxIn.connect(tame.i); tame.o.connect(low.i); low.o.connect(sat.i); sat.o.connect(rev.i);
   if(worklet){ lowNode=new AudioWorkletNode(ctx,'cabin-low',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
-    lowNode.port.onmessage=e=>{ lowLvl=e.data.lvl; lowGr=e.data.gr; lowThr=e.data.thr; lowHist.l[lowHist.i]=lowLvl; lowHist.g[lowHist.i]=lowGr; lowHist.i=(lowHist.i+1)%LOWH; };
+    lowNode.port.onmessage=e=>{ lowLvl=e.data.lvl; lowGr=e.data.gr; lowThr=e.data.thr; lowHist.l[lowHist.i]=lowLvl; lowHist.o[lowHist.i]=e.data.out; lowHist.g[lowHist.i]=lowGr; lowHist.i=(lowHist.i+1)%LOWH; };
     low.i.connect(lowNode); lowNode.connect(low.wet); }
   if(worklet){ tameNode=new AudioWorkletNode(ctx,'cabin-tame',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     tameNode.port.onmessage=e=>{ tameSp=e.data.sp; tameRd=e.data.rd; }; tame.i.connect(tameNode); tameNode.connect(tame.wet); } rev.o.connect(wid.i); wid.o.connect(fxOut);
@@ -1867,7 +1875,7 @@ const segUI=[
 const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A800</b> שמן וחם יותר עם בס מודגש, <b>ATR-102</b> נקי ומדויק יותר. ב-<b>15 IPS</b> הבס מתנפח והגבוהים מתרככים, ב-<b>30 IPS</b> הצליל הדוק ופתוח. <b>Drive</b> מוסיף רוויה, <b>Wow</b> מוסיף את התנודה העדינה של הסליל.',
   ssl:'<b>SATURATOR</b>: רוויה הרמונית. <b>Character</b> שמאלה מוסיף הרמוניות זוגיות, חמות ועגולות, וימינה הרמוניות אי-זוגיות, חדות ונוכחות. <b>Tone</b> מטה את הצבע לכהה או בהיר, ו-<b>Mix</b> מאפשר רוויה מקבילית.'};
 function fxUI(){
-  { const T=FX.tame; $('tameSub').textContent=T.on?'פועל · השהיה '+Math.round(2048/SR*1000)+' ms':'כבוי · MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess;
+  { const T=FX.tame; $('tameSub').textContent=T.on?'\u2066⏱ '+Math.round(2048/SR*1000)+' ms\u2069':'כבוי · MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess;
     $('tameDelta').classList.toggle('on',T.delta); $('tameDelta').setAttribute('aria-pressed',T.delta); }
   $('fx_tame').classList.toggle('tame-on',FX.tame.on); $('fx_low').classList.toggle('tame-on',FX.low.on); tameLatMs=FX.tame.on&&tameNode?2048/SR*1000:0; $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
   { const LW=FX.low; if(!LW.on) $('lowSub').textContent='כבוי · < '+LW.xo+' Hz · CONTROL '+LW.control+'%'+(LW.level?' · '+sgn(LW.level)+' dB':''); }
@@ -1900,6 +1908,8 @@ knob($('kRev'),fSpec({label:()=>'MIX', color:'#ffb347', get:()=>FX.rev.mix/50, s
 /* FX displays (drawn only while a strip is open) */
 function fxCanvas(id){ const c=$(id), o={c,g:c.getContext('2d'),w:200,h:110,d:1};
   new ResizeObserver(()=>{ o.d=Math.min(2,window.devicePixelRatio||1); o.w=Math.max(10,c.clientWidth); o.h=Math.max(10,c.clientHeight); c.width=Math.round(o.w*o.d); c.height=Math.round(o.h*o.d); }).observe(c); return o; }
+/* places each region back on the spots that usually hurt: boxy low-mids, the ear's most sensitive 2.5–4 kHz zone, and sibilance */
+$('tameTypical').onclick=()=>{ FX.tame.R={mud:{f:300,w:.8,att:20,rel:160,focus:'st'},harsh:{f:3000,w:.75,att:8,rel:110,focus:'st'},ess:{f:6800,w:.7,att:2,rel:70,focus:'mid'}}; fxSend(); toast('האזורים הוחזרו לנקודות הכאב הטיפוסיות'); };
 $('tameDelta').onclick=()=>{ FX.tame.delta=!FX.tame.delta; fxSend(); toast(FX.tame.delta?'שומעים רק את מה ש-TAME מוריד':'חזרה לצליל המלא'); };
 { const kb=$('kTameBig'), mk=(key,lab,col)=>knob(kb,{label:()=>lab,color:col,enabled:()=>true,get:()=>FX.tame[key]/100,set:n=>{ FX.tame[key]=Math.round(n*100); fxSend(); },text:()=>FX.tame[key]+'%',reset:()=>{ FX.tame[key]=0; fxSend(); }});
   mk('mud','MUD','#c9a466'); mk('harsh','HARSH','#ff8a5a'); mk('ess','ESS','#7fe0a8');
@@ -1917,7 +1927,7 @@ function drawTame(){ const {g:c,w,h,d}=tameC; c.setTransform(d,0,0,d,0,0);
   for(const f of [100,1000,10000]){ const x=Math.round(lx(f))+.5; c.beginPath(); c.moveTo(x,0); c.lineTo(x,h); c.stroke(); c.fillText(f>=1000?f/1000+'k':f,x,3); }
   keys.forEach(k=>{ const r=T.R[k], cfg=TREG[k], sp=.22+(cfg.full-.22)*r.w, amt=T[k]/100, selk=T.edit===k, base=h-14;
     c.beginPath(); c.moveTo(0,base); for(let x=0;x<=w;x+=2){ const f=20*Math.pow(1000,x/w), wt=f<60?0:Math.exp(-Math.pow(Math.abs(Math.log2(f/r.f))/sp,4)); c.lineTo(x,base-wt*(h*.42)*(.25+.75*amt)); } c.lineTo(w,base); c.closePath();
-    c.fillStyle=cfg.col+(selk?'40':'1c'); c.fill(); if(selk){ c.strokeStyle=cfg.col; c.lineWidth=1.2; c.stroke(); }
+    c.fillStyle=cfg.col+(selk?'48':'26'); c.fill(); c.strokeStyle=cfg.col+(selk?'ff':'aa'); c.lineWidth=selk?1.8:1.1; c.stroke();
     c.fillStyle=cfg.col; c.font='600 9.5px "Chakra Petch", sans-serif'; c.textBaseline='bottom'; c.fillText(k.toUpperCase(),clamp(lx(r.f),18,w-18),h-2); });
   const on=T.on&&S.playing&&tameSp; if(!on){ c.fillStyle='rgba(200,215,225,.55)'; c.font='12px Heebo, sans-serif'; c.textBaseline='middle'; c.textAlign='center'; c.fillText(T.on?'מתחיל לעבוד עם הנגינה':'TAME כבוי',w/2,h/2-8); return; }
   const B=tameSp.length, X=i=>i/(B-1)*w, Y=v=>h-14-clamp((v+10)/60,0,1)*(h-30);
@@ -1927,15 +1937,22 @@ function drawTame(){ const {g:c,w,h,d}=tameC; c.setTransform(d,0,0,d,0,0);
     c.fillStyle=TREG[k].col+'b0'; c.fill(); });
   c.fillStyle='#ffd1a6'; c.textAlign='right'; c.textBaseline='top'; c.font='500 10px "IBM Plex Mono", monospace'; c.fillText('−'+mx.toFixed(1)+' dB',w-6,16); }
 /* LOW display: sub level against the control threshold, and how much it is held back */
-const lowC=fxCanvas('lowCv');
+const lowC=fxCanvas('lowCv'), lowGrab=$('lowGrab');
+{ let on=false; const setC=e=>{ const r=$('lowCv').getBoundingClientRect(), h=r.height, v=-clamp((e.clientY-r.top-4)/(h-8),0,1)*60;
+    FX.low.control=clamp(Math.round((-6-v)/26*100),0,100); fxSend(); };
+  lowGrab.addEventListener('pointerdown',e=>{ on=true; lowGrab.setPointerCapture(e.pointerId); setC(e); });
+  lowGrab.addEventListener('pointermove',e=>{ if(on) setC(e); });
+  lowGrab.addEventListener('pointerup',()=>on=false); lowGrab.addEventListener('pointercancel',()=>on=false); }
 function drawLow(){ const {g:c,w,h,d}=lowC; c.setTransform(d,0,0,d,0,0); c.fillStyle='#0b171c'; c.fillRect(0,0,w,h);
   const PW=w-40, Y=v=>4+(-clamp(v,-60,0))/60*(h-8), xi=i=>i/(LOWH-1)*PW, idx=i=>(lowHist.i+i)%LOWH;
   c.strokeStyle='rgba(150,200,220,.07)'; for(const v of [-12,-24,-36,-48]){ const y=Math.round(Y(v))+.5; c.beginPath(); c.moveTo(0,y); c.lineTo(PW,y); c.stroke(); }
-  c.beginPath(); c.moveTo(0,h); for(let i=0;i<LOWH;i++) c.lineTo(xi(i),Y(lowHist.l[idx(i)])); c.lineTo(PW,h); c.closePath(); c.fillStyle='rgba(201,164,102,.45)'; c.fill();
+  c.beginPath(); c.moveTo(0,h); for(let i=0;i<LOWH;i++) c.lineTo(xi(i),Y(lowHist.o[idx(i)])); c.lineTo(PW,h); c.closePath(); c.fillStyle='rgba(201,164,102,.5)'; c.fill();
+  c.beginPath(); for(let i=0;i<LOWH;i++){ const y=Y(lowHist.l[idx(i)]); i?c.lineTo(xi(i),y):c.moveTo(xi(i),y); } c.strokeStyle='rgba(230,220,200,.45)'; c.lineWidth=1; c.stroke();
   c.beginPath(); c.moveTo(0,0); for(let i=0;i<LOWH;i++) c.lineTo(xi(i),Math.min(h,lowHist.g[idx(i)]/12*(h*.5))); c.lineTo(PW,0); c.closePath(); c.fillStyle='rgba(255,90,60,.55)'; c.fill();
   const ty=Y(-6-FX.low.control/100*26); c.setLineDash([5,4]); c.strokeStyle='#ff9a3c'; c.lineWidth=1.3; c.beginPath(); c.moveTo(0,ty); c.lineTo(PW,ty); c.stroke(); c.setLineDash([]);
   const gr=FX.low.on&&S.playing?lowGr:0, bx=PW+12; c.fillStyle='#121518'; c.fillRect(bx,4,14,h-8); c.fillStyle='#ff6a4a'; c.fillRect(bx,4,14,Math.min(h-8,gr/12*(h-8)));
-  c.fillStyle='rgba(200,215,225,.7)'; c.font='9px "IBM Plex Mono", monospace'; c.textAlign='left'; c.textBaseline='top'; c.fillText('SUB < '+FX.low.xo+' Hz',6,6); c.fillStyle='#ff9a3c'; c.fillText('CONTROL',6,Math.max(16,ty-12)); }
+  c.fillStyle='rgba(200,215,225,.7)'; c.font='9px "IBM Plex Mono", monospace'; c.textAlign='left'; c.textBaseline='top'; c.fillText('SUB < '+FX.low.xo+' Hz',6,6); c.fillStyle='#ff9a3c'; c.fillText('CONTROL ⇕',6,Math.max(16,ty-12));
+  c.fillStyle='rgba(200,215,225,.5)'; c.textAlign='right'; c.fillText('IN ─  OUT ▮',PW-4,6); lowGrab.style.top=Math.max(0,ty-26)+'px'; }
 { const kl2=$('kLow'), LWs=()=>FX.low;
   knob(kl2,{label:()=>'CROSSOVER',color:'#c9a466',enabled:()=>true,get:()=>lg(LWs().xo,40,200),set:n=>{ LWs().xo=Math.round(unlg(n,40,200)); fxSend(); },text:()=>LWs().xo+' Hz',reset:()=>{ LWs().xo=100; fxSend(); }});
   knob(kl2,{label:()=>'LEVEL',color:'#e9eef2',bip:true,enabled:()=>true,get:()=>lin(LWs().level,-12,6),set:n=>{ LWs().level=Math.round(unlin(n,-12,6)*2)/2; fxSend(); },text:()=>sgn(LWs().level)+' dB',reset:()=>{ LWs().level=0; fxSend(); }});
@@ -1948,8 +1965,8 @@ const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
 function drawFx(now){
   const dt=Math.min(.1,(now-reelT)/1000); reelT=now;
   { const T=FX.tame; if(T.on){ let mx=0; if(S.playing&&tameRd) for(const v of tameRd) if(v>mx) mx=v;
-      $('tameSub').textContent='פועל · '+(S.playing?'\u2066−'+mx.toFixed(1)+' dB\u2069':'מוכן')+' · השהיה \u2066'+Math.round(2048/SR*1000)+' ms\u2069'; } }
-  { const LW=FX.low; if(LW.on) $('lowSub').textContent='פועל · '+(S.playing?'\u2066GR −'+lowGr.toFixed(1)+' dB\u2069':'מוכן')+' · \u2066< '+LW.xo+' Hz\u2069'; }
+      $('tameSub').textContent='\u2066⏱ '+Math.round(2048/SR*1000)+' ms'+(S.playing?' · −'+mx.toFixed(1)+' dB':'')+'\u2069'; } }
+  { const LW=FX.low; if(LW.on) $('lowSub').textContent='\u2066< '+LW.xo+' Hz'+(S.playing?' · GR −'+lowGr.toFixed(1)+' dB':'')+'\u2069'; }
   if(FX.open.tame) drawTame();
   if(FX.open.low) drawLow();
   if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
