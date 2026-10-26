@@ -118,16 +118,22 @@ select.pill{appearance:none; -webkit-appearance:none; padding-right:28px; letter
 select.pill option{background:#1f2226; color:var(--ink)}
 
 /* mode bar */
-.ab{display:flex; align-items:center; gap:6px; padding:5px; border-radius:12px; background:var(--well); box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
-.ab-ic{width:22px; height:22px; flex:none; margin:0 6px; fill:none; stroke:var(--ink-3); stroke-width:2; stroke-linecap:round}
-.ab button{flex:1; height:40px; border-radius:9px; border:1px solid transparent; background:transparent; color:var(--ink-3); font-family:var(--f-he); font-size:15px; font-weight:500;
-  display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer}
-.ab button .led{width:7px; height:7px; border-radius:50%; background:#3a3f45}
-.ab button[aria-pressed="true"]{background:linear-gradient(180deg,#41464c,#30343a); color:var(--ink); border-color:#121416; box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
-.ab button[data-v="proc"][aria-pressed="true"] .led{background:var(--led); box-shadow:0 0 8px var(--led-glow)}
-.ab button[data-v="orig"][aria-pressed="true"]{color:#9ecbff}
-.ab button[data-v="orig"][aria-pressed="true"] .led{background:#5aa9ff; box-shadow:0 0 8px rgba(90,169,255,.7)}
-.ab.orig .ab-ic{stroke:#5aa9ff}
+.ab{display:flex; flex-direction:column; align-items:center; gap:8px}
+.proc-btn{width:100%; display:flex; align-items:center; justify-content:center; gap:14px; padding:10px 16px; border-radius:14px; cursor:pointer;
+  border:1px solid #121416; background:linear-gradient(180deg,#2a2e33,#1e2125); color:var(--ink-3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -2px 6px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.45); transition:background .15s, box-shadow .15s, border-color .15s}
+.proc-btn svg{width:30px; height:30px; flex:none; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round}
+.proc-btn .pt{display:flex; flex-direction:column; align-items:center; line-height:1.15}
+.proc-btn b{font-family:var(--f-he); font-size:19px; font-weight:600; color:var(--ink-2)}
+.proc-btn small{font-family:var(--f-he); font-size:12.5px; color:var(--ink-3)}
+.proc-btn[aria-pressed="true"]{border-color:rgba(255,154,60,.7); color:var(--led);
+  background:linear-gradient(180deg,#4a4036,#342d27); box-shadow:0 0 18px rgba(255,154,60,.28), inset 0 1px 0 rgba(255,255,255,.12)}
+.proc-btn[aria-pressed="true"] svg{filter:drop-shadow(0 0 6px var(--led-glow))}
+.proc-btn[aria-pressed="true"] b{color:#fff4e6}
+.proc-btn[aria-pressed="true"] small{color:var(--led)}
+.lm-btn{height:30px; font-size:12.5px !important}
+.lm-btn .lm-v{font-family:var(--f-mono); font-size:11px; color:var(--led); margin-inline-start:6px}
+.lm-btn .lm-v:empty{display:none}
 .unit.fs .ab{display:none}
 @supports (-webkit-touch-callout:none){ input,select,textarea{font-size:16px !important} }
 .modebar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:0 6px}
@@ -639,10 +645,12 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <span class="lat"><span class="sys-st" id="sysSt" hidden></span>LATENCY <b id="latV">0.0 ms</b></span>
   </div>
 
-  <div class="ab" id="abBar" dir="rtl" role="group" aria-label="השוואה למקור">
-    <svg class="ab-ic" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
-    <button data-v="proc" aria-pressed="true"><span class="led"></span>עם העיבוד</button>
-    <button data-v="orig" aria-pressed="false"><span class="led"></span>מקור</button>
+  <div class="ab" id="abBar" dir="rtl">
+    <button class="proc-btn" id="procBtn" aria-pressed="true" title="הדלקה וכיבוי של כל העיבוד, כדי לשמוע את השיר כמו במקור">
+      <svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+      <span class="pt"><b>עיבוד</b><small id="procSt">פעיל</small></span>
+    </button>
+    <button class="pill he-pill lm-btn" id="lmBtn" aria-pressed="false" title="משווה את העוצמה עם העיבוד ובלעדיו, כדי שההשוואה תהיה רק על הצליל"><span class="led"></span>השוואת עוצמה<span class="lm-v" id="lmV" dir="ltr"></span></button>
   </div>
   <div class="screen">
     <div class="rail" id="rail">
@@ -916,6 +924,10 @@ const fin=G(); out.connect(fin); // the limiter is inserted between trim (out) a
 const procG=G(), rawG=G(), rawDelay=ctx.createDelay(2.0), outSel=G(); rawG.gain.value=0;
 fin.connect(procG); procG.connect(outSel); input.connect(rawDelay); rawDelay.connect(rawG); rawG.connect(outSel);
 outSel.connect(mon); mon.connect(ctx.destination);
+function kMeter(src){ const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=60; hp.Q.value=.5;
+  const sh=ctx.createBiquadFilter(); sh.type='highshelf'; sh.frequency.value=1500; sh.gain.value=4;
+  const an=ctx.createAnalyser(); an.fftSize=2048; src.connect(hp); hp.connect(sh); sh.connect(an); return an; }
+const lmRawAn=kMeter(input), lmProcAn=kMeter(fin);
 fin.connect(soloF); soloF.connect(soloG); soloG.connect(ctx.destination); soloG.gain.value=0;
 sink.gain.value=0; sink.connect(ctx.destination); // keeps analysers pulled on every browser
 lpOut.gain.value=0; byp.gain.value=0; detLp.gain.value=0;
@@ -1314,7 +1326,7 @@ function activity(){
     const bu=busEls.get(b.id); if(bu){ bu.btn.classList.toggle('act',act); bu.bar.style.height=(b.dyn.on?Math.min(1,Math.abs(a.d)/Math.max(1,Math.abs(b.dyn.range)))*100:0)+'%'; } }
 }
 function loop(now){
-  dynamics(now); computeLive(); if(APPM==='phone') anyDynLive=false; draw(); phoneTick(now); drawHist(); drawVU(now); drawLim(); drawFx(now); if(SES.preview) previewTick(); activity(); meters(now); updateTime(); renderProgress();
+  lmTick(now); dynamics(now); computeLive(); if(APPM==='phone') anyDynLive=false; draw(); phoneTick(now); drawHist(); drawVU(now); drawLim(); drawFx(now); if(SES.preview) previewTick(); activity(); meters(now); updateTime(); renderProgress();
   requestAnimationFrame(loop);
 }
 
@@ -2898,9 +2910,10 @@ function systemCurve(){
   const n=SYS_BANDS.length, fr=new Float32Array(SYS_BANDS), m=new Float32Array(n), ph=new Float32Array(n), db=new Float32Array(n);
   if(!S.bypass) for(const b of S.bands){ if(!b.on) continue; for(const nd of A.get(b.id).disp){ nd.getFrequencyResponse(fr,m,ph); for(let i=0;i<n;i++) if(m[i]>0&&isFinite(m[i])) db[i]+=20*Math.log10(m[i]); } }
   const cutoffs=SYS_BANDS.map((f,i)=> i<n-1? Math.round(Math.sqrt(f*SYS_BANDS[i+1])) : 20000);
+  let lmc=0; if(typeof LM!=='undefined'){ const est=phoneGainEst(db); if(APPM==='phone') LM.comp=est; if(LM.on&&!S.bypass) lmc= ORIG? Math.min(0,est) : -Math.max(0,est); setTimeout(lmUI,0); }
   if(ORIG) db.fill(0);
   const byp=S.bypass||ORIG, P=PH;
-  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:byp?0:P.inp, lim:{on:!ORIG,ceil:P.ceil,rel:80},
+  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:(byp?0:P.inp)+lmc, lim:{on:!ORIG,ceil:P.ceil,rel:80},
     smooth:{on:P.sm.on&&!byp, r:SMK.map(k=>smRegion(k))},
     glue:{on:P.gl.on&&!byp, thr:P.gl.thr, ratio:P.gl.ratio, att:P.gl.att, rel:P.gl.rel, makeup:P.gl.makeup}};
 }
@@ -3111,17 +3124,51 @@ function phoneTick(now){
   $('glGr').textContent= live&&PH.gl.on? 'GR −'+glNeedle.toFixed(1)+' dB' : '';
 }
 if(NATIVE){ $('modeTabs').hidden=false; phUI(); let m='player'; try{ m=localStorage.getItem('cabinq.appmode')||'player'; }catch(_){} setAppMode(m,true); }
-/* ---------- A/B: everything on, or the song exactly as it is ---------- */
-var ORIG=false;
+/* ---------- PROCESS on/off (hear the song as it is) and loudness match ---------- */
+var ORIG=false, LM={on:false,p:0,r:0,comp:0,t:0};
+try{ LM.on=localStorage.getItem('cabinq.lm')==='1'; }catch(_){}
+const lmBuf=new Float32Array(2048);
+function msOf(an){ an.getFloatTimeDomainData(lmBuf); let s2=0; for(let i=0;i<lmBuf.length;i++) s2+=lmBuf[i]*lmBuf[i]; return s2/lmBuf.length; }
+/* player mode: measured. Long-term power of the input and of the processed chain (gated on silence), ~3 s memory */
+function lmTick(now){
+  const dt=Math.min(.1,(now-(LM.t||now))/1000); LM.t=now;
+  if(APPM==='phone'||!S.playing||!ctx||ctx.state!=='running') return;
+  const r=msOf(lmRawAn), p=msOf(lmProcAn); if(r<1e-6) return;
+  const k=1-Math.exp(-dt/3); LM.r+= (r-LM.r)*k; LM.p+= (p-LM.p)*k;
+  if(LM.r>0&&LM.p>0){ LM.comp=10*Math.log10(LM.p/LM.r); }
+  if((LM.n=(LM.n||0)+1)%6===0) lmApply();
+}
+/* phone mode: estimated from the curve over a typical music spectrum, plus input and GLUE make-up */
+function phoneGainEst(db){
+  let sw=0, sp=0; for(let i=0;i<SYS_BANDS.length;i++){ const f=SYS_BANDS[i]; if(f<30||f>16000) continue;
+    let w=1; if(f<100) w*=Math.pow(f/100,2); if(f>1500) w*=1.6; sw+=w; sp+=w*Math.pow(10,db[i]/10); }
+  let est=(sw>0?10*Math.log10(sp/sw):0)+PH.inp;
+  if(PH.gl.on){ const G=PH.gl, safe=PH.ceil-G.thr*(1-1/G.ratio); est+=Math.min(G.makeup,safe)-(SCOPE.glGr||0); }
+  return est;
+}
+function lmApply(){
+  const t=ctx.currentTime, c=LM.on? LM.comp : 0;
+  // turn the louder side down, so nothing can clip
+  const pg=ORIG?0:10**(-Math.max(0,c)/20), rg=ORIG?10**(Math.min(0,c)/20):0;
+  procG.gain.setTargetAtTime(pg,t,.04); rawG.gain.setTargetAtTime(rg,t,.04);
+  lmUI();
+}
+function lmUI(){
+  const b=$('lmBtn'); b.setAttribute('aria-pressed',LM.on); b.classList.toggle('on',LM.on);
+  const c=LM.comp, ok=Math.abs(c)>=.1&&(APPM==='phone'||LM.r>0);
+  $('lmV').textContent= LM.on&&ok? (APPM==='phone'?'≈':'')+(c>0?'−':'+')+Math.abs(c).toFixed(1)+' dB' : '';
+}
 function setOrig(v){
   ORIG=v; const t=ctx.currentTime;
   if(v){ try{ rawDelay.delayTime.setValueAtTime(Math.min(1.9,chainLatency(getState(),SR)/SR),t); }catch(_){ rawDelay.delayTime.value=latencyS(); } }
-  procG.gain.setTargetAtTime(v?0:1,t,.012); rawG.gain.setTargetAtTime(v?1:0,t,.012);
-  $('abBar').classList.toggle('orig',v);
-  document.querySelectorAll('#abBar button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.v==='orig')===v));
+  lmApply();
+  const b=$('procBtn'); b.setAttribute('aria-pressed',!v); $('procSt').textContent=v?'כבוי · השיר כמו במקור':'פעיל';
   pushSystem();
 }
-document.querySelectorAll('#abBar button').forEach(b=>b.onclick=()=>setOrig(b.dataset.v==='orig'));
+$('procBtn').onclick=()=>setOrig(!ORIG);
+$('lmBtn').onclick=()=>{ LM.on=!LM.on; try{ localStorage.setItem('cabinq.lm',LM.on?'1':'0'); }catch(_){} lmApply(); pushSystem();
+  toast(LM.on?'העוצמה מושווית: עכשיו שומעים רק את ההבדל בצליל':'השוואת העוצמה כבויה'); };
+lmUI();
 /* iPhone: the page lives in Safari, which zooms on pinch and double-tap. The app has its own pinch (EQ) and taps, so page zoom is off. */
 for(const ev of ['gesturestart','gesturechange','gestureend']) document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
 document.addEventListener('touchmove',e=>{ if(e.touches&&e.touches.length>1) e.preventDefault(); },{passive:false});
