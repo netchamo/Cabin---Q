@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0c0d0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -30,7 +30,7 @@
   --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --f-he:"Heebo", "Arial Hebrew", system-ui, sans-serif;
 }
-html{height:100%}
+html{height:100%; touch-action:manipulation; -webkit-text-size-adjust:100%; text-size-adjust:100%}
 body{min-height:100%}
 [hidden]{display:none!important}
 body{
@@ -118,6 +118,18 @@ select.pill{appearance:none; -webkit-appearance:none; padding-right:28px; letter
 select.pill option{background:#1f2226; color:var(--ink)}
 
 /* mode bar */
+.ab{display:flex; align-items:center; gap:6px; padding:5px; border-radius:12px; background:var(--well); box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
+.ab-ic{width:22px; height:22px; flex:none; margin:0 6px; fill:none; stroke:var(--ink-3); stroke-width:2; stroke-linecap:round}
+.ab button{flex:1; height:40px; border-radius:9px; border:1px solid transparent; background:transparent; color:var(--ink-3); font-family:var(--f-he); font-size:15px; font-weight:500;
+  display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer}
+.ab button .led{width:7px; height:7px; border-radius:50%; background:#3a3f45}
+.ab button[aria-pressed="true"]{background:linear-gradient(180deg,#41464c,#30343a); color:var(--ink); border-color:#121416; box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.ab button[data-v="proc"][aria-pressed="true"] .led{background:var(--led); box-shadow:0 0 8px var(--led-glow)}
+.ab button[data-v="orig"][aria-pressed="true"]{color:#9ecbff}
+.ab button[data-v="orig"][aria-pressed="true"] .led{background:#5aa9ff; box-shadow:0 0 8px rgba(90,169,255,.7)}
+.ab.orig .ab-ic{stroke:#5aa9ff}
+.unit.fs .ab{display:none}
+@supports (-webkit-touch-callout:none){ input,select,textarea{font-size:16px !important} }
 .modebar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:0 6px}
 .seg{display:inline-flex; padding:3px; gap:3px; border-radius:9px; background:var(--well); box-shadow:inset 0 1px 3px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05)}
 .seg button{height:26px; padding:0 10px; border:0; border-radius:6px; background:transparent; color:var(--ink-3);
@@ -627,6 +639,11 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     <span class="lat"><span class="sys-st" id="sysSt" hidden></span>LATENCY <b id="latV">0.0 ms</b></span>
   </div>
 
+  <div class="ab" id="abBar" dir="rtl" role="group" aria-label="השוואה למקור">
+    <svg class="ab-ic" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+    <button data-v="proc" aria-pressed="true"><span class="led"></span>עם העיבוד</button>
+    <button data-v="orig" aria-pressed="false"><span class="led"></span>מקור</button>
+  </div>
   <div class="screen">
     <div class="rail" id="rail">
       <div class="bandbox" id="bandBox"><span class="dot"></span><span id="bbName">—</span>
@@ -895,14 +912,17 @@ compIn.connect(out); // replaced by the compressor once it is ready
 detMp.connect(detBus); detLp.connect(detBus);
 const mon=G(), soloF=ctx.createBiquadFilter(), soloG=G(), sink=G();
 const fin=G(); out.connect(fin); // the limiter is inserted between trim (out) and fin once ready
-fin.connect(mon); mon.connect(ctx.destination);
+/* A/B: the listener and the meters hear `outSel`: either the processed chain or the untouched input, delayed to line up */
+const procG=G(), rawG=G(), rawDelay=ctx.createDelay(2.0), outSel=G(); rawG.gain.value=0;
+fin.connect(procG); procG.connect(outSel); input.connect(rawDelay); rawDelay.connect(rawG); rawG.connect(outSel);
+outSel.connect(mon); mon.connect(ctx.destination);
 fin.connect(soloF); soloF.connect(soloG); soloG.connect(ctx.destination); soloG.gain.value=0;
 sink.gain.value=0; sink.connect(ctx.destination); // keeps analysers pulled on every browser
 lpOut.gain.value=0; byp.gain.value=0; detLp.gain.value=0;
 const preAn=ctx.createAnalyser(), postAn=ctx.createAnalyser();
 [preAn,postAn].forEach(a=>{a.fftSize=8192; a.smoothingTimeConstant=.78; a.minDecibels=-120; a.maxDecibels=0;});
-input.connect(preAn); fin.connect(postAn); preAn.connect(sink); postAn.connect(sink);
-const split=ctx.createChannelSplitter(2); fin.connect(split);
+input.connect(preAn); outSel.connect(postAn); preAn.connect(sink); postAn.connect(sink);
+const split=ctx.createChannelSplitter(2); outSel.connect(split);
 const anL=ctx.createAnalyser(), anR=ctx.createAnalyser(); anL.fftSize=anR.fftSize=2048;
 split.connect(anL,0); split.connect(anR,1); anL.connect(sink); anR.connect(sink);
 let convOn=false;
@@ -1131,7 +1151,7 @@ function draw(){
     g.fillStyle='rgba(255,154,60,.42)'; g.fill();
   }
   // total curve
-  const dim=S.bypass;
+  const dim=S.bypass||ORIG;
   pathCurve(total); g.lineWidth=2.2; g.strokeStyle=dim?'rgba(230,235,240,.25)':(anyDynLive?'rgba(238,243,246,.55)':'#eef3f6'); g.shadowColor='rgba(200,235,255,.45)'; g.shadowBlur=dim||anyDynLive?0:8; g.stroke(); g.shadowBlur=0;
   if(anyDynLive){ pathCurve(live); g.lineWidth=2.4; g.strokeStyle='#ffb070'; g.shadowColor='rgba(255,154,60,.8)'; g.shadowBlur=10; g.stroke(); g.shadowBlur=0; }
   // handles
@@ -2878,8 +2898,9 @@ function systemCurve(){
   const n=SYS_BANDS.length, fr=new Float32Array(SYS_BANDS), m=new Float32Array(n), ph=new Float32Array(n), db=new Float32Array(n);
   if(!S.bypass) for(const b of S.bands){ if(!b.on) continue; for(const nd of A.get(b.id).disp){ nd.getFrequencyResponse(fr,m,ph); for(let i=0;i<n;i++) if(m[i]>0&&isFinite(m[i])) db[i]+=20*Math.log10(m[i]); } }
   const cutoffs=SYS_BANDS.map((f,i)=> i<n-1? Math.round(Math.sqrt(f*SYS_BANDS[i+1])) : 20000);
-  const byp=S.bypass, P=PH;
-  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:byp?0:P.inp, lim:{on:true,ceil:P.ceil,rel:80},
+  if(ORIG) db.fill(0);
+  const byp=S.bypass||ORIG, P=PH;
+  return {cutoffs, gains:Array.from(db,v=>Math.round(v*100)/100), post:byp?0:P.inp, lim:{on:!ORIG,ceil:P.ceil,rel:80},
     smooth:{on:P.sm.on&&!byp, r:SMK.map(k=>smRegion(k))},
     glue:{on:P.gl.on&&!byp, thr:P.gl.thr, ratio:P.gl.ratio, att:P.gl.att, rel:P.gl.rel, makeup:P.gl.makeup}};
 }
@@ -2942,7 +2963,7 @@ function binLevel(lo,hi){ const b=SCOPE.bins; if(!b) return -120; const hz=SCOPE
 /* what the engine is doing, estimated from the measured sound with the same thresholds, ratios and timing */
 function phDetect(now){
   const dt=clamp((now-(SCOPE.lt||now))/1000,.01,.2); SCOPE.lt=now;
-  const k=tau=>1-Math.exp(-dt/Math.max(tau/1000,.001)), on=SYS.on&&!S.bypass;
+  const k=tau=>1-Math.exp(-dt/Math.max(tau/1000,.001)), on=SYS.on&&!S.bypass&&!ORIG;
   for(const key of SMK){ const [lo,hi]=smEdges(key), r=PH.sm.R[key];
     const lvl=binLevel(lo,hi)+PH.inp; SCOPE.lv[key]=lvl;
     let tgt=0; if(on&&PH.sm.on&&PH.sm[key]>0){ const over=lvl-smThr(key); if(over>0) tgt=over*(1-1/smRatio(key)); }
@@ -3090,6 +3111,20 @@ function phoneTick(now){
   $('glGr').textContent= live&&PH.gl.on? 'GR −'+glNeedle.toFixed(1)+' dB' : '';
 }
 if(NATIVE){ $('modeTabs').hidden=false; phUI(); let m='player'; try{ m=localStorage.getItem('cabinq.appmode')||'player'; }catch(_){} setAppMode(m,true); }
+/* ---------- A/B: everything on, or the song exactly as it is ---------- */
+var ORIG=false;
+function setOrig(v){
+  ORIG=v; const t=ctx.currentTime;
+  if(v){ try{ rawDelay.delayTime.setValueAtTime(Math.min(1.9,chainLatency(getState(),SR)/SR),t); }catch(_){ rawDelay.delayTime.value=latencyS(); } }
+  procG.gain.setTargetAtTime(v?0:1,t,.012); rawG.gain.setTargetAtTime(v?1:0,t,.012);
+  $('abBar').classList.toggle('orig',v);
+  document.querySelectorAll('#abBar button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.v==='orig')===v));
+  pushSystem();
+}
+document.querySelectorAll('#abBar button').forEach(b=>b.onclick=()=>setOrig(b.dataset.v==='orig'));
+/* iPhone: the page lives in Safari, which zooms on pinch and double-tap. The app has its own pinch (EQ) and taps, so page zoom is off. */
+for(const ev of ['gesturestart','gesturechange','gestureend']) document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+document.addEventListener('touchmove',e=>{ if(e.touches&&e.touches.length>1) e.preventDefault(); },{passive:false});
 /* remember the setup between launches */
 function getState(){ return JSON.parse(JSON.stringify({bands:S.bands.map(b=>({type:b.type,freq:b.freq,gain:b.gain,q:b.q,slope:b.slope,on:b.on,dyn:b.dyn,slot:b.slot})),trim:S.trim,C,L,FX:typeof FX!=='undefined'?FX:undefined,mode:S.mode,res:S.res,bypass:S.bypass})); }
 function saveState(){ try{ const st=getState(); st.preset=presetSel.value; st.mode=S.mode; st.res=S.res; localStorage.setItem('cabinq.v1',JSON.stringify(st)); }catch(_){} }
