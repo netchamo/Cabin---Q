@@ -23,6 +23,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Bundle the MP3 encoder (lamejs, LGPL)
+        run: |
+          mkdir -p web/vendor
+          curl -fsSL https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js -o web/vendor/lame.min.js
+          node -e "const fs=require('fs'); new Function(fs.readFileSync('web/vendor/lame.min.js','utf8')+';this.L=lamejs;').call(globalThis); const e=new L.Mp3Encoder(2,48000,320); const z=new Int16Array(1152); const b=e.encodeBuffer(z,z); console.log('lamejs ok', b.length>=0)"
       - name: Stamp the interface version
         run: |
           echo "{\"sha\":\"$GITHUB_SHA\",\"time\":$(git log -1 --format=%ct),\"minNative\":$(cat web/min-native.txt)}" > web/version.json

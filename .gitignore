@@ -6,3 +6,4 @@ android/.idea/
 .DS_Store
 web/version.json
 web/apk.json
+web/vendor/

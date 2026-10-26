@@ -122,6 +122,9 @@ select.pill option{background:#1f2226; color:var(--ink)}
 #cv{position:absolute; inset:0; width:100%; height:100%; touch-action:none; display:block}
 .rail{position:absolute; top:-38px; left:-2px; right:-2px; height:32px; display:flex; align-items:center; gap:5px; z-index:4}
 .rail .sp{flex:1}
+.rail{overflow-x:auto; scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail .chip{white-space:nowrap; flex:none}
 .rail .chip{height:28px; padding:0 9px; border-radius:7px; border:1px solid rgba(0,0,0,.45); background:linear-gradient(180deg,rgba(20,12,6,.55),rgba(20,12,6,.75));
   color:#f1dfc2; box-shadow:inset 0 1px 0 rgba(255,230,190,.12), 0 1px 0 rgba(255,220,170,.12); font-size:11px}
 .rail .chip[aria-pressed="true"]{color:#fff; border-color:rgba(255,210,150,.55)}
@@ -207,8 +210,8 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .fx.tame-on .fx-sub{color:#7fe0a8}
 .fx-sub{unicode-bidi:plaintext; flex:1; min-width:0; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .fx-h .pill{height:30px; padding:0 11px; flex:none}
-.fx-chev{width:30px; height:30px; flex:none; border:0; background:transparent; display:grid; place-items:center}
-.fx-chev svg{width:14px; height:14px; stroke:var(--ink-2); fill:none; stroke-width:2.2; stroke-linecap:round; transition:transform .2s}
+.fx-chev{width:44px; height:36px; flex:none; border-radius:10px; border:1px solid rgba(255,255,255,.1); background:linear-gradient(180deg,#3a3f45,#2a2e33); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 2px 5px rgba(0,0,0,.4); display:grid; place-items:center; cursor:pointer}
+.fx-chev svg{width:18px; height:18px; stroke:var(--ink); fill:none; stroke-width:2.4; stroke-linecap:round; transition:transform .2s}
 .fx.open .fx-chev svg{transform:rotate(180deg)}
 .fx-b{display:flex; flex-direction:column; gap:10px; padding:0 10px 12px}
 .fx-row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
@@ -272,7 +275,26 @@ select.pill option{background:#1f2226; color:var(--ink)}
 .unit.fs .screen{position:fixed; inset:0; z-index:40; border-radius:0; height:auto; border-width:44px 0 0 0;
   padding:8px max(8px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(8px, env(safe-area-inset-left,0px))}
 .unit.fs .rail{left:max(8px, env(safe-area-inset-left,0px)); right:max(8px, env(safe-area-inset-right,0px)); top:-38px}
-.fsbar{position:absolute; left:8px; right:8px; bottom:8px; z-index:3; display:flex; align-items:center; gap:6px; flex-wrap:nowrap}
+.bandbox{display:none; align-items:center; gap:4px; height:30px; padding:0 4px 0 8px; border-radius:8px; border:1px solid var(--c,#888); background:rgba(10,6,3,.55); flex:none}
+.unit.fs .bandbox{display:flex}
+.bandbox .dot{width:10px; height:10px; border-radius:50%; background:var(--c,#888); box-shadow:0 0 8px var(--c,#888)}
+.bandbox #bbName{font-family:var(--f-mono); font-size:11.5px; color:#f1dfc2; margin:0 4px; white-space:nowrap}
+.bandbox .chip{height:24px !important; padding:0 7px !important; font-size:10px !important}
+.bandbox .chip.ic{width:26px !important}
+.fs-info{display:none; position:absolute; top:8px; left:12px; z-index:3; pointer-events:none; font-family:var(--f-mono); font-size:13px; color:#eef3f6; text-shadow:0 1px 3px #000, 0 0 10px rgba(0,0,0,.8); white-space:nowrap}
+.fs-info small{display:block; font-size:11px; color:#ffb070; margin-top:3px}
+.unit.fs .fs-info{display:block}
+.fx-title{justify-content:center; font-size:13px !important; letter-spacing:.3em !important; color:var(--silk) !important}
+.out-opts{display:flex; flex-direction:column; gap:8px; width:100%}
+.out-line{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--f-he); font-size:12.5px; color:var(--ink-3)}
+.out-line .seg button{height:26px; font-size:10.5px}
+.fmt-chip{display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 10px; border-radius:8px; border:1px solid rgba(255,154,60,.45); background:rgba(255,154,60,.1); color:var(--ink); font-family:var(--f-mono); font-size:11.5px}
+.fmt-chip::after{content:""; width:0; height:0; border:4px solid transparent; border-top-color:var(--ink-2); margin-top:4px}
+.fmt-menu{display:flex; flex-direction:column; gap:4px; padding:6px; border-radius:10px; background:#15181b; border:1px solid rgba(255,255,255,.08)}
+.fmt-menu button{display:flex; justify-content:space-between; gap:12px; padding:9px 10px; border:0; border-radius:7px; background:transparent; color:var(--ink-2); font-family:var(--f-mono); font-size:12px; text-align:start}
+.fmt-menu button small{font-family:var(--f-he); color:var(--ink-3); font-size:11.5px}
+.fmt-menu button.cur{background:rgba(255,154,60,.12); color:var(--ink)}
+.lufs-now{font-family:var(--f-mono); color:var(--ink-2)}
 .fsbar .chip{flex:none}
 .fs-read{flex:1 1 auto; min-width:0; text-overflow:ellipsis; display:inline-flex; align-items:center; gap:8px; height:30px; padding:0 10px; border-radius:6px;
   background:rgba(6,13,17,.82); border:1px solid rgba(160,210,230,.14); font-family:var(--f-mono); font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden}
@@ -567,6 +589,9 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 
   <div class="screen">
     <div class="rail" id="rail">
+      <div class="bandbox" id="bandBox"><span class="dot"></span><span id="bbName">—</span>
+        <button class="chip" id="fsOn" title="הפעלה וכיבוי של הבנד">ON</button><button class="chip" id="fsDyn" title="Dynamic EQ לבנד">DYN</button>
+        <button class="chip ic" id="fsListen" title="האזנה לאזור הבנד בלבד"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="2"/><rect x="16.5" y="14" width="4.5" height="7" rx="2"/></svg></button></div>
       <button class="chip" id="rangeBtn" title="טווח התצוגה">±12 dB</button>
       <button class="chip ic" id="undoBtn" title="ביטול שינוי ב-EQ" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="chip ic redo" id="redoBtn" title="ביצוע מחדש" disabled><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
@@ -578,13 +603,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
     </div>
     <div class="glass" id="glass">
       <canvas id="cv" aria-label="Equalizer display. Drag points to set frequency and gain, pinch a point to set Q, pinch the background to zoom."></canvas>
-      <div class="fsbar" id="fsbar" hidden>
-        <span class="fs-read" id="fsRead"><span class="dot"></span><span id="fsTxt">—</span></span>
-        <button class="chip" id="fsListen">LISTEN</button>
-        <button class="chip" id="fsDyn">DYN</button>
-        <button class="chip" id="fsByp">BYPASS</button>
-        <button class="chip he" id="fsExit">יציאה</button>
-      </div>
+      <div class="fs-info" id="fsInfo"></div>
     </div>
     <div class="meter" id="meter">
       <div class="mbar"><div class="clip" id="clipL"></div><div class="mfill" id="mL"></div><div class="mpk" id="pL"></div></div>
@@ -629,7 +648,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
         <p class="dyn-help" dir="rtl"><b>SC HPF</b> קובע מאיזה תדר הקומפרסור מתחיל להגיב: בהגדרה גבוהה הבס כבר לא "מושך" את כל המיקס למטה. <b>Mix</b> מערבב בין האות המקורי לאות הדחוס, לקומפרסיה מקבילית.</p>
       </div>
       <div class="group g-fx">
-        <div class="gt">FX <span class="dyn-note" dir="rtl">לפני הלימיטר · לחיצה על פס פותחת אותו</span></div>
+        <div class="gt fx-title">FX</div>
         <div class="fx off" id="fx_tame" style="--fxc:#7fe0a8">
           <div class="fx-h" data-fx="tame"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 14c3 0 3-4 5-4s2 6 4 6 2-11 4-11 2 9 4 9h3"/><path d="M13 3l3 3M16 3l-3 3" opacity=".7"/></svg></span><b>TAME</b><span class="fx-sub" id="tameSub"></span>
             <button class="pill" id="tameOn" aria-pressed="false"><span class="led"></span>On</button>
@@ -705,7 +724,13 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
           <div class="render" dir="rtl">
             <div class="render-row"><button class="pill he-pill" id="renderBtn"><span class="led"></span>רינדור השיר</button><button class="pill he-pill" id="renderCancel" hidden>ביטול</button></div>
             <div class="render-bar" id="renderBar" hidden><i id="renderFill"></i></div>
-            <span class="render-txt" id="renderTxt">שומר את השיר שמתנגן עם כל העיבוד, כקובץ WAV באיכות 24 ביט.</span>
+            <span class="render-txt" id="renderTxt">שומר את השיר שמתנגן עם כל העיבוד.</span>
+            <div class="out-opts">
+              <div class="out-line">פורמט <button class="fmt-chip" id="outFmt">WAV 24-BIT</button></div>
+              <div class="fmt-menu" id="fmtMenu" hidden></div>
+              <div class="out-line">עוצמה לסטרימינג <div class="seg" id="outTarget" dir="ltr"><button data-v="0">OFF</button><button data-v="-14">−14 LUFS</button><button data-v="-16">−16 LUFS</button></div></div>
+              <div class="out-line"><span class="lufs-now" id="lufsNow" dir="ltr">I — LUFS</span><span id="lufsHint"></span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2039,6 +2064,70 @@ async function renderOffline(buf,st,from,to,onProg,abort){
   l.set(L0.subarray(lat,lat+want)); r.set(R0.subarray(lat,lat+want)); return {l,r};
 }
 /* streams a WAV file out piece by piece, so a long session never has to sit in memory at once */
+/* ---------- output formats ---------- */
+const FMTS={wav24:{ext:'wav',mime:'audio/wav',label:'WAV 24-BIT',sub:'מקסימום איכות'},wav16:{ext:'wav',mime:'audio/wav',label:'WAV 16-BIT',sub:'איכות CD'},
+  mp3:{ext:'mp3',mime:'audio/mpeg',label:'MP3 320',sub:'הכי נפוץ, קובץ קטן'},aac:{ext:'aac',mime:'audio/aac',label:'AAC 320',sub:'קטן ואיכותי'}};
+const OUT={fmt:'wav24',target:0}; try{ Object.assign(OUT,JSON.parse(localStorage.getItem('cabinq.out')||'{}')); }catch(_){}
+let AAC_OK=false; try{ if(window.AudioEncoder) AudioEncoder.isConfigSupported({codec:'mp4a.40.2',sampleRate:ctx.sampleRate,numberOfChannels:2,bitrate:320000}).then(r=>{ AAC_OK=!!r.supported; renderOut(); }).catch(()=>{}); }catch(_){}
+function outSave(){ try{ localStorage.setItem('cabinq.out',JSON.stringify(OUT)); }catch(_){} }
+function renderOut(){ if(OUT.fmt==='aac'&&!AAC_OK&&window.AudioEncoder===undefined) OUT.fmt='wav24';
+  for(const id of ['outFmt','sesFmt']){ const b=$(id); if(b) b.textContent=FMTS[OUT.fmt].label; }
+  $('outTarget').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===OUT.target));
+  $('lufsHint').textContent= OUT.target? 'הרינדור יכוון את השיר ל-\u2066'+OUT.target+' LUFS\u2069, בלי לעבור את תקרת הלימיטר. ככה YouTube ו-Spotify לא יחלישו אותו' : 'בלי התאמת עוצמה';
+  if(typeof sumHead==='function'&&SES.view==='sum'&&$('sumTot')) sumHead(); }
+function fmtMenu(anchor){ const m=anchor==='ses'?$('sesFmtMenu'):$('fmtMenu'); if(!m.hidden){ m.hidden=true; return; } m.textContent='';
+  Object.entries(FMTS).forEach(([k,f])=>{ if(k==='aac'&&!AAC_OK) return; const b=document.createElement('button'); b.className=k===OUT.fmt?'cur':''; b.innerHTML='<span>'+f.label+'</span><small>'+f.sub+'</small>';
+    b.onclick=()=>{ OUT.fmt=k; outSave(); m.hidden=true; renderOut(); }; m.appendChild(b); });
+  m.hidden=false; }
+$('outFmt').onclick=()=>fmtMenu('out');
+$('outTarget').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; OUT.target=+b.dataset.v; outSave(); renderOut(); };
+/* integrated loudness (ITU-R BS.1770) of a rendered stereo buffer */
+function lufsOf(l,r,sr){ const kw=()=>{ let K=Math.tan(Math.PI*1681.9744509555319/sr), Q=.7071752369554193, Vh=Math.pow(10,3.99984385397/20), Vb=Math.pow(Vh,.499666774155), a0=1+K/Q+K*K;
+    const s1=[(Vh+Vb*K/Q+K*K)/a0,2*(K*K-Vh)/a0,(Vh-Vb*K/Q+K*K)/a0,2*(K*K-1)/a0,(1-K/Q+K*K)/a0]; K=Math.tan(Math.PI*38.13547087613982/sr); Q=.5003270373253953; a0=1+K/Q+K*K;
+    return [s1,[1,-2,1,2*(K*K-1)/a0,(1-K/Q+K*K)/a0]]; };
+  const [a,b]=kw(), hop=Math.round(sr*.1), nb=Math.floor(l.length/hop), e=new Float64Array(nb);
+  for(const ch of [l,r]){ let z0=0,z1=0,z2=0,z3=0,y0=0,y1=0,y2=0,y3=0;
+    for(let i=0;i<nb*hop;i++){ const x=ch[i]; const u=a[0]*x+a[1]*z0+a[2]*z1-a[3]*z2-a[4]*z3; z1=z0; z0=x; z3=z2; z2=u;
+      const v=b[0]*u+b[1]*y0+b[2]*y1-b[3]*y2-b[4]*y3; y1=y0; y0=u; y3=y2; y2=v; e[(i/hop)|0]+=v*v; } }
+  const blocks=[]; for(let k=3;k<nb;k++){ const ms=(e[k]+e[k-1]+e[k-2]+e[k-3])/(4*hop); blocks.push(ms); }
+  const L=ms=>-.691+10*Math.log10(ms+1e-20), g1=blocks.filter(m=>L(m)>-70); if(!g1.length) return -70;
+  const rel=L(g1.reduce((x,y)=>x+y,0)/g1.length)-10, g2=g1.filter(m=>L(m)>rel); return L(g2.reduce((x,y)=>x+y,0)/(g2.length||1)); }
+/* bring a rendered buffer to the streaming target without going over the limiter ceiling */
+function normalize(l,r,sr,st){ if(!OUT.target) return null; const now=lufsOf(l,r,sr); let pk=0; for(let i=0;i<l.length;i++){ const a=Math.abs(l[i]), c=Math.abs(r[i]); if(a>pk) pk=a; if(c>pk) pk=c; }
+  const ceil=st&&st.L&&st.L.on?st.L.ceil:-1; let gdb=OUT.target-now; const room=ceil-20*Math.log10(pk+1e-12); if(gdb>room) gdb=room;
+  const g=Math.pow(10,gdb/20); for(let i=0;i<l.length;i++){ l[i]*=g; r[i]*=g; } return {from:now,gain:gdb}; }
+/* live reading of the current song's integrated loudness after all processing */
+var LIVEI={arr:[]};
+setInterval(()=>{ const I=integrated(LIVEI.arr); $('lufsNow').textContent='I '+(I!=null?I.toFixed(1):'—')+' LUFS'; },1000);
+/* a writer streams any format out piece by piece */
+function makeSink(name,mime){ const nat=!!(NATIVE&&NATIVE.saveBegin), tok=nat?(NATIVE.saveBeginMime?NATIVE.saveBeginMime(name,mime):NATIVE.saveBegin(name)):null, parts=[];
+  return { put(u8){ if(nat) NATIVE.saveChunk(tok,b64(u8)); else parts.push(new Blob([u8])); },
+    end(){ if(nat) return {where:NATIVE.saveEnd(tok)}; return {file:new File(parts,name,{type:mime})}; },
+    abort(){ if(nat){ try{ NATIVE.saveAbort(tok); }catch(_){} } parts.length=0; } }; }
+async function loadLame(){ if(window.lamejs) return;
+  for(const src of ['vendor/lame.min.js','https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js']){
+    try{ await new Promise((ok,no)=>{ const sc=document.createElement('script'); sc.src=src; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); }); if(window.lamejs) return; }catch(_){} }
+  throw new Error('מקודד ה-MP3 לא נטען. בדוק חיבור לאינטרנט ונסה שוב.'); }
+async function makeWriter(fmt,base,frames,sr){
+  const F=FMTS[fmt]; const name=base+'.'+F.ext;
+  if(fmt!=='wav24'&&fmt!=='wav16'&&NATIVE&&NATIVE.saveBegin&&!NATIVE.saveBeginMime) throw new Error('לשמירת MP3 או AAC צריך לעדכן את האפליקציה');
+  if(fmt==='wav24'||fmt==='wav16') return Object.assign(wavWriter(name,frames,fmt==='wav24'?24:16,sr),{name});
+  const sink=makeSink(name,F.mime); let written=0; const STEP=1152*40;
+  const toI16=(x,a,b)=>{ const o=new Int16Array(b-a); for(let k=a;k<b;k++){ let v=x[k]; v=v>1?1:v<-1?-1:v; o[k-a]=v<0?v*32768:v*32767; } return o; };
+  if(fmt==='mp3'){ await loadLame(); const enc=new lamejs.Mp3Encoder(2,sr,320);
+    const w={ name, async pcm(l,r,a,b){ for(let s0=a;s0<b;s0+=STEP){ const s1=Math.min(b,s0+STEP), out=enc.encodeBuffer(toI16(l,s0,s1),toI16(r,s0,s1)); if(out.length) sink.put(new Uint8Array(out)); written+=s1-s0; await new Promise(z=>setTimeout(z,0)); } },
+      async silence(n){ const z=new Float32Array(Math.min(n,STEP)); let left=n; while(left>0){ const k=Math.min(left,z.length); await w.pcm(z,z,0,k); left-=k; } },
+      async end(){ if(written<frames) await w.silence(frames-written); const f=enc.flush(); if(f.length) sink.put(new Uint8Array(f)); return sink.end(); }, abort(){ sink.abort(); } };
+    return w; }
+  // AAC through the phone's own encoder (WebCodecs), written as an ADTS .aac stream
+  let ts=0, err=null; const enc=new AudioEncoder({output:ch=>{ const u=new Uint8Array(ch.byteLength); ch.copyTo(u); sink.put(u); },error:e=>{ err=e; }});
+  enc.configure({codec:'mp4a.40.2',sampleRate:sr,numberOfChannels:2,bitrate:320000,aac:{format:'adts'}});
+  const w={ name, async pcm(l,r,a,b){ for(let s0=a;s0<b;s0+=STEP){ if(err) throw err; const s1=Math.min(b,s0+STEP), n=s1-s0, d=new Float32Array(n*2); d.set(l.subarray?l.subarray(s0,s1):l.slice(s0,s1),0); d.set(r.subarray?r.subarray(s0,s1):r.slice(s0,s1),n);
+        const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(ts*1e6/sr),data:d}); enc.encode(ad); ad.close(); ts+=n; written+=n;
+        while(enc.encodeQueueSize>8) await new Promise(z=>setTimeout(z,5)); await new Promise(z=>setTimeout(z,0)); } },
+    async silence(n){ const z=new Float32Array(Math.min(n,STEP)); let left=n; while(left>0){ const k=Math.min(left,z.length); await w.pcm(z,z,0,k); left-=k; } },
+    async end(){ if(written<frames) await w.silence(frames-written); await enc.flush(); enc.close(); if(err) throw err; return sink.end(); }, abort(){ try{ enc.close(); }catch(_){} sink.abort(); } };
+  return w; }
 function wavWriter(name,frames,bits,sr){
   const bps=bits/8, bytes=frames*2*bps, hd=new Uint8Array(44), v=new DataView(hd.buffer), wr=(o,t)=>{ for(let i=0;i<t.length;i++) hd[o+i]=t.charCodeAt(i); };
   wr(0,'RIFF'); v.setUint32(4,36+bytes,true); wr(8,'WAVE'); wr(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,2,true);
@@ -2076,10 +2165,11 @@ $('renderBtn').onclick=async()=>{
     const t=tracks[cur], txt=x=>$('renderTxt').textContent=x; pause(); RENDER.active=true; RENDER.off=true; renderUI(); keepAwake(true);
     try{ txt('קורא את השיר…'); const buf=await decodeTrack(t), st=getState(), tail=FX.rev.on?Math.min(7,FX.rev.decay*1.2)+.3:.3, sr=ctx.sampleRate;
       const r=await renderOffline(buf,st,0,buf.duration+tail,f=>{ $('renderFill').style.width=(f*100)+'%'; txt('מעבד… '+Math.round(f*100)+'%'); });
-      const name=t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q).wav', w=wavWriter(name,r.l.length,24,sr);
+      const nm=normalize(r.l,r.r,sr,st); if(nm) txt('עוצמה: '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS');
+      const w=await makeWriter(OUT.fmt,t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q)',r.l.length,sr);
       txt('שומר את הקובץ…'); await w.pcm(r.l,r.r,0,r.l.length); const res=await w.end();
       if(res.where){ txt('נשמר בתיקייה '+res.where); toast('הקובץ נשמר'); } else await deliverFile(res.file,txt);
-    }catch(e){ txt('הרינדור נעצר. אפשר לנסות שוב.'); }
+    }catch(e){ txt(e&&e.message&&/[א-ת]/.test(e.message)?e.message:'הרינדור נעצר. אפשר לנסות שוב.'); }
     RENDER.active=false; RENDER.off=false; keepAwake(false); renderUI(); return; }
   if(!recNode){ toast('הרינדור לא נתמך בדפדפן הזה'); return; }
   pause(); aud.currentTime=0; RENDER.active=true; RENDER.ch=[]; RENDER.frames=0; RENDER.stopping=false; RENDER.name=tracks[cur].name;
@@ -2185,11 +2275,13 @@ function refreshDeck(){
   const b=sel();
   if(b&&dynOk(b.type)) $('dynBandTxt').textContent='BAND '+(b.slot+1)+' · '+fmtHz(b.freq)+' · '+TYPE_LBL[b.type];
   // fullscreen readout
-  if(b){ $('fsRead').style.setProperty('--c',COLORS[b.slot]);
-    const p=[(b.slot+1)+' '+TYPE_LBL[b.type],fmtHz(b.freq)]; if(!isCut(b.type)&&b.type!=='notch') p.push(sgn(b.gain)+' dB');
+  if(b){ $('bandBox').style.setProperty('--c',COLORS[b.slot]); $('bbName').textContent=(b.slot+1)+' · '+TYPE_LBL[b.type];
+    const p=[fmtHz(b.freq)]; if(!isCut(b.type)&&b.type!=='notch') p.push(sgn(b.gain)+' dB');
     if(isCut(b.type)) p.push(b.slope+' dB/oct'); else if(b.type==='bell'||b.type==='notch') p.push('Q '+b.q.toFixed(2));
-    $('fsTxt').textContent=p.join('  ·  '); }
-  else $('fsTxt').textContent='הקשה כפולה מוסיפה בנד';
+    $('fsInfo').innerHTML=''; $('fsInfo').append(p.join('  ·  '));
+    if(b.dyn&&b.dyn.on&&dynOk(b.type)){ const sm=document.createElement('small'); sm.textContent='DYN · THR '+sgn(b.dyn.thresh)+' · RANGE '+sgn(b.dyn.range); $('fsInfo').append(sm); }
+    $('fsOn').classList.toggle('lit',b.on); $('fsOn').textContent=b.on?'ON':'OFF'; }
+  else { $('bbName').textContent='—'; $('fsInfo').textContent='הקשה כפולה מוסיפה בנד'; }
   const fd=$('fsDyn'); fd.disabled=!b||!dynOk(b.type); fd.classList.toggle('lit',!!b&&dynOk(b.type)&&b.dyn.on);
   $('fsListen').classList.toggle('lit',S.solo); $('listenBtn').classList.toggle('on',S.solo); $('listenBtn').setAttribute('aria-pressed',S.solo);
   updateSolo();
@@ -2212,7 +2304,7 @@ function updateRot(){
   if(rot!==S.rot){ S.rot=rot; $('unit').classList.toggle('rot',rot); }
 }
 function setFs(on){
-  if(S.fs===on) return; S.fs=on; $('unit').classList.toggle('fs',on); $('fsbar').hidden=!on; PB=on?66:22;
+  if(S.fs===on) return; S.fs=on; $('unit').classList.toggle('fs',on); PB=22;
   document.body.classList.toggle('noscroll',on);
   $('fsBtn').textContent=on?'⤡ יציאה':'⤢ מסך מלא';
   if(window.CabinNative){ try{ CabinNative.setFullscreen(on); }catch(_){} }
@@ -2226,7 +2318,7 @@ function setFs(on){
 }
 window.addEventListener('resize',updateRot);
 $('fsBtn').onclick=()=>setFs(!S.fs);
-$('fsExit').onclick=()=>setFs(false);
+$('fsOn').onclick=()=>{ const b=sel(); if(!b) return; b.on=!b.on; structural(); };
 document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement&&nativeFs){ nativeFs=false; setFs(false); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.fs) setFs(false); });
 $('bandOn').onclick=()=>{ const b=sel(); if(!b) return; b.on=!b.on; structural(); };
@@ -2263,8 +2355,8 @@ $('presetDel').onclick=()=>{ const v=presetSel.value; if(!v.startsWith('u:')) re
   if($('presetDel').dataset.armed!=='1'){ $('presetDel').dataset.armed='1'; $('presetDel').textContent='בטוח?'; setTimeout(()=>{ $('presetDel').dataset.armed=''; $('presetDel').textContent='מחיקה'; },2500); return; }
   delete USERP[n]; try{ localStorage.setItem('cabinq.presets',JSON.stringify(USERP)); }catch(_){}
   presetSel.value=''; renderPresets(); openPresetRow(false); toast('נמחק: '+n); };
-function setBypass(v){ S.bypass=v; for(const id of ['bypass','fsByp']){ const b=$(id); b.setAttribute('aria-pressed',v); b.classList.toggle('lit',v); } updateRouting(); pushSystem(); }
-$('bypass').onclick=$('fsByp').onclick=()=>setBypass(!S.bypass);
+function setBypass(v){ S.bypass=v; for(const id of ['bypass']){ const b=$(id); b.setAttribute('aria-pressed',v); b.classList.toggle('lit',v); } updateRouting(); pushSystem(); }
+$('bypass').onclick=()=>setBypass(!S.bypass);
 function setMode(m){
   S.mode=m; $('modeSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
   $('resSeg').classList.toggle('dim',m!=='lp');
@@ -2409,6 +2501,7 @@ function play(){
 }
 function pause(){ if(cur<0) stopPink(); else aud.pause(); setPlaying(false); }
 function select(i,autoplay){
+  if(typeof LIVEI!=='undefined') LIVEI.arr=[];
   if(RENDER.active) cancelRender();
   const was=S.playing||autoplay; pause(); cur=i;
   if(i>=0){ const t=tracks[i]; $('npTitle').textContent=t.name; $('npSub').textContent=(t.artist&&t.artist!==t.folder?t.artist+' · ':'')+(t.folder||'שיר מהטלפון'); $('scrub').classList.remove('dis'); $('miniSeek').classList.remove('dis'); paintArt(t.name);
@@ -2824,7 +2917,7 @@ function renderSesInfo(){ const t=curTab(); const I=t?integrated(t.loud):null;
   $('sesInfo').innerHTML=SES.view==='sum'? '<span class="he" dir="rtl">סיכום: סידור, חיתוך ומעברים</span>' :
     'M <b>'+(loudM>-70?loudM.toFixed(1):'—')+'</b> · I <b>'+(I!=null?I.toFixed(1):'—')+'</b> LUFS'+
     '<span class="he" dir="rtl">'+(t?'· נמדד מאז השינוי האחרון בכרטיסייה':'')+'</span>'; }
-function loudMsg(v){ loudM=v; const t=curTab();
+function loudMsg(v){ loudM=v; if(S.playing){ LIVEI.arr.push(v); if(LIVEI.arr.length>20000) LIVEI.arr.shift(); } const t=curTab();
   if(SES.on&&t&&S.playing&&SES.view==='tab'&&cur>=0&&tKey(tracks[cur])===t.key){ t.loud.push(v); if(t.loud.length>30000) t.loud.shift(); } }
 /* every 1.5 s: remember the tab's settings; restart its loudness reading when the sound changed */
 setInterval(()=>{ if(!SES.on) return; const t=curTab(); if(!t) return;
@@ -2869,9 +2962,9 @@ function bindWave(cv,t,row){ let which=null;
   cv.addEventListener('pointermove',mv); const up=()=>{ if(which){ which=null; sesSave(); } }; cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); }
 function updRow(row,t){ row.querySelector('.tin').textContent='התחלה '+fmtS(t.in||0); row.querySelector('.tout').textContent='סוף '+fmtS(t.out??t.dur);
   row.querySelector('.len').textContent=fmtS(tabLen(t)); }
-function sumHead(){ const tot=sesTotal(), J=SES.join, bps=J.bits/8;
+function sumHead(){ const tot=sesTotal(), J=SES.join, bps=OUT.fmt==='wav16'?2:3;
   $('sumTot').textContent=SES.tabs.length+' שירים · '+(tot!=null?fmtT(tot):'מחשב…');
-  $('sumSize').textContent=tot!=null?'≈ '+Math.round(tot*ctx.sampleRate*2*bps/1048576)+' MB':''; }
+  $('sumSize').textContent=tot!=null?'≈ '+Math.round(OUT.fmt.startsWith('wav')? tot*ctx.sampleRate*2*bps/1048576 : tot*320000/8/1048576)+' MB':''; }
 function renderSum(){
   const P=$('sumPanel'); if(SES.view!=='sum') return; const J=SES.join;
   if(!P.dataset.built){ P.dataset.built='1'; P.innerHTML=`
@@ -2883,7 +2976,8 @@ function renderSum(){
     </div>
     <div class="sum-list" id="sumList"></div>
     <div class="sum-ctl">
-      <div class="row"><div class="seg" id="bitSeg"><button data-v="24">WAV 24-BIT</button><button data-v="16">WAV 16-BIT</button></div><span class="dyn-note" id="sumSize" dir="ltr"></span></div>
+      <div class="row">פורמט <button class="fmt-chip" id="sesFmt">WAV 24-BIT</button><span class="dyn-note" id="sumSize" dir="ltr"></span></div>
+      <div class="fmt-menu" id="sesFmtMenu" hidden></div>
       <div class="row"><button class="pill he-pill" id="sesRender"><span class="led"></span>רינדור הסשן לקובץ אחד</button><button class="pill he-pill" id="sesCancel" hidden>ביטול</button></div>
       <div class="render-bar" id="sesBar2" hidden><i id="sesFill"></i></div>
       <span class="render-txt" id="sesTxt">כל שיר מעובד עם ההגדרות של הכרטיסייה שלו, ואז כולם מתחברים לפי המעברים שבחרת. הרינדור מהיר מזמן אמת.</span>
@@ -2894,12 +2988,12 @@ function renderSum(){
     knob(kj,{label:()=>'FADE OUT',color:'#5aa9ff',enabled:()=>true,get:()=>J2().fout/10,set:n=>{ J2().fout=Math.round(n*100)/10; ch(); },text:()=>J2().fout.toFixed(1)+' s',reset:()=>{ J2().fout=3; ch(); }});
     knob(kj,{label:()=>'TRIM THR',color:'#b38cff',enabled:()=>true,get:()=>lin(J2().thr,-80,-30),set:n=>{ J2().thr=Math.round(unlin(n,-80,-30)); ch(); },text:()=>J2().thr+' dB',reset:()=>{ J2().thr=-50; ch(); }});
     $('joinMode').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; SES.join.mode=b.dataset.v; ch(); knobs.forEach(k=>k.refresh()); };
-    $('bitSeg').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; SES.join.bits=+b.dataset.v; ch(); };
+    $('sesFmt').onclick=()=>fmtMenu('ses'); renderOut();
     $('autoTrimBtn').onclick=()=>{ let n=0; SES.tabs.forEach(t=>{ if(META.has(t.id)){ autoTrim(t); n++; } }); renderSum(); sesSave(); toast(n?'הקצוות נחתכו ב-'+n+' שירים':'עוד מנתח את השירים'); };
     $('sesRender').onclick=()=>renderSession(); $('sesCancel').onclick=()=>{ SES.cancel=true; $('sesTxt').textContent='מבטל…'; };
   }
   function updJoin(){ $('joinMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SES.join.mode));
-    $('bitSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===SES.join.bits));
+
     $('joinNote').textContent=SES.join.mode==='gap'?'שקט בין השירים':'השירים נכנסים זה בזה'; document.querySelectorAll('.sum-join small').forEach(x=>x.textContent=joinTxt()); }
   const list=$('sumList'); list.textContent='';
   if(!SES.tabs.length){ list.innerHTML='<div class="lib-empty">עוד אין שירים בסשן. לחץ על "+ שיר" כדי להוסיף.</div>'; }
@@ -2942,13 +3036,14 @@ async function renderSession(){
     const ov=len.map((l,k)=>k<n-1&&J.mode==='xfade'? Math.min(Math.round(J.sec*sr),Math.floor(l/2),Math.floor(len[k+1]/2)) : 0);
     const gap=J.mode==='gap'?Math.round(J.sec*sr):0;
     const total=len.reduce((a,b)=>a+b,0)-ov.reduce((a,b)=>a+b,0)+gap*(n-1);
-    const name='Cabin Q Session '+new Date().toISOString().slice(0,16).replace('T',' ').replace(':','-')+'.wav';
-    wr=wavWriter(name,total,J.bits,sr); let carry=null;
+    const name='Cabin Q Session '+new Date().toISOString().slice(0,16).replace('T',' ').replace(':','-');
+    wr=await makeWriter(OUT.fmt,name,total,sr); let carry=null;
     for(let k=0;k<n;k++){ if(SES.cancel) throw 'cancel';
       const t=SES.tabs[k], i=trackOf(t); if(i<0) throw new Error('השיר "'+t.name+'" לא נמצא בספרייה');
       const base=k/n; ui(base,'שיר '+(k+1)+' מתוך '+n+': '+t.name);
       const buf=await decodeTrack(tracks[i]);
       const r=await renderOffline(buf,t.state,t.in||0,(t.in||0)+len[k]/sr,f=>ui(base+f/n*.9),()=>SES.cancel);
+      normalize(r.l,r.r,sr,t.state);
       const L=r.l, R=r.r, N=len[k];
       if(k===0&&J.fin>0){ const F=Math.min(N,Math.round(J.fin*sr)); for(let x=0;x<F;x++){ const g=x/F; L[x]*=g; R[x]*=g; } }
       if(k===n-1&&J.fout>0){ const F=Math.min(N,Math.round(J.fout*sr)); for(let x=0;x<F;x++){ const g=x/F; L[N-1-x]*=g; R[N-1-x]*=g; } }
@@ -2958,17 +3053,17 @@ async function renderSession(){
       const O2=ov[k]; await wr.pcm(L,R,start,N-O2);
       carry=O2? {l:L.slice(N-O2),r:R.slice(N-O2)} : null;
     }
-    ui(1,'שומר את הקובץ…'); const res=await wr.end(); wr=null;
-    if(res.where){ $('sesTxt').textContent='נשמר: '+name+' בתיקייה '+res.where; toast('הסשן נשמר'); }
+    ui(1,'שומר את הקובץ…'); const res=await wr.end(); const wname=wr.name; wr=null;
+    if(res.where){ $('sesTxt').textContent='נשמר: '+wname+' בתיקייה '+res.where; toast('הסשן נשמר'); }
     else if(res.file) await deliverFile(res.file,x=>$('sesTxt').textContent=x);
     else $('sesTxt').textContent='השמירה נכשלה';
-  }catch(e){ if(wr) wr.abort(); $('sesTxt').textContent= e==='cancel'? 'הרינדור בוטל.' : 'הרינדור נעצר: '+(e&&e.message?e.message:'שגיאה'); }
+  }catch(e){ if(wr&&wr.abort) wr.abort(); $('sesTxt').textContent= e==='cancel'? 'הרינדור בוטל.' : 'הרינדור נעצר: '+(e&&e.message?e.message:'שגיאה'); }
   SES.busy=false; keepAwake(false); $('sesRender').disabled=false; $('sesCancel').hidden=true;
 }
 
 /* ---------- boot ---------- */
 if(!loadState()){ presetSel.value='Sedan · boom fix'; loadPreset('Sedan · boom fix'); }
-renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad();
+renderLim(); sendLim(); fxOpenUI(); fxUI(); sesLoad(); renderOut();
 if(NATIVE&&NATIVE.deviceAudio) setTimeout(()=>scanDevice(false),600);
 fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{ const t=$('verTag'); t.textContent=(t.textContent?t.textContent+' · ':'')+'UI '+String(v.sha||'').slice(0,7); }).catch(()=>{});
 /* ---------- undo / redo of every sound setting ---------- */

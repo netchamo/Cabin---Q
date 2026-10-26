@@ -462,6 +462,10 @@ class MainActivity : Activity() {
             return token
         }
 
+        /** Like saveBegin, for any audio type (MP3, AAC, WAV). */
+        @JavascriptInterface
+        fun saveBeginMime(name: String, mime: String): String { val t = saveBegin(name); mimes[t] = mime; return t }
+
         @JavascriptInterface
         fun saveChunk(token: String, b64: String) {
             saves[token]?.second?.write(Base64.decode(b64, Base64.DEFAULT))
@@ -471,12 +475,13 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun saveEnd(token: String): String {
             val (f, out, name) = saves.remove(token) ?: return ""
+            val mime = mimes.remove(token) ?: "audio/wav"
             return try {
                 out.close()
                 if (Build.VERSION.SDK_INT >= 29) {
                     val values = ContentValues().apply {
                         put(MediaStore.Audio.Media.DISPLAY_NAME, name)
-                        put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav")
+                        put(MediaStore.Audio.Media.MIME_TYPE, mime)
                         put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/Cabin Q")
                         put(MediaStore.Audio.Media.IS_PENDING, 1)
                     }
@@ -666,6 +671,7 @@ class MainActivity : Activity() {
     // ---------------------------------------------------------------- updates
 
     private val saves = HashMap<String, Triple<File, FileOutputStream, String>>()
+    private val mimes = HashMap<String, String>()
     private var updateId = -1L
     private var updateReceiver: BroadcastReceiver? = null
 
