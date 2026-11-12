@@ -2657,7 +2657,7 @@ if('mediaSession' in navigator){ try{ const ms=navigator.mediaSession;
   ms.setActionHandler('nexttrack',()=>{ const n=stepIdx(1,false); if(n>=0) select(n,true); });
   ms.setActionHandler('previoustrack',()=>{ const n=stepIdx(-1,false); if(n>=0) select(n,true); });
   ms.setActionHandler('seekto',d=>{ if(cur>=0&&d.seekTime!=null) aud.currentTime=d.seekTime; }); }catch(_){} }
-function setPlaying(v){ S.playing=v; mediaInfo(); try{ navigator.mediaSession.playbackState=v?'playing':'paused'; }catch(_){}
+function setPlaying(v){ if(v&&XP&&XP.src) stopJoinPreview(); S.playing=v; mediaInfo(); try{ navigator.mediaSession.playbackState=v?'playing':'paused'; }catch(_){}
   for(const id of ['playBtn','miniPlay','brPlay']){ const b=$(id); b.classList.toggle('on',v); b.setAttribute('aria-label',v?'השהה':'נגן'); b.querySelector('svg').innerHTML=v?ICO_PAUSE:ICO_PLAY; }
   document.querySelectorAll('.eqbars').forEach(e=>e.classList.toggle('paused',!v)); }
 function play(){
@@ -3352,7 +3352,7 @@ setInterval(()=>{ if(!SES.on) return; const t=curTab(); if(!t) return;
   renderSesInfo(); if(SES.view==='tab'&&S.playing) renderSes(); sesSave(); },1500);
 
 /* ---------- summary: order, trims, transitions, render ---------- */
-function showSum(on){ SES.view=on?'sum':'tab'; $('unit').classList.toggle('sumview',on); $('sumPanel').hidden=!on;
+function showSum(on){ if(!on&&typeof stopJoinPreview==='function') stopJoinPreview(); SES.view=on?'sum':'tab'; $('unit').classList.toggle('sumview',on); $('sumPanel').hidden=!on;
   if(on){ saveCurTab(); renderSum(); analyzeAll(); } renderSes(); renderSesInfo(); sesSave(); }
 const fmtS=s=>{ if(s==null||!isFinite(s)) return '—'; const m=Math.floor(s/60), r=s-m*60; return m+':'+(r<10?'0':'')+r.toFixed(1); };
 function tabLen(t){ if(t.dur==null) return null; return Math.max(0,(t.out??t.dur)-(t.in||0)); }
@@ -3479,7 +3479,7 @@ function openXf(k){ const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b) return;
 }
 function xfOwn(){ const t=SES.tabs[XF.k]; if(!t.join) t.join={mode:SES.join.mode,sec:SES.join.sec}; return t.join; }
 function xfChanged(){ xfDraw(); sumHead(); sesSave(); renderSum(); }
-function closeXf(){ const m=$('xfModal'); if(m) m.hidden=true; XF.k=-1; }
+function closeXf(){ const m=$('xfModal'); if(m) m.hidden=true; XF.k=-1; stopJoinPreview(); }
 function xfDraw(){ const k=XF.k, a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b) return; const J=jn(k);
   $('xfTitle').textContent='מעבר '+(k+1)+' ← '+(k+2); $('xfA').textContent=(k+1)+' · '+a.name; $('xfB').textContent=(k+2)+' · '+b.name;
   $('xfLen').textContent=(J.mode==='gap'?'GAP ':'X-FADE ')+J.sec.toFixed(1)+' s'+(a.join?'':' · כמו כולם');
@@ -3512,9 +3512,42 @@ function xfDraw(){ const k=XF.k, a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b) retu
   c.fillText('סוף '+fmtS(outA),Math.min(w-70,X(outA)+5),14); c.fillText('התחלה '+fmtS(inB),Math.min(w-80,X(inB+bOff)+5),h/2+16);
 }
 /* listen to a transition: the last seconds of one song, then the start of the next (each with its own settings) */
-function previewJoin(k){ const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b||a.dur==null){ toast('עוד מנתח את השירים'); return; }
-  const outA=a.out??a.dur; SES.preview={a:k,b:k+1,outA,stage:1};
-  switchTab(k,{pos:Math.max(a.in||0,outA-6),play:true,keepView:true,force:true}); toast('מעבר בין '+(k+1)+' ל-'+(k+2)); }
+/* the real transition: both songs rendered with their own settings, joined exactly as in the final render, then played */
+var XP={src:null,busy:false};
+function stopJoinPreview(){ if(XP.src){ try{ XP.src.onended=null; XP.src.stop(); }catch(_){} XP.src=null; } xpUI(); }
+function xpUI(){ const on=!!XP.src, t=XP.busy?'מכין את המעבר…':on?'■ עצירה':'▶ השמע את המעבר';
+  const b=$('xfPlay'); if(b) b.textContent=t;
+  document.querySelectorAll('.sum-join .jp').forEach((x,i)=>x.textContent= XP.k===i&&(on||XP.busy)? (XP.busy?'…':'■') : '▶'); }
+async function previewJoin(k){
+  if(XP.src||XP.busy){ const same=XP.k===k; stopJoinPreview(); if(same||XP.busy) return; }
+  const a=SES.tabs[k], b=SES.tabs[k+1]; if(!a||!b||a.dur==null||b.dur==null){ toast('עוד מנתח את השירים'); return; }
+  if(!window.OfflineAudioContext||!fxWorklet){ toast('ההשמעה הזו לא נתמכת בדפדפן הזה'); return; }
+  const ia=trackOf(a), ib=trackOf(b); if(ia<0||ib<0){ toast('השיר לא נמצא בספרייה'); return; }
+  saveCurTab(); pause(); XP.busy=true; XP.k=k; xpUI();
+  try{
+    const sr=ctx.sampleRate, J=jn(k), PRE=4, POST=4;
+    const outA=a.out??a.dur, inA=a.in||0, inB=b.in||0, outB=b.out??b.dur;
+    const lenA=outA-inA, lenB=outB-inB;
+    const ov= J.mode==='xfade'? Math.min(J.sec,lenA/2,lenB/2) : 0, gap= J.mode==='gap'? J.sec : 0;
+    const a0=Math.max(inA,outA-ov-PRE), b1=Math.min(outB,inB+ov+POST);
+    const [bufA,bufB]=await Promise.all([decodeTrack(tracks[ia]),decodeTrack(tracks[ib])]);
+    const rA=await renderOffline(bufA,a.state,a0,outA), rB=await renderOffline(bufB,b.state,inB,b1);
+    if(OUT.target){ normalize(rA.l,rA.r,sr,a.state); normalize(rB.l,rB.r,sr,b.state); }
+    const NA=rA.l.length, NB=rB.l.length, O=Math.min(Math.round(ov*sr),NA,NB), G=Math.round(gap*sr), N=NA+G+NB-O;
+    const out=ctx.createBuffer(2,N,sr), L=out.getChannelData(0), R=out.getChannelData(1);
+    L.set(rA.l.subarray(0,NA)); R.set(rA.r.subarray(0,NA));
+    const st=NA+G-O;
+    for(let x=0;x<NB;x++){ let gi=1, go=0; const y=st+x;
+      if(x<O){ const u=(x+.5)/O; gi=Math.sin(u*Math.PI/2); go=Math.cos(u*Math.PI/2); }
+      L[y]=(x<O? L[y]*go : 0)+rB.l[x]*gi; R[y]=(x<O? R[y]*go : 0)+rB.r[x]*gi; }
+    if(XP.k!==k||!XP.busy) return;
+    const src=ctx.createBufferSource(); src.buffer=out; src.connect(mon); if(ctx.state!=='running') await ctx.resume();
+    src.onended=()=>{ if(XP.src===src){ XP.src=null; xpUI(); } };
+    src.start(); XP.src=src;
+    toast((J.mode==='gap'?'GAP ':'CROSSFADE ')+J.sec.toFixed(1)+' s · '+(k+1)+' ← '+(k+2));
+  }catch(e){ toast('לא הצלחתי להכין את המעבר'); }
+  XP.busy=false; xpUI();
+}
 function previewTick(){ const P=SES.preview; if(!P||!S.playing) return;
   if(P.stage===1&&SES.cur===P.a&&aud.currentTime>=P.outA){ const b=SES.tabs[P.b]; P.stage=2; P.end=(b.in||0)+6; switchTab(P.b,{pos:b.in||0,play:true,keepView:true}); }
   else if(P.stage===2&&SES.cur===P.b&&aud.currentTime>=P.end){ pause(); SES.preview=null; } }
@@ -3577,7 +3610,7 @@ function applyBands(list){ const selSlot=(sel()||{}).slot; A.forEach(destroy); A
 function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); HIST.quiet=Date.now()+500; applyBands(JSON.parse(from.pop())); HIST.cur=histSig(); HIST.pending=null; histUI(); }
 $('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
 $('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
-window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend,addTab,showSum,openXf,sesToggle});  // read-only peek, used by automated checks
+window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend,addTab,showSum,openXf,sesToggle,XP});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
