@@ -578,6 +578,8 @@ input[type=range]:disabled{opacity:.3}
 .sum-top .ib.del{display:grid; place-items:center}
 .sum-top .ib.del svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .sum-top .ib.del.armed{color:#ff5a4a; border-color:rgba(255,90,74,.7); background:rgba(255,90,74,.12)}
+.gate-disp{border-radius:10px; overflow:hidden; background:#0b171c; box-shadow:inset 0 2px 5px rgba(0,0,0,.9)}
+#gateCv{display:block; width:100%; height:120px}
 .xf{position:fixed; inset:0; z-index:55; display:flex; align-items:center; justify-content:center; padding:12px; background:rgba(0,0,0,.6); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
 .xf[hidden]{display:none}
 .xf-p{width:100%; max-width:760px; display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:16px; background:linear-gradient(180deg,#2c3035,#1d2024); border:1px solid var(--plate-edge); box-shadow:0 20px 60px rgba(0,0,0,.7)}
@@ -839,6 +841,17 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
           <div class="fx-b" hidden>
             <div class="fx-row"><div class="fx-disp"><canvas id="widCv"></canvas></div><div class="knobs wrap" id="kWid"></div></div>
             <p class="dyn-help" dir="rtl"><b>Width</b> מרחיב או מצמצם את הצדדים בלי לגעת במרכז, כלומר בשירה ובבס. <b>Bass Mono</b> משאיר את התדרים הנמוכים במרכז, כדי שהבס יישאר מלא. ברכב כדאי להישאר בין 100% ל-130%: יושבים קרוב לרמקול אחד, והרחבה גדולה מחלישה את המרכז. המד מראה את ההתאמה בין הערוצים, ושמאלה מ-0 זה סימן לבעיית פאזה.</p>
+          </div>
+        </div>
+        <div class="fx off" id="fx_gate" style="--fxc:#e0d27f">
+          <div class="fx-h" data-fx="gate"><span class="fx-ic"><svg viewBox="0 0 24 24"><path d="M2 14h3l2-6 2 10 2-12 2 14 2-8h7"/><path d="M2 20h20" opacity=".45"/></svg></span><b>GATE</b><span class="fx-sub" id="gateSub"></span>
+            <button class="pill" id="gateOn" aria-pressed="false"><span class="led"></span>On</button>
+            <button class="fx-chev" aria-label="הרחבה" aria-expanded="false"><svg viewBox="0 0 16 16"><path d="M3 6l5 5 5-5"/></svg></button></div>
+          <div class="fx-b" hidden>
+            <div class="fx-segs"><div class="seg" id="gateMode"><button data-v="voice" aria-pressed="true">VOICE · BREATHS</button><button data-v="drums" aria-pressed="false">DRUMS</button></div></div>
+            <div class="gate-disp"><canvas id="gateCv" aria-label="עוצמה והנמכה של הגייט בזמן אמת"></canvas></div>
+            <div class="knobs wrap" id="kGate"></div>
+            <p class="dyn-help" id="gateHelp" dir="rtl"></p>
           </div>
         </div>
         <div class="fx off" id="fx_rev" style="--fxc:#b38cff">
@@ -1580,7 +1593,7 @@ registerProcessor('cabin-limiter',CabinLimiter);
    Saturator: odd/even harmonic blend with dry/wet mix. EQ colour (head bump, HF) is done with filters after this node. */
 class CabinSat extends AudioWorkletProcessor{
   constructor(o){ super(); this.p={mode:'tape',drive:4,machine:'a800',wow:.3,char:0,mix:1,out:0}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions); this.N=4096;
-    this.buf=[new Float32Array(4096),new Float32Array(4096)]; this.w=0; this.t=0; this.dr=0; this.cnt=0; this.acc=0; this.n=0;
+    this.buf=[new Float32Array(4096),new Float32Array(4096)]; this.w=0; this.t=this.p.t0||0; this.dr=0; this.cnt=0; this.acc=0; this.n=0;
     this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
   process(inputs,outputs){
     const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length) return true;
@@ -1794,7 +1807,51 @@ class CabinLow extends AudioWorkletProcessor{
     return true;
   }
 }
-registerProcessor('cabin-low',CabinLow);`;
+registerProcessor('cabin-low',CabinLow);
+/* Smart gate. VOICE: finds breaths (quiet, noise-like, little voiced low energy, well under the running voice level)
+   and turns only them down. DRUMS: classic keyed gate with hold. 10 ms look-ahead so word and hit onsets stay intact. */
+class CabinGate extends AudioWorkletProcessor{
+  constructor(o){ super(); this.p={mode:'voice',sens:50,range:12,att:2,hold:30,rel:25,thr:-35,hpf:80}; if(o&&o.processorOptions) Object.assign(this.p,o.processorOptions);
+    const sr=sampleRate; this.L=Math.round(.015*sr); this.N=this.L+1; this.d=[new Float32Array(this.N),new Float32Array(this.N)]; this.w=0;
+    this.lp=0; this.hs=0; this.prev=0; this.eA=1e-9; this.eL=1e-9; this.zc=0; this.spk=-50; this.g=1; this.hold=0; this.env=0; this.hp=0; this.hx=0;
+    this.open=true; this.br=0; this.lv=-120; this.cnt=0; this.minG=1; this.port.onmessage=e=>{ Object.assign(this.p,e.data); }; }
+  process(inputs,outputs){
+    const inp=inputs[0], out=outputs[0]; if(!inp||!inp.length||!inp[0]) return true;
+    const p=this.p, n=inp[0].length, sr=sampleRate, chs=out.length, N=this.N, l=inp[0], r=inp[1]||inp[0];
+    const floorG=Math.pow(10,-Math.max(0,p.range)/20), voice=p.mode!=='drums';
+    const kO=1-Math.exp(-1/(Math.max(.05,p.att)*.001*sr)), kC=1-Math.exp(-1/(Math.max(3,p.rel)*.001*sr)), holdN=Math.max(0,p.hold)*.001*sr;
+    let blockTgt=1;
+    if(voice){
+      const aLP=1-Math.exp(-2*Math.PI*450/sr); let eA=0,eL=0,zc=0;
+      for(let i=0;i<n;i++){ const x=(l[i]+r[i])*.5; this.lp+=aLP*(x-this.lp); eA+=x*x; eL+=this.lp*this.lp; const sg=x>=0; if(sg!==this.prevS) zc++; this.prevS=sg; }
+      const kb=1-Math.exp(-n/(.012*sr)); this.eA+=kb*(eA/n-this.eA); this.eL+=kb*(eL/n-this.eL); this.zc+=kb*(zc/n-this.zc);
+      const lv=10*Math.log10(this.eA+1e-12); this.lv=lv;
+      if(lv>this.spk) this.spk+=(lv-this.spk)*(1-Math.exp(-n/(.08*sr))); else this.spk+=(lv-this.spk)*(1-Math.exp(-n/(4*sr)));
+      if(this.spk<-60) this.spk=-60;
+      const sn=Math.min(1,Math.max(0,p.sens/100)), below=this.spk-lv, lowR=this.eL/(this.eA+1e-12);
+      const quiet=below>(18-12*sn)&&lv>-80, noisy=lowR<(.22+.25*sn)&&this.zc>(.06-.035*sn);
+      this.br= quiet&&noisy?1:0;
+      if(this.br){ blockTgt=floorG; } else { this.hold=holdN; }
+    }
+    const aHP=Math.exp(-2*Math.PI*Math.max(20,p.hpf)/sr), rel=Math.exp(-1/(.012*sr)), thr=Math.pow(10,p.thr/20), thrC=Math.pow(10,(p.thr-4)/20);
+    let mn=1;
+    for(let i=0;i<n;i++){
+      let tgt;
+      if(voice){ if(blockTgt<1){ if(this.hold>0){ this.hold--; tgt=1; } else tgt=floorG; } else tgt=1; }
+      else { const x=(l[i]+r[i])*.5, h=aHP*(this.hp+x-this.hx); this.hx=x; this.hp=h; const a=Math.abs(h); this.env= a>this.env? a : this.env*rel;
+        if(this.env>thr){ this.open=true; this.hold=holdN; } else if(this.env<thrC){ if(this.hold>0) this.hold--; else this.open=false; }
+        tgt=this.open?1:floorG; }
+      this.g+= (tgt-this.g)*(tgt>this.g?kO:kC); if(this.g<mn) mn=this.g;
+      const w=this.w, rd=(w+1)%N;
+      for(let c=0;c<chs;c++){ const b=this.d[c<2?c:1], xin=(c===0?l:r)[i]; b[w]=xin; out[c][i]=b[rd]*this.g; }
+      this.w=rd;
+    }
+    if(!voice) this.lv=20*Math.log10(this.env+1e-9);
+    if(mn<this.minG) this.minG=mn;
+    if(++this.cnt>=Math.round(sr/128/30)){ this.cnt=0; this.port.postMessage({lv:this.lv,gr:20*Math.log10(this.minG),br:this.br,spk:this.spk}); this.minG=1; }
+    return true; }
+}
+registerProcessor('cabin-gate',CabinGate);`;
 function compParams(Cx){ const c=Cx||C, r=REL[c.rli]; return {on:c.on,thr:c.thr,ratio:RATIOS[c.ri],att:ATT[c.ai]/1000,rel:r>0?r:.6,auto:r<0,makeup:c.makeup,mix:c.mix/100,hpf:c.hpf}; }
 function sendComp(){
   const p=compParams();
@@ -1920,9 +1977,12 @@ const FX={
   rev:{on:false,type:'hall',decay:2.2,pre:20,tone:.5,lowcut:250,mix:12},
   tame:{on:false,mud:30,harsh:30,ess:25,delta:false,edit:'harsh',R:{mud:{f:330,w:1,att:20,rel:150,focus:'st'},harsh:{f:2100,w:1,att:10,rel:120,focus:'st'},ess:{f:7200,w:1,att:3,rel:80,focus:'st'}}},
   low:{on:false,xo:100,level:0,control:40,att:15,rel:150},
-  open:{sat:false,wid:false,rev:false,tame:false,low:false}
+  gate:{on:false,mode:'voice',v:{sens:50,range:12,att:2,hold:30,rel:25},d:{thr:-35,range:40,att:.3,hold:40,rel:120,hpf:80}},
+  open:{sat:false,wid:false,rev:false,tame:false,low:false,gate:false}
 };
 var tameLatMs=0;
+function gateParams(Gt){ Gt=Gt||FX.gate; const P=Gt.mode==='drums'? Object.assign({},Gt.d) : Object.assign({thr:-35,hpf:80},Gt.v); P.mode=Gt.mode; return P; }
+const GATEH=220; var gateNode=null, gateHist={lv:new Float32Array(GATEH).fill(-90),gr:new Float32Array(GATEH),br:new Uint8Array(GATEH),i:0}, gateNow={lv:-90,gr:0,br:0,spk:-50};
 const TREG={mud:{lo:150,hi:800,full:.9,col:'#c9a466',def:330},harsh:{lo:800,hi:5000,full:1.15,col:'#ff8a5a',def:2100},ess:{lo:4000,hi:14000,full:.75,col:'#7fe0a8',def:7200}};
 function tameParams(T){ const R=T.R||FX.tame.R; return {on:true,delta:!!T.delta,regions:['mud','harsh','ess'].map(k=>({amt:(T[k]||0)/100,f:R[k].f,w:R[k].w,att:R[k].att,rel:R[k].rel,focus:R[k].focus,full:TREG[k].full}))}; }
 let lowNode=null, lowLvl=-120, lowGr=0, lowThr=-16; const LOWH=200, lowHist={o:new Float32Array(LOWH).fill(-120),l:new Float32Array(LOWH).fill(-120),g:new Float32Array(LOWH),i:0};  // declared with var: read by updateRouting, which can run before this line
@@ -1932,8 +1992,11 @@ function fxBlock(){ const i=G(), o=G(), dry=G(), wet=G(); i.connect(dry); dry.co
   return {i,o,dry,wet,set(on){ const t=ctx.currentTime; dry.gain.setTargetAtTime(on?0:1,t,.015); wet.gain.setTargetAtTime(on?1:0,t,.015); }}; }
 function fxInit(worklet){
   fxIn.disconnect();
-  const tame=fxBlock(), low=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
-  fxIn.connect(tame.i); tame.o.connect(low.i); low.o.connect(sat.i); sat.o.connect(rev.i);
+  const gate=fxBlock(), tame=fxBlock(), low=fxBlock(), sat=fxBlock(), rev=fxBlock(), wid=fxBlock();
+  fxIn.connect(gate.i); gate.o.connect(tame.i);
+  if(worklet){ gateNode=new AudioWorkletNode(ctx,'cabin-gate',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    gateNode.port.onmessage=e=>{ const m=e.data; gateNow=m; const H=gateHist; H.lv[H.i]=m.lv; H.gr[H.i]=m.gr; H.br[H.i]=m.br; H.i=(H.i+1)%GATEH; };
+    gate.i.connect(gateNode); gateNode.connect(gate.wet); } tame.o.connect(low.i); low.o.connect(sat.i); sat.o.connect(rev.i);
   if(worklet){ lowNode=new AudioWorkletNode(ctx,'cabin-low',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
     lowNode.port.onmessage=e=>{ lowLvl=e.data.lvl; lowGr=e.data.gr; lowThr=e.data.thr; lowHist.l[lowHist.i]=lowLvl; lowHist.o[lowHist.i]=e.data.out; lowHist.g[lowHist.i]=lowGr; lowHist.i=(lowHist.i+1)%LOWH; };
     low.i.connect(lowNode); lowNode.connect(low.wet); }
@@ -1954,7 +2017,7 @@ function fxInit(worklet){
   // width
   if(worklet){ widNode=new AudioWorkletNode(ctx,'cabin-width',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]}); widNode.port.onmessage=e=>{ widCorr=e.data; };
     wid.i.connect(widNode); widNode.connect(wid.wet); }
-  Object.assign(fxBlocks,{tame,low,sat,rev,wid}); fxReady=true; fxWorklet=worklet;
+  Object.assign(fxBlocks,{gate,tame,low,sat,rev,wid}); fxReady=true; fxWorklet=worklet;
   fxSend(); buildIR();
 }
 let fxWorklet=false;
@@ -1979,6 +2042,7 @@ function fxSend(){
   const T=FX.tame; if(tameNode) tameNode.port.postMessage(tameParams(T));
   const LW=FX.low; if(lowNode) lowNode.port.postMessage({xo:LW.xo,level:LW.level,control:LW.control/100,att:LW.att,rel:LW.rel}); B.low.set(LW.on&&!!lowNode);
   B.tame.set(T.on&&!!tameNode);
+  if(gateNode) gateNode.port.postMessage(gateParams()); B.gate.set(FX.gate.on&&!!gateNode);
   B.wid.set(FX.wid.on&&!!widNode);
   B.rev.pre.delayTime.setTargetAtTime(FX.rev.pre/1000,t,.02); B.rev.hp.frequency.setTargetAtTime(FX.rev.lowcut,t,.02);
   B.rev.set(FX.rev.on);
@@ -2003,17 +2067,18 @@ function makeIR(c,R){ const T=REVT[R.type], sr=c.sampleRate, len=Math.min(7,R.de
   for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<N;i++) d[i]*=sc; }
   let mx=0; for(const v of irEnv) if(v>mx) mx=v; for(let i=0;i<200;i++) irEnv[i]/=(mx||1);
   return {buf,env:irEnv}; }
-function fxApply(st){ for(const k of ['tame','low','sat','wid','rev','open']) if(st[k]) Object.assign(FX[k],JSON.parse(JSON.stringify(st[k]))); if(!FX.tame.R||!FX.tame.R.mud) FX.tame.R={mud:{f:330,w:1,att:20,rel:150,focus:'st'},harsh:{f:2100,w:1,att:10,rel:120,focus:'st'},ess:{f:7200,w:1,att:3,rel:80,focus:'st'}}; if(!FX.tame.edit) FX.tame.edit='harsh'; fxSend(); buildIR(); fxOpenUI(); }
+function fxApply(st){ for(const k of ['tame','low','sat','wid','gate','rev','open']) if(st[k]) Object.assign(FX[k],JSON.parse(JSON.stringify(st[k]))); if(!FX.tame.R||!FX.tame.R.mud) FX.tame.R={mud:{f:330,w:1,att:20,rel:150,focus:'st'},harsh:{f:2100,w:1,att:10,rel:120,focus:'st'},ess:{f:7200,w:1,att:3,rel:80,focus:'st'}}; if(!FX.tame.edit) FX.tame.edit='harsh'; if(!st.gate) FX.gate.on=false; if(!FX.gate.v) FX.gate.v={sens:50,range:12,att:2,hold:30,rel:25}; if(!FX.gate.d) FX.gate.d={thr:-35,range:40,att:.3,hold:40,rel:120,hpf:80}; fxSend(); buildIR(); fxOpenUI(); }
 
 /* strips */
-function fxOpenUI(){ for(const k of ['tame','low','sat','wid','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
+function fxOpenUI(){ for(const k of ['tame','low','sat','wid','gate','rev']){ const el=$('fx_'+k), o=!!FX.open[k]; el.classList.toggle('open',o); el.querySelector('.fx-b').hidden=!o; el.querySelector('.fx-chev').setAttribute('aria-expanded',o); } }
 document.querySelectorAll('.fx-h').forEach(h=>h.addEventListener('click',e=>{ if(e.target.closest('.pill')) return; const k=h.dataset.fx; FX.open[k]=!FX.open[k]; fxOpenUI(); knobs.forEach(x=>x.refresh()); }));
-for(const k of ['tame','low','sat','wid','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
+for(const k of ['tame','low','sat','wid','gate','rev']) $(k+'On').onclick=e=>{ e.stopPropagation(); FX[k].on=!FX[k].on; if(k==='rev'&&FX.rev.on) buildIR(); fxSend(); };
 function segBind(id,get,set){ const el=$(id); el.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; set(b.dataset.v); fxSend(); }; return ()=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(get())===b.dataset.v)); }
 const segUI=[
   segBind('tameFocus',()=>FX.tame.R[FX.tame.edit].focus,v=>FX.tame.R[FX.tame.edit].focus=v),
   segBind('tameReg',()=>FX.tame.edit,v=>FX.tame.edit=v),
   segBind('satMode',()=>FX.sat.mode,v=>FX.sat.mode=v),
+  segBind('gateMode',()=>FX.gate.mode,v=>FX.gate.mode=v),
   segBind('satMach',()=>FX.sat.machine,v=>FX.sat.machine=v),
   segBind('satSpeed',()=>FX.sat.speed,v=>FX.sat.speed=+v),
   segBind('revType',()=>FX.rev.type,v=>{ FX.rev.type=v; const d={room:.8,hall:2.2,plate:1.6}[v]; FX.rev.decay=d; buildIR(); })
@@ -2023,13 +2088,14 @@ const SAT_HELP={tape:'<b>TAPE</b>: סימולציה של מכונת סרט. <b>A
 function fxUI(){
   { const T=FX.tame; $('tameSub').textContent=T.on?'\u2066⏱ '+Math.round(2048/SR*1000)+' ms\u2069':'כבוי · MUD '+T.mud+' · HARSH '+T.harsh+' · ESS '+T.ess;
     $('tameDelta').classList.toggle('on',T.delta); $('tameDelta').setAttribute('aria-pressed',T.delta); }
-  $('fx_tame').classList.toggle('tame-on',FX.tame.on); $('fx_low').classList.toggle('tame-on',FX.low.on); tameLatMs=FX.tame.on&&tameNode?2048/SR*1000:0; $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
+  $('fx_tame').classList.toggle('tame-on',FX.tame.on); $('fx_low').classList.toggle('tame-on',FX.low.on); tameLatMs=(FX.tame.on&&tameNode?2048/SR*1000:0)+(FX.gate.on&&gateNode?Math.round(.015*SR)/SR*1000:0); $('latV').textContent=(latencyS()*1000+tameLatMs).toFixed(1)+' ms';
   { const LW=FX.low; if(!LW.on) $('lowSub').textContent='כבוי · < '+LW.xo+' Hz · CONTROL '+LW.control+'%'+(LW.level?' · '+sgn(LW.level)+' dB':''); }
-  for(const k of ['tame','low','sat','wid','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
+  for(const k of ['tame','low','sat','wid','gate','rev']){ const on=FX[k].on; $('fx_'+k).classList.toggle('off',!on); const b=$(k+'On'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }
   const sv=FX.sat; $('satMach').hidden=$('satSpeed').hidden=sv.mode!=='tape';
   $('satSub').textContent= sv.mode==='tape'? 'TAPE · '+(sv.machine==='a800'?'A800':'ATR-102')+' · '+sv.speed+' IPS · DRIVE '+sgn(sv.drive) : 'SATURATOR · DRIVE +'+sv.drive.toFixed(1)+' · MIX '+sv.mix+'%';
   $('satHelp').innerHTML=SAT_HELP[sv.mode];
   $('widSub').textContent='WIDTH '+FX.wid.width+'% · '+(FX.wid.mono>0?'MONO < '+FX.wid.mono+' Hz':'FULL STEREO');
+  { const Gt=FX.gate; if(!Gt.on) $('gateSub').textContent='כבוי · '+(Gt.mode==='drums'?'DRUMS':'נשימות · RANGE −'+Gt.v.range+' dB'); $('gateHelp').innerHTML=GATE_HELP[Gt.mode==='drums'?'drums':'voice']; }
   $('revSub').textContent=FX.rev.type.toUpperCase()+' · '+FX.rev.decay.toFixed(1)+' s · MIX '+FX.rev.mix+'%';
   segUI.forEach(f=>f());
   if(!fxWorklet&&fxReady){ $('satSub').textContent='לא נתמך בדפדפן הזה'; $('widSub').textContent='לא נתמך בדפדפן הזה'; }
@@ -2105,7 +2171,35 @@ function drawLow(){ const {g:c,w,h,d}=lowC; c.setTransform(d,0,0,d,0,0); c.fillS
   knob(kl2,{label:()=>'CONTROL',color:'#ff9a3c',enabled:()=>true,get:()=>LWs().control/100,set:n=>{ LWs().control=Math.round(n*100); fxSend(); },text:()=>LWs().control+'%',reset:()=>{ LWs().control=40; fxSend(); }});
   knob(kl2,{label:()=>'ATTACK',color:'#5aa9ff',enabled:()=>true,get:()=>lg(LWs().att,1,100),set:n=>{ LWs().att=Math.round(unlg(n,1,100)); fxSend(); },text:()=>LWs().att+' ms',reset:()=>{ LWs().att=15; fxSend(); }});
   knob(kl2,{label:()=>'RELEASE',color:'#5aa9ff',enabled:()=>true,get:()=>lg(LWs().rel,20,800),set:n=>{ LWs().rel=Math.round(unlg(n,20,800)); fxSend(); },text:()=>LWs().rel+' ms',reset:()=>{ LWs().rel=150; fxSend(); }}); }
-const satC=fxCanvas('satCv'), widC=fxCanvas('widCv'), revC=fxCanvas('revCv');
+const satC=fxCanvas('satCv'), widC=fxCanvas('widCv'), revC=fxCanvas('revCv'), gateC=fxCanvas('gateCv');
+const GATE_HELP={voice:'<b>VOICE</b>: מוצא נשימות בדיבור ובשירה ומנמיך רק אותן. הוא מזהה צליל שקט, אוורירי ובלי צליל קול, הרבה מתחת לעוצמת הקול. <b>SENS</b> גבוה תופס יותר נשימות, ואם הוא נוגע בסופי מילים מורידים אותו. <b>RANGE</b> כמה להנמיך. <b>HOLD</b> מחכה רגע אחרי מילה לפני שמנמיך, כדי לא לקטוע סופי מילים. בגרף, סימון סגול הוא נשימה שנמצאה, והכתום מלמעלה הוא ההנמכה.',
+  drums:'<b>DRUMS</b>: גייט קלאסי לכלי הקשה. נפתח כשהמכה עוברת את <b>THRESH</b> (הקו המקווקו), נשאר פתוח לפי <b>HOLD</b>, ונסגר לפי <b>RELEASE</b>. <b>RANGE</b> כמה לסגור. <b>KEY HPF</b> מסנן בס מהזיהוי, כדי שהבס או הקיק לא יפתחו גייט של סנר או טום.'};
+{ const kg=$('kGate'), V=()=>FX.gate.v, D=()=>FX.gate.d, isV=()=>FX.gate.mode!=='drums', cur=()=>isV()?V():D();
+  knob(kg,fSpec({label:()=>'SENS', color:'#e0d27f', hide:()=>!isV(), get:()=>V().sens/100, set:n=>{ V().sens=Math.round(n*100); fxSend(); }, text:()=>V().sens+'%', reset:()=>{ V().sens=50; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'THRESH', color:'#e0d27f', hide:()=>isV(), get:()=>lin(D().thr,-70,0), set:n=>{ D().thr=Math.round(unlin(n,-70,0)); fxSend(); }, text:()=>D().thr+' dB', reset:()=>{ D().thr=-35; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'RANGE', color:'#ff9a3c', get:()=>cur().range/60, set:n=>{ cur().range=Math.round(n*60); fxSend(); }, text:()=>'−'+cur().range+' dB', reset:()=>{ cur().range=isV()?12:40; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'ATTACK', color:'#5aa9ff', get:()=>lg(cur().att,.05,50), set:n=>{ const v=unlg(n,.05,50); cur().att=v<1?Math.round(v*100)/100:Math.round(v*10)/10; fxSend(); }, text:()=>cur().att+' ms', reset:()=>{ cur().att=isV()?2:.3; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'HOLD', color:'#7fe0a8', get:()=>cur().hold/500, set:n=>{ cur().hold=Math.round(n*500); fxSend(); }, text:()=>cur().hold+' ms', reset:()=>{ cur().hold=isV()?30:40; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'RELEASE', color:'#5aa9ff', get:()=>lg(cur().rel,5,1000), set:n=>{ cur().rel=Math.round(unlg(n,5,1000)); fxSend(); }, text:()=>cur().rel+' ms', reset:()=>{ cur().rel=isV()?25:120; fxSend(); } }));
+  knob(kg,fSpec({label:()=>'KEY HPF', color:'#b38cff', hide:()=>isV(), get:()=>lg(D().hpf,20,2000), set:n=>{ D().hpf=Math.round(unlg(n,20,2000)/5)*5; fxSend(); }, text:()=>fmtHz(D().hpf), reset:()=>{ D().hpf=80; fxSend(); } })); }
+function drawGate(){ const {g:c,w,h,d}=gateC; c.setTransform(d,0,0,d,0,0);
+  const bg=c.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#0b171c'); bg.addColorStop(1,'#060d11'); c.fillStyle=bg; c.fillRect(0,0,w,h);
+  const H=gateHist, n=GATEH, top=6, bot=h-14, yL=v=>top+(-clamp(v,-80,0))/80*(bot-top), x=k=>k/(n-1)*w, at=k=>(H.i+k)%n, live=S.playing&&FX.gate.on;
+  c.strokeStyle='rgba(150,200,220,.08)'; c.lineWidth=1; c.fillStyle='rgba(160,200,215,.45)'; c.font='9px "IBM Plex Mono", monospace'; c.textAlign='left'; c.textBaseline='middle';
+  for(const v of [-20,-40,-60]){ const y=Math.round(yL(v))+.5; c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); c.fillText(v,3,y-6); }
+  // breaths found (voice)
+  if(FX.gate.mode!=='drums'){ c.fillStyle='rgba(179,140,255,.55)'; for(let k=0;k<n;k++) if(H.br[at(k)]) c.fillRect(x(k),bot+3,w/n+1,8); }
+  // level
+  c.beginPath(); for(let k=0;k<n;k++){ const y=yL(H.lv[at(k)]); k?c.lineTo(x(k),y):c.moveTo(x(k),y); } c.lineTo(w,bot); c.lineTo(0,bot); c.closePath();
+  const lg2=c.createLinearGradient(0,top,0,bot); lg2.addColorStop(0,'rgba(143,179,194,.55)'); lg2.addColorStop(1,'rgba(143,179,194,.08)'); c.fillStyle=lg2; c.fill();
+  // gain reduction from the top
+  c.beginPath(); c.moveTo(0,top); for(let k=0;k<n;k++){ const g=Math.min(0,H.gr[at(k)]); c.lineTo(x(k),top+clamp(-g/36,0,1)*(bot-top)); } c.lineTo(w,top); c.closePath();
+  c.fillStyle='rgba(255,154,60,.55)'; c.fill();
+  if(FX.gate.mode==='drums'){ const y=yL(FX.gate.d.thr); c.strokeStyle='#e0d27f'; c.setLineDash([5,4]); c.lineWidth=1.4; c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); c.setLineDash([]); }
+  else if(live){ const y=yL(gateNow.spk); c.strokeStyle='rgba(127,224,168,.6)'; c.setLineDash([2,4]); c.beginPath(); c.moveTo(0,y); c.lineTo(w,y); c.stroke(); c.setLineDash([]);
+    c.fillStyle='rgba(127,224,168,.8)'; c.textAlign='right'; c.fillText('VOICE',w-4,y-7); }
+  if(!live){ c.fillStyle='rgba(200,215,225,.55)'; c.font='12px Heebo, sans-serif'; c.textAlign='center'; c.fillText(FX.gate.on?'נגן שיר כדי לראות את הגייט':'הגייט כבוי',w/2,h/2); }
+}
 let reelA=0, reelT=performance.now(), satShown=-60;
 const vsL=new Float32Array(1024), vsR=new Float32Array(1024);
 function drawFx(now){
@@ -2113,6 +2207,8 @@ function drawFx(now){
   { const T=FX.tame; if(T.on){ let mx=0; if(S.playing&&tameRd) for(const v of tameRd) if(v>mx) mx=v;
       $('tameSub').textContent='\u2066⏱ '+Math.round(2048/SR*1000)+' ms'+(S.playing?' · −'+mx.toFixed(1)+' dB':'')+'\u2069'; } }
   { const LW=FX.low; if(LW.on) $('lowSub').textContent='\u2066< '+LW.xo+' Hz'+(S.playing?' · GR −'+lowGr.toFixed(1)+' dB':'')+'\u2069'; }
+  if(FX.open.gate) drawGate();
+  { const Gt=FX.gate; if(Gt.on) $('gateSub').textContent='\u2066'+(Gt.mode==='drums'?'DRUMS':'BREATHS')+(S.playing?' · −'+Math.max(0,-gateNow.gr).toFixed(1)+' dB':'')+'\u2069'; }
   if(FX.open.tame) drawTame();
   if(FX.open.low) drawLow();
   if(FX.open.sat){ const {g:c,w,h,d}=satC; c.setTransform(d,0,0,d,0,0);
@@ -2172,8 +2268,8 @@ let WURL=null; const workletURL=()=>WURL||(WURL=URL.createObjectURL(new Blob([WO
 const isDynBand=b=>b.on&&b.dyn&&b.dyn.on&&(b.type==='bell'||b.type==='lowshelf'||b.type==='highshelf');
 function limWin(Lx,sr){ const ms=Lx.mode==='simple'?1.5:Lx.style===1?Math.min(Lx.look,1):Lx.style===2?.3:Lx.look; return Math.max(2,Math.round(ms*sr/1000)); }
 function chainLatency(st,sr){ const F=st.FX||FX;
-  return (F.tame&&F.tame.on?2048:0)+(st.mode==='lp'&&!st.bypass?RES[st.res||'med']/2:0)+(st.L&&st.L.on?limWin(st.L,sr)-1:0)+(F.sat&&F.sat.on&&F.sat.mode==='tape'?Math.round(.002*sr):0); }
-function buildOffline(oc,st){
+  return (F.gate&&F.gate.on?Math.round(.015*sr):0)+(F.tame&&F.tame.on?2048:0)+(st.mode==='lp'&&!st.bypass?RES[st.res||'med']/2:0)+(st.L&&st.L.on?limWin(st.L,sr)-1:0)+(F.sat&&F.sat.on&&F.sat.mode==='tape'?Math.round(.002*sr):0); }
+function buildOffline(oc,st,ro){ ro=ro||{};
   const sr=oc.sampleRate, Gn=()=>oc.createGain(), i=Gn(); let p=i;
   const W=(name,opt)=>new AudioWorkletNode(oc,name,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],processorOptions:opt});
   const link=n=>{ p.connect(n); p=n; };
@@ -2198,16 +2294,17 @@ function buildOffline(oc,st){
   }
   link(W('bus-comp',compParams(st.C||C)));
   const F=st.FX||FX;
+  if(F.gate&&F.gate.on) link(W('cabin-gate',gateParams(F.gate)));
   if(F.tame&&F.tame.on){ const tp=tameParams(F.tame); tp.delta=false; link(W('cabin-tame',tp)); }
   if(F.low&&F.low.on){ const LW=F.low; link(W('cabin-low',{xo:LW.xo,level:LW.level,control:LW.control/100,att:LW.att,rel:LW.rel})); }
-  if(F.sat&&F.sat.on){ const sv=F.sat; link(W('cabin-sat',{mode:sv.mode,drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out}));
+  if(F.sat&&F.sat.on){ const sv=F.sat; link(W('cabin-sat',{mode:sv.mode,drive:sv.drive,machine:sv.machine,wow:sv.wow,char:sv.char,mix:sv.mix/100,out:sv.out,t0:ro.t0||0}));
     const f=[0,1,2,3].map(()=>oc.createBiquadFilter()); f[1].type='peaking'; f[2].type='highshelf'; f[3].type='lowpass';
     if(sv.mode==='tape'){ const c=TAPE[sv.machine+sv.speed]; f[0].type='peaking'; f[0].frequency.value=c.b[0]; f[0].gain.value=c.b[1]; f[0].Q.value=c.b[2];
       f[1].frequency.value=c.d[0]; f[1].gain.value=c.d[1]; f[1].Q.value=c.d[2]; f[2].frequency.value=c.h[0]; f[2].gain.value=c.h[1]; f[3].frequency.value=c.lp; }
     else { f[0].type='lowshelf'; f[0].frequency.value=250; f[0].gain.value=-sv.tone*3; f[1].gain.value=0; f[2].frequency.value=3500; f[2].gain.value=sv.tone*4; f[3].frequency.value=22000; }
     f.forEach(link); }
   if(F.rev&&F.rev.on){ const R=F.rev, o=Gn(), pre=oc.createDelay(.5), hp=oc.createBiquadFilter(), cv=oc.createConvolver(), wet=Gn();
-    pre.delayTime.value=R.pre/1000; hp.type='highpass'; hp.frequency.value=R.lowcut; cv.normalize=false; cv.buffer=makeIR(oc,R).buf; wet.gain.value=R.mix/100;
+    pre.delayTime.value=R.pre/1000; hp.type='highpass'; hp.frequency.value=R.lowcut; cv.normalize=false; cv.buffer=ro.ir? irCopy(oc,ro.ir) : makeIR(oc,R).buf; wet.gain.value=R.mix/100;
     p.connect(o); p.connect(pre); pre.connect(hp); hp.connect(cv); cv.connect(wet); wet.connect(o); p=o; }
   if(F.wid&&F.wid.on) link(W('cabin-width',{width:F.wid.width/100,mono:F.wid.mono}));
   const tg=Gn(); tg.gain.value=10**((+st.trim||0)/20); link(tg);
@@ -2215,17 +2312,71 @@ function buildOffline(oc,st){
   return {i,o:p};
 }
 async function decodeTrack(t){ const r=await fetch(t.blob||t.url); if(!r.ok) throw new Error('read'); const ab=await r.arrayBuffer(); return await ctx.decodeAudioData(ab); }
-/* renders [from,to] seconds of the song through state st; returns exactly the requested length */
-async function renderOffline(buf,st,from,to,onProg,abort){
-  const sr=ctx.sampleRate, want=Math.max(1,Math.round((to-from)*sr)), lat=chainLatency(st,sr), len=want+lat;
-  const oc=new OfflineAudioContext(2,len,sr); await oc.audioWorklet.addModule(workletURL());
-  const src=oc.createBufferSource(); src.buffer=buf; const ch=buildOffline(oc,st); src.connect(ch.i); ch.o.connect(oc.destination);
-  src.start(0,from,to-from);
-  const total=len/sr; for(let t=2;t<total-.05;t+=2){ oc.suspend(t).then(()=>{ onProg&&onProg(t/total); if(abort&&abort()) {} oc.resume(); }); }
-  const out=await oc.startRendering();
-  const l=new Float32Array(want), r=new Float32Array(want), L0=out.getChannelData(0), R0=out.getChannelData(1);
-  l.set(L0.subarray(lat,lat+want)); r.set(R0.subarray(lat,lat+want)); return {l,r};
+/* ---------- chunked offline render ----------
+   The song is processed in short pieces (12 s), each in its own small OfflineAudioContext, so memory stays flat
+   whatever the song length or the processing (linear phase, reverb, TAME…). Every piece starts a few seconds early
+   (warm-up), so compressors, filters and the reverb tail are already in the state they would be in a single long pass,
+   and the joins are cross-faded over 2048 samples. Slower than one big pass, but it does not run out of memory. */
+function irCopy(oc,ir){ const b=oc.createBuffer(2,ir.l.length,oc.sampleRate); b.copyToChannel(ir.l,0); b.copyToChannel(ir.r,1); return b; }
+function renderWarm(st,sr){ const F=st.FX||FX; let w=6;
+  if(F.rev&&F.rev.on) w=Math.max(w,Math.min(7,F.rev.decay*1.35+.05)+F.rev.pre/1000+.5);
+  if(st.mode==='lp'&&!st.bypass) w+=RES[st.res||'med']/sr;
+  return w; }
+async function renderStream(buf,st,from,to,onBlock,o){ o=o||{};
+  const sr=ctx.sampleRate, want=Math.max(1,Math.round((to-from)*sr)), lat=chainLatency(st,sr), X=2048, CH=Math.round((o.chunk||12)*sr);
+  const warm=Math.round(renderWarm(st,sr)*sr), fromS=Math.round(from*sr), nCh=buf.numberOfChannels;
+  const ro=o.ro||{}; const F=st.FX||FX;
+  if(F.rev&&F.rev.on&&!ro.ir){ const tc=new OfflineAudioContext(2,1,sr), r=makeIR(tc,F.rev).buf; ro.ir={l:r.getChannelData(0).slice(),r:r.getChannelData(1).slice()}; }
+  let prev=null;
+  for(let pos=0;pos<want;pos+=CH){
+    if(o.abort&&o.abort()) throw 'cancel';
+    const n=Math.min(CH,want-pos), pre=Math.min(warm,pos), ext=pos+n<want?X:0, inStart=fromS+pos-pre, inLen=pre+n+ext, len=inLen+lat;
+    const oc=new OfflineAudioContext(2,len,sr); await oc.audioWorklet.addModule(workletURL());
+    const ib=oc.createBuffer(2,inLen,sr), a0=Math.max(0,inStart), a1=Math.min(buf.length,inStart+inLen);
+    if(a1>a0) for(let c=0;c<2;c++) ib.copyToChannel(buf.getChannelData(Math.min(c,nCh-1)).subarray(a0,a1),c,a0-inStart);
+    const src=oc.createBufferSource(); src.buffer=ib; const chn=buildOffline(oc,st,{ir:ro.ir,t0:pos-pre}); src.connect(chn.i); chn.o.connect(oc.destination); src.start(0);
+    const out=await oc.startRendering();
+    const L=out.getChannelData(0).slice(pre+lat,pre+lat+n+ext), R=out.getChannelData(1).slice(pre+lat,pre+lat+n+ext);
+    if(prev){ for(let i=0;i<X&&i<n;i++){ const u=(i+.5)/X; L[i]=prev.l[i]*(1-u)+L[i]*u; R[i]=prev.r[i]*(1-u)+R[i]*u; } }
+    prev= ext? {l:L.slice(n),r:R.slice(n)} : null;
+    await onBlock(n===L.length?L:L.subarray(0,n), n===R.length?R:R.subarray(0,n), pos);
+    if(o.prog) o.prog((pos+n)/want);
+    await new Promise(z=>setTimeout(z,0));
+  }
+  return want;
 }
+/* renders [from,to] seconds into memory (short pieces only: transition previews) */
+async function renderOffline(buf,st,from,to,onProg,abort){
+  const want=Math.max(1,Math.round((to-from)*ctx.sampleRate)), l=new Float32Array(want), r=new Float32Array(want);
+  await renderStream(buf,st,from,to,(L,R,pos)=>{ l.set(L,pos); r.set(R,pos); },{prog:onProg,abort});
+  return {l,r};
+}
+/* streaming loudness (BS.1770, gated) and peak, so the target gain is known before anything is written */
+function lufsMeter(sr){ let K=Math.tan(Math.PI*1681.9744509555319/sr), Q=.7071752369554193, Vh=Math.pow(10,3.99984385397/20), Vb=Math.pow(Vh,.499666774155), a0=1+K/Q+K*K;
+  const a=[(Vh+Vb*K/Q+K*K)/a0,2*(K*K-Vh)/a0,(Vh-Vb*K/Q+K*K)/a0,2*(K*K-1)/a0,(1-K/Q+K*K)/a0]; K=Math.tan(Math.PI*38.13547087613982/sr); Q=.5003270373253953; a0=1+K/Q+K*K;
+  const b=[1,-2,1,2*(K*K-1)/a0,(1-K/Q+K*K)/a0], hop=Math.round(sr*.1), st=[0,1].map(()=>({z0:0,z1:0,z2:0,z3:0,y0:0,y1:0,y2:0,y3:0}));
+  const E=[]; let acc=0, cnt=0, pk=0;
+  return { push(l,r){ for(let i=0;i<l.length;i++){ let e=0;
+        for(let c=0;c<2;c++){ const x=c?r[i]:l[i], S2=st[c]; const ax=x<0?-x:x; if(ax>pk) pk=ax;
+          const u=a[0]*x+a[1]*S2.z0+a[2]*S2.z1-a[3]*S2.z2-a[4]*S2.z3; S2.z1=S2.z0; S2.z0=x; S2.z3=S2.z2; S2.z2=u;
+          const v=b[0]*u+b[1]*S2.y0+b[2]*S2.y1-b[3]*S2.y2-b[4]*S2.y3; S2.y1=S2.y0; S2.y0=u; S2.y3=S2.y2; S2.y2=v; e+=v*v; }
+        acc+=e; if(++cnt===hop){ E.push(acc); acc=0; cnt=0; } } },
+    result(){ const blocks=[]; for(let k=3;k<E.length;k++) blocks.push((E[k]+E[k-1]+E[k-2]+E[k-3])/(4*hop));
+      const Lf=ms=>-.691+10*Math.log10(ms+1e-20), g1=blocks.filter(m=>Lf(m)>-70); let lufs=-70;
+      if(g1.length){ const rel=Lf(g1.reduce((x,y)=>x+y,0)/g1.length)-10, g2=g1.filter(m=>Lf(m)>rel); lufs=Lf(g2.reduce((x,y)=>x+y,0)/(g2.length||1)); }
+      return {lufs,peak:pk}; } }; }
+function targetGain(meas,st){ const ceil=st&&st.L&&st.L.on?st.L.ceil:-1; let gdb=OUT.target-meas.lufs; const room=ceil-20*Math.log10(meas.peak+1e-12); if(gdb>room) gdb=room; return gdb; }
+/* render one song to the writer: optional loudness pass, then the real pass. onPcm gets the final blocks. */
+async function renderSong(buf,st,from,to,onPcm,o){ o=o||{}; const sr=ctx.sampleRate, ro={}; let gdb=0, meas=null;
+  const P=o.prog||(()=>{});
+  if(OUT.target){ const m=lufsMeter(sr); await renderStream(buf,st,from,to,(l,r)=>m.push(l,r),{ro,abort:o.abort,prog:f=>P(f*.5,'מודד עוצמה')}); meas=m.result(); gdb=targetGain(meas,st); }
+  const g=Math.pow(10,gdb/20);
+  await renderStream(buf,st,from,to,async(l,r,pos)=>{ if(g!==1) for(let i=0;i<l.length;i++){ l[i]*=g; r[i]*=g; } await onPcm(l,r,pos); },{ro,abort:o.abort,prog:f=>P(OUT.target?.5+f*.5:f,'מעבד')});
+  return meas? {from:meas.lufs,gain:gdb,capped:gdb<OUT.target-meas.lufs-.05} : null;
+}
+function errText(e){ if(e==='cancel') return 'הרינדור בוטל.'; const m=e&&e.message?e.message:String(e||'');
+  if(/[א-ת]/.test(m)) return m; if(/memory|allocation|RangeError/i.test(m)) return 'הרינדור נעצר: לא היה מספיק זיכרון. נסה שוב, או סגור אפליקציות אחרות.';
+  return 'הרינדור נעצר'+(m?': '+m:'. אפשר לנסות שוב.'); }
 /* streams a WAV file out piece by piece, so a long session never has to sit in memory at once */
 /* ---------- output formats ---------- */
 const FMTS={wav24:{ext:'wav',mime:'audio/wav',label:'WAV 24-BIT',sub:'מקסימום איכות'},wav16:{ext:'wav',mime:'audio/wav',label:'WAV 16-BIT',sub:'איכות CD'},
@@ -2271,7 +2422,14 @@ async function loadLame(){ if(window.lamejs) return;
   for(const src of ['vendor/lame.min.js','https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js']){
     try{ await new Promise((ok,no)=>{ const sc=document.createElement('script'); sc.src=src; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); }); if(window.lamejs) return; }catch(_){} }
   throw new Error('מקודד ה-MP3 לא נטען. בדוק חיבור לאינטרנט ונסה שוב.'); }
+async function aacWorks(sr){ if(aacWorks.r!=null) return aacWorks.r; aacWorks.r=false;
+  try{ let bad=false, got=0; const e=new AudioEncoder({output:()=>{ got++; },error:()=>{ bad=true; }});
+    e.configure({codec:'mp4a.40.2',sampleRate:sr,numberOfChannels:2,bitrate:320000,aac:{format:'adts'}});
+    const d=new Float32Array(4096*2); for(let k=0;k<4;k++){ const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:4096,numberOfChannels:2,timestamp:Math.round(k*4096*1e6/sr),data:d}); e.encode(ad); ad.close(); }
+    await e.flush(); e.close(); aacWorks.r=!bad&&got>0; }catch(_){ aacWorks.r=false; }
+  return aacWorks.r; }
 async function makeWriter(fmt,base,frames,sr){
+  if(fmt==='aac'&&!(window.AudioEncoder&&await aacWorks(sr))){ fmt='mp3'; AAC_OK=false; toast('AAC לא עובד בטלפון הזה, אז הקובץ נשמר כ-MP3 320'); }
   const F=FMTS[fmt]; const name=base+'.'+F.ext;
   if(fmt!=='wav24'&&fmt!=='wav16'&&NATIVE&&NATIVE.saveBegin&&!NATIVE.saveBeginMime) throw new Error('לשמירת MP3 או AAC צריך לעדכן את האפליקציה');
   if(fmt==='wav24'||fmt==='wav16') return Object.assign(wavWriter(name,frames,fmt==='wav24'?24:16,sr),{name});
@@ -2319,20 +2477,24 @@ async function deliverFile(file,txt){ const mb=(file.size/1048576).toFixed(1);
 /* ---------- render: record the processed song in real time and save it as WAV ---------- */
 const RENDER={active:false,ch:[],frames:0,startT:0,stopping:false};
 function recMsg(m){ if(m.done){ finishRender(); return; } if(!RENDER.active) return; RENDER.ch.push(m); RENDER.frames+=m.n; }
-function renderUI(){ const a=RENDER.active; $('renderBtn').classList.toggle('rec',a); $('renderBtn').disabled=a; $('renderCancel').hidden=!a||!!RENDER.off; $('renderBar').hidden=!a;
+function renderUI(){ const a=RENDER.active; $('renderBtn').classList.toggle('rec',a); $('renderBtn').disabled=a; $('renderCancel').hidden=!a; $('renderBar').hidden=!a;
   $('scrub').classList.toggle('dis',a||cur<0); $('miniSeek').classList.toggle('dis',a||cur<0); }
 function keepAwake(on){ try{ if(NATIVE&&NATIVE.keepAwake) NATIVE.keepAwake(on); }catch(_){} try{ if(on&&navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>RENDER.wl=w).catch(()=>{}); else if(RENDER.wl){ RENDER.wl.release(); RENDER.wl=null; } }catch(_){} }
 $('renderBtn').onclick=async()=>{
   if(cur<0){ toast('בחר שיר מהספרייה כדי לרנדר אותו'); return; }
   if(window.OfflineAudioContext&&fxWorklet&&!RENDER.active){
-    const t=tracks[cur], txt=x=>$('renderTxt').textContent=x; pause(); RENDER.active=true; RENDER.off=true; renderUI(); keepAwake(true);
-    try{ txt('קורא את השיר…'); const buf=await decodeTrack(t), st=getState(), tail=FX.rev.on?Math.min(7,FX.rev.decay*1.2)+.3:.3, sr=ctx.sampleRate;
-      const r=await renderOffline(buf,st,0,buf.duration+tail,f=>{ $('renderFill').style.width=(f*100)+'%'; txt('מעבד… '+Math.round(f*100)+'%'); });
-      const nm=normalize(r.l,r.r,sr,st); if(nm) txt('עוצמה: '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS');
-      const w=await makeWriter(OUT.fmt,t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q)',r.l.length,sr);
-      txt('שומר את הקובץ…'); await w.pcm(r.l,r.r,0,r.l.length); const res=await w.end();
-      if(res.where){ txt('נשמר בתיקייה '+res.where); toast('הקובץ נשמר'); } else await deliverFile(res.file,txt);
-    }catch(e){ txt(e&&e.message&&/[א-ת]/.test(e.message)?e.message:'הרינדור נעצר. אפשר לנסות שוב.'); }
+    const t=tracks[cur], txt=x=>$('renderTxt').textContent=x; pause(); RENDER.active=true; RENDER.off=true; RENDER.cancel=false; renderUI(); keepAwake(true);
+    let w=null;
+    try{ txt('קורא את השיר…'); const buf=await decodeTrack(t), st=getState(), tail=FX.rev.on?Math.min(7,FX.rev.decay*1.2)+.3:.3, sr=ctx.sampleRate, to=buf.duration+tail;
+      const frames=Math.round(to*sr);
+      w=await makeWriter(OUT.fmt,t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q)',frames,sr);
+      const t0=performance.now();
+      const nm=await renderSong(buf,st,0,to,(l,r)=>w.pcm(l,r,0,l.length),{abort:()=>RENDER.cancel,prog:(f,what)=>{ $('renderFill').style.width=(f*100)+'%';
+        const el=(performance.now()-t0)/1000, left=f>.03? el/f-el : null; txt(what+'… '+Math.round(f*100)+'%'+(left!=null?' · עוד כ-'+fmtT(left):'')); }});
+      txt('שומר את הקובץ…'); const res=await w.end(); w=null;
+      const lu=nm? ' · '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS'+(nm.capped?' (תקרת הלימיטר עצרה. כדי להגיע ל-\u2066'+OUT.target+'\u2069 מעלים GAIN בלימיטר)':'') : '';
+      if(res.where){ txt('נשמר בתיקייה '+res.where+lu); toast('הקובץ נשמר'); } else await deliverFile(res.file,x=>txt(x+lu));
+    }catch(e){ if(w&&w.abort) w.abort(); txt(errText(e)); }
     RENDER.active=false; RENDER.off=false; keepAwake(false); renderUI(); return; }
   if(!recNode){ toast('הרינדור לא נתמך בדפדפן הזה'); return; }
   pause(); aud.currentTime=0; RENDER.active=true; RENDER.ch=[]; RENDER.frames=0; RENDER.stopping=false; RENDER.name=tracks[cur].name;
@@ -2340,10 +2502,10 @@ $('renderBtn').onclick=async()=>{
   $('renderTxt').textContent='מרנדר בזמן אמת. השאר את המסך דולק עד הסוף.';
 };
 $('renderCancel').onclick=()=>cancelRender();
-function cancelRender(){ if(!RENDER.active||RENDER.off) return; RENDER.active=false; RENDER.ch=[]; try{ recNode.port.postMessage('stop'); }catch(_){} keepAwake(false); pause(); renderUI(); $('renderTxt').textContent='הרינדור בוטל.'; }
+function cancelRender(){ if(RENDER.active&&RENDER.off){ RENDER.cancel=true; $('renderTxt').textContent='מבטל…'; return; } if(!RENDER.active) return; RENDER.active=false; RENDER.ch=[]; try{ recNode.port.postMessage('stop'); }catch(_){} keepAwake(false); pause(); renderUI(); $('renderTxt').textContent='הרינדור בוטל.'; }
 function renderTail(){ if(RENDER.stopping) return; RENDER.stopping=true; setPlaying(false); $('renderTxt').textContent='מסיים את הזנב של העיבוד…';
   setTimeout(()=>{ if(RENDER.active) recNode.port.postMessage('stop'); }, FX.rev.on? Math.min(7000,FX.rev.decay*1200)+300 : 400); }
-function renderProgress(){ if(!RENDER.active||RENDER.stopping) return; const d=aud.duration; if(!isFinite(d)||d<=0) return;
+function renderProgress(){ if(!RENDER.active||RENDER.off||RENDER.stopping) return; const d=aud.duration; if(!isFinite(d)||d<=0) return;
   $('renderFill').style.width=(aud.currentTime/d*100)+'%'; $('renderTxt').textContent='מרנדר '+fmtT(aud.currentTime)+' / '+fmtT(d)+' · השאר את המסך דולק'; }
 function wav24(chunks,frames,sr){ const bytes=frames*6, buf=new Uint8Array(44+bytes), v=new DataView(buf.buffer);
   const wr=(o,str)=>{ for(let i=0;i<str.length;i++) buf[o+i]=str.charCodeAt(i); };
@@ -3571,22 +3733,22 @@ async function renderSession(){
       const t=SES.tabs[k], i=trackOf(t); if(i<0) throw new Error('השיר "'+t.name+'" לא נמצא בספרייה');
       const base=k/n; ui(base,'שיר '+(k+1)+' מתוך '+n+': '+t.name);
       const buf=await decodeTrack(tracks[i]);
-      const r=await renderOffline(buf,t.state,t.in||0,(t.in||0)+len[k]/sr,f=>ui(base+f/n*.9),()=>SES.cancel);
-      normalize(r.l,r.r,sr,t.state);
-      const L=r.l, R=r.r, N=len[k];
-      if(k===0&&J.fin>0){ const F=Math.min(N,Math.round(J.fin*sr)); for(let x=0;x<F;x++){ const g=x/F; L[x]*=g; R[x]*=g; } }
-      if(k===n-1&&J.fout>0){ const F=Math.min(N,Math.round(J.fout*sr)); for(let x=0;x<F;x++){ const g=x/F; L[N-1-x]*=g; R[N-1-x]*=g; } }
-      let start=0;
-      if(k>0&&carry){ const O=carry.l.length; for(let x=0;x<O;x++){ const u=(x+.5)/O, gi=Math.sin(u*Math.PI/2), go=Math.cos(u*Math.PI/2); L[x]=L[x]*gi+carry.l[x]*go; R[x]=R[x]*gi+carry.r[x]*go; } }
+      const N=len[k], Oin=k>0?ov[k-1]:0, Oout=ov[k], tail=N-Oout, next=Oout?{l:new Float32Array(Oout),r:new Float32Array(Oout)}:null;
+      const Fin=k===0&&J.fin>0?Math.min(N,Math.round(J.fin*sr)):0, Fout=k===n-1&&J.fout>0?Math.min(N,Math.round(J.fout*sr)):0;
       if(k>0&&gaps[k-1]) await wr.silence(gaps[k-1]);
-      const O2=ov[k]; await wr.pcm(L,R,start,N-O2);
-      carry=O2? {l:L.slice(N-O2),r:R.slice(N-O2)} : null;
+      await renderSong(buf,t.state,t.in||0,(t.in||0)+N/sr,async(L,R,pos)=>{ const m=L.length;
+        for(let x=0;x<m;x++){ const q=pos+x; let g=1; if(q<Fin) g*=q/Fin; if(q>=N-Fout) g*=(N-1-q)/Fout; if(g!==1){ L[x]*=g; R[x]*=g; }
+          if(q<Oin&&carry){ const u=(q+.5)/Oin, gi=Math.sin(u*Math.PI/2), go=Math.cos(u*Math.PI/2); L[x]=L[x]*gi+carry.l[q]*go; R[x]=R[x]*gi+carry.r[q]*go; } }
+        const wEnd=Math.min(m,Math.max(0,tail-pos)); if(wEnd>0) await wr.pcm(L,R,0,wEnd);
+        if(next&&pos+m>tail){ const s0=Math.max(0,tail-pos); next.l.set(L.subarray(s0,m),pos+s0-tail); next.r.set(R.subarray(s0,m),pos+s0-tail); }
+      },{abort:()=>SES.cancel,prog:(f,what)=>ui(base+f/n,'שיר '+(k+1)+' מתוך '+n+' · '+what+' '+Math.round(f*100)+'%: '+t.name)});
+      carry=next;
     }
     ui(1,'שומר את הקובץ…'); const res=await wr.end(); const wname=wr.name; wr=null;
     if(res.where){ $('sesTxt').textContent='נשמר: '+wname+' בתיקייה '+res.where; toast('הסשן נשמר'); }
     else if(res.file) await deliverFile(res.file,x=>$('sesTxt').textContent=x);
     else $('sesTxt').textContent='השמירה נכשלה';
-  }catch(e){ if(wr&&wr.abort) wr.abort(); $('sesTxt').textContent= e==='cancel'? 'הרינדור בוטל.' : 'הרינדור נעצר: '+(e&&e.message?e.message:'שגיאה'); }
+  }catch(e){ if(wr&&wr.abort) wr.abort(); $('sesTxt').textContent=errText(e); }
   SES.busy=false; keepAwake(false); $('sesRender').disabled=false; $('sesCancel').hidden=true;
 }
 
@@ -3610,7 +3772,7 @@ function applyBands(list){ const selSlot=(sel()||{}).slot; A.forEach(destroy); A
 function histGo(from,to){ if(!from.length) return; to.push(HIST.cur); HIST.quiet=Date.now()+500; applyBands(JSON.parse(from.pop())); HIST.cur=histSig(); HIST.pending=null; histUI(); }
 $('undoBtn').onclick=()=>{ histGo(HIST.undo,HIST.redo); toast('בוטל'); };
 $('redoBtn').onclick=()=>{ histGo(HIST.redo,HIST.undo); toast('בוצע מחדש'); };
-window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend,addTab,showSum,openXf,sesToggle,XP});  // read-only peek, used by automated checks
+window.__cq=()=>({SES,S,tracks,cur,loudM,out,sesTotal,ctx,PH,SCOPE,phSend,addTab,showSum,openXf,sesToggle,XP,renderStream,renderSong,decodeTrack,getState,buildOffline,chainLatency,FX,lufsMeter,applyState:typeof applyState!=="undefined"?applyState:null,makeWriter});  // read-only peek, used by automated checks
 if(NATIVE){ let st={}; try{ st=JSON.parse(NATIVE.getStatus()); }catch(_){} if(st.enabled) setSystem(true);
   try{ NATIVE.ready(); }catch(_){}
   // update check: the build number in the latest release notes vs this install
