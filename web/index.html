@@ -1607,7 +1607,7 @@ class CabinSat extends AudioWorkletProcessor{
     const flut=p.machine==='a800'?1.4:.8, base=.002*sr, wowA=p.wow*.0003*sr, flA=p.wow*.00012*sr*flut;
     for(let i=0;i<n;i++){
       let mod=0;
-      if(tape){ const t=this.t/sr; this.dr+=(Math.random()*2-1)*.02-this.dr*.001; mod=wowA*Math.sin(6.2832*.55*t)+flA*Math.sin(6.2832*6.3*t+1)+p.wow*this.dr*.0001*sr; }
+      if(tape){ const t=this.t/sr; let hh=Math.imul((this.t|0)^0x9e3779b9,0x85ebca6b); hh^=hh>>>13; hh=Math.imul(hh,0xc2b2ae35); hh^=hh>>>16; this.dr+=((hh>>>0)/2147483648-1)*.02-this.dr*.001; mod=wowA*Math.sin(6.2832*.55*t)+flA*Math.sin(6.2832*6.3*t+1)+p.wow*this.dr*.0001*sr; }
       for(let ch=0;ch<chs;ch++){
         const x=(inp[ch]||inp[0])[i]; let y;
         if(tape){ y=(Math.tanh(g*x+bias)-tb)*comp;
@@ -2327,28 +2327,51 @@ function renderWarm(st,sr){ const F=st.FX||FX; let w=6;
   if(st.mode==='lp'&&!st.bypass) w+=RES[st.res||'med']/sr;
   return w; }
 async function renderStream(buf,st,from,to,onBlock,o){ o=o||{};
-  const sr=ctx.sampleRate, want=Math.max(1,Math.round((to-from)*sr)), lat=chainLatency(st,sr), X=2048, CH=Math.round((o.chunk||12)*sr);
-  const warm=Math.round(renderWarm(st,sr)*sr), fromS=Math.round(from*sr), nCh=buf.numberOfChannels;
-  const ro=o.ro||{}; const F=st.FX||FX;
+  const sr=ctx.sampleRate, want=Math.max(1,Math.round((to-from)*sr)), lat=chainLatency(st,sr), X=4096, CH=Math.round((o.chunk||12)*sr);
+  const warm0=Math.round(renderWarm(st,sr)*sr), fromS=Math.round(from*sr), toS=fromS+want, nCh=buf.numberOfChannels;
+  const ro=o.ro||{}; const F=st.FX||FX; const rep=o.report||{joins:0,fixed:[],bad:[],holes:[]};
   if(F.rev&&F.rev.on&&!ro.ir){ const tc=new OfflineAudioContext(2,1,sr), r=makeIR(tc,F.rev).buf; ro.ir={l:r.getChannelData(0).slice(),r:r.getChannelData(1).slice()}; }
+  // one piece: always returns exactly n+ext samples per channel
+  const piece=async(pos,n,ext,warm)=>{
+    // the input runs on past the piece by the chain latency: linear phase, look-ahead and TAME need that much future sound
+    const pre=Math.min(warm,pos), inStart=fromS+pos-pre, inLen=pre+n+ext+lat, len=inLen;
+    const oc=new OfflineAudioContext(2,len,sr); await oc.audioWorklet.addModule(workletURL());
+    const ib=oc.createBuffer(2,inLen,sr), a0=Math.max(0,inStart), a1=Math.min(buf.length,toS,inStart+inLen);
+    if(a1>a0) for(let c=0;c<2;c++) ib.copyToChannel(buf.getChannelData(Math.min(c,nCh-1)).subarray(a0,a1),c,a0-inStart);
+    const src=oc.createBufferSource(); src.buffer=ib; const chn=buildOffline(oc,st,{ir:ro.ir,t0:pos-pre}); src.connect(chn.i); chn.o.connect(oc.destination); src.start(0);
+    const out=await oc.startRendering(), L=new Float32Array(n+ext), R=new Float32Array(n+ext), o0=pre+lat;
+    const c0=out.getChannelData(0), c1=out.numberOfChannels>1?out.getChannelData(1):c0, m=Math.max(0,Math.min(n+ext,c0.length-o0));
+    L.set(c0.subarray(o0,o0+m)); R.set(c1.subarray(o0,o0+m));
+    // a hole: exact digital silence for ≥10 ms in the output while the input there has sound
+    let hole=-1; const inp=ib.getChannelData(0), W=Math.round(.01*sr);
+    for(let i=0,z=0;i<n;i++){ if(L[i]===0&&R[i]===0){ if(++z>=W){ let e=0; for(let k=i-W+1;k<=i;k++){ const v=inp[pre+k]||0; e+=v*v; } if(e/W>1e-7){ hole=i; break; } } } else z=0; }
+    return {L,R,hole};
+  };
+  const mis=(pl,L)=>{ let e=0,s2=0; for(let i=0;i<X;i++){ const d=pl[i]-L[i]; e+=d*d; s2+=L[i]*L[i]+pl[i]*pl[i]; } return s2<1e-6? -99 : 10*Math.log10(e/(s2/2)+1e-12); };
+  const TH= F.sat&&F.sat.on&&F.sat.mode==='tape'? -12 : -30;  // tape wow is random by nature, so its pieces differ a little
   let prev=null;
   for(let pos=0;pos<want;pos+=CH){
     if(o.abort&&o.abort()) throw 'cancel';
-    const n=Math.min(CH,want-pos), pre=Math.min(warm,pos), ext=pos+n<want?X:0, inStart=fromS+pos-pre, inLen=pre+n+ext, len=inLen+lat;
-    const oc=new OfflineAudioContext(2,len,sr); await oc.audioWorklet.addModule(workletURL());
-    const ib=oc.createBuffer(2,inLen,sr), a0=Math.max(0,inStart), a1=Math.min(buf.length,inStart+inLen);
-    if(a1>a0) for(let c=0;c<2;c++) ib.copyToChannel(buf.getChannelData(Math.min(c,nCh-1)).subarray(a0,a1),c,a0-inStart);
-    const src=oc.createBufferSource(); src.buffer=ib; const chn=buildOffline(oc,st,{ir:ro.ir,t0:pos-pre}); src.connect(chn.i); chn.o.connect(oc.destination); src.start(0);
-    const out=await oc.startRendering();
-    const L=out.getChannelData(0).slice(pre+lat,pre+lat+n+ext), R=out.getChannelData(1).slice(pre+lat,pre+lat+n+ext);
+    const n=Math.min(CH,want-pos), ext=pos+n<want?X:0;
+    let P=await piece(pos,n,ext,warm0);
+    // check the join with the previous piece; a bad join or a hole is rendered again with a longer warm-up
+    let mm=prev? mis(prev.l,P.L) : -99;
+    if(P.hole>=0||mm>TH){ const Q=await piece(pos,n,ext,warm0*2+Math.round(sr)); const m2=prev?mis(prev.l,Q.L):-99;
+      if((Q.hole<0&&P.hole>=0)||m2<mm){ P=Q; mm=m2; rep.fixed.push((from+pos/sr)); } }
+    if(prev){ rep.joins++; if(mm>TH) rep.bad.push({t:from+pos/sr,db:mm}); }
+    if(P.hole>=0) rep.holes.push(from+(pos+P.hole)/sr);
+    const {L,R}=P;
     if(prev){ for(let i=0;i<X&&i<n;i++){ const u=(i+.5)/X; L[i]=prev.l[i]*(1-u)+L[i]*u; R[i]=prev.r[i]*(1-u)+R[i]*u; } }
     prev= ext? {l:L.slice(n),r:R.slice(n)} : null;
     await onBlock(n===L.length?L:L.subarray(0,n), n===R.length?R:R.subarray(0,n), pos);
     if(o.prog) o.prog((pos+n)/want);
     await new Promise(z=>setTimeout(z,0));
   }
-  return want;
+  o.report=rep; return want;
 }
+function repText(r){ if(!r) return ''; const t=x=>fmtT(x);
+  if(!r.bad.length&&!r.holes.length) return ' · בדיקת חיבורים: '+r.joins+' תקינים'+(r.fixed.length?' ('+r.fixed.length+' תוקנו)':'');
+  return ' · חיבורים לא נקיים: '+r.bad.map(b=>t(b.t)+' ('+b.db.toFixed(0)+' dB)').join(', ')+(r.holes.length?' · שקט לא צפוי: '+r.holes.map(t).join(', '):''); }
 /* renders [from,to] seconds into memory (short pieces only: transition previews) */
 async function renderOffline(buf,st,from,to,onProg,abort){
   const want=Math.max(1,Math.round((to-from)*ctx.sampleRate)), l=new Float32Array(want), r=new Float32Array(want);
@@ -2375,7 +2398,9 @@ async function renderSong(buf,st,from,to,onPcm,o){ o=o||{}; const sr=ctx.sampleR
   const P=o.prog||(()=>{});
   if(OUT.target){ const m=lufsMeter(sr); await renderStream(buf,st,from,to,(l,r)=>m.push(l,r),{ro,abort:o.abort,prog:f=>P(f*.5,'מודד עוצמה')}); meas=m.result(); gdb=targetGain(meas,st); }
   const g=Math.pow(10,gdb/20);
-  await renderStream(buf,st,from,to,async(l,r,pos)=>{ if(g!==1) for(let i=0;i<l.length;i++){ l[i]*=g; r[i]*=g; } await onPcm(l,r,pos); },{ro,abort:o.abort,prog:f=>P(OUT.target?.5+f*.5:f,'מעבד')});
+  const op={ro,abort:o.abort,prog:f=>P(OUT.target?.5+f*.5:f,'מעבד')};
+  await renderStream(buf,st,from,to,async(l,r,pos)=>{ if(g!==1) for(let i=0;i<l.length;i++){ l[i]*=g; r[i]*=g; } await onPcm(l,r,pos); },op);
+  if(o.report) o.report.push(op.report);
   return meas? {from:meas.lufs,gain:gdb,capped:gdb<OUT.target-meas.lufs-.05} : null;
 }
 function errText(e){ if(e==='cancel') return 'הרינדור בוטל.'; const m=e&&e.message?e.message:String(e||'');
@@ -2506,10 +2531,10 @@ $('renderBtn').onclick=async()=>{
       const frames=Math.round(to*sr);
       w=await makeWriter(OUT.fmt,t.name.replace(/[\\/:*?"<>|]+/g,' ').trim()+' (Cabin Q)',frames,sr);
       const t0=performance.now();
-      const nm=await renderSong(buf,st,0,to,(l,r)=>w.pcm(l,r,0,l.length),{abort:()=>RENDER.cancel,prog:(f,what)=>{ $('renderFill').style.width=(f*100)+'%';
+      const reps=[]; const nm=await renderSong(buf,st,0,to,(l,r)=>w.pcm(l,r,0,l.length),{report:reps,abort:()=>RENDER.cancel,prog:(f,what)=>{ $('renderFill').style.width=(f*100)+'%';
         const el=(performance.now()-t0)/1000, left=f>.03? el/f-el : null; txt(what+'… '+Math.round(f*100)+'%'+(left!=null?' · עוד כ-'+fmtT(left):'')); }});
       txt('שומר את הקובץ…'); const res=await w.end(); w=null;
-      const lu=nm? ' · '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS'+(nm.capped?' (תקרת הלימיטר עצרה. כדי להגיע ל-\u2066'+OUT.target+'\u2069 מעלים GAIN בלימיטר)':'') : '';
+      const lu=repText(reps[0])+(nm? ' · '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS'+(nm.capped?' (תקרת הלימיטר עצרה. כדי להגיע ל-\u2066'+OUT.target+'\u2069 מעלים GAIN בלימיטר)':'') : '');
       if(res.where){ txt('נשמר בתיקייה '+res.where+lu); toast('הקובץ נשמר'); } else await deliverFile(res.file,x=>txt(x+lu),$('renderTxt'));
     }catch(e){ if(w&&w.abort) w.abort(); txt(errText(e)); }
     RENDER.active=false; RENDER.off=false; keepAwake(false); renderUI(); return; }
