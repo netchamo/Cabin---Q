@@ -580,6 +580,10 @@ input[type=range]:disabled{opacity:.3}
 .sum-top .ib.del.armed{color:#ff5a4a; border-color:rgba(255,90,74,.7); background:rgba(255,90,74,.12)}
 .gate-disp{border-radius:10px; overflow:hidden; background:#0b171c; box-shadow:inset 0 2px 5px rgba(0,0,0,.9)}
 #gateCv{display:block; width:100%; height:120px}
+.save-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.save-row .pill{height:40px; font-size:15px; text-decoration:none}
+.save-main{border-color:rgba(255,154,60,.7) !important; color:#fff4e6 !important; background:linear-gradient(180deg,#4a4036,#342d27) !important; box-shadow:0 0 14px rgba(255,154,60,.25)}
+.save-main .led{background:var(--led) !important; box-shadow:0 0 8px var(--led-glow)}
 .xf{position:fixed; inset:0; z-index:55; display:flex; align-items:center; justify-content:center; padding:12px; background:rgba(0,0,0,.6); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
 .xf[hidden]{display:none}
 .xf-p{width:100%; max-width:760px; display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:16px; background:linear-gradient(180deg,#2c3035,#1d2024); border:1px solid var(--plate-edge); box-shadow:0 20px 60px rgba(0,0,0,.7)}
@@ -2470,9 +2474,21 @@ function wavWriter(name,frames,bits,sr){
     abort(){ if(nat){ try{ NATIVE.saveAbort(tok); }catch(_){ } } parts.length=0; }
   };
 }
-async function deliverFile(file,txt){ const mb=(file.size/1048576).toFixed(1);
-  if(navigator.canShare&&navigator.canShare({files:[file]})){ txt('הקובץ מוכן ('+mb+' MB). בחר "שמור בקבצים".'); await navigator.share({files:[file],title:file.name}); return; }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); txt('הקובץ ירד ('+mb+' MB): '+file.name); }
+/* hand the finished file to the person. On iPhone the share sheet only opens straight from a tap, and a render
+   takes longer than the browser keeps the original tap alive, so the file waits behind a "save" button. */
+async function deliverFile(file,txt,after){ const mb=(file.size/1048576).toFixed(1);
+  const old=document.getElementById('saveRow'); if(old) old.remove();
+  const row=document.createElement('div'); row.id='saveRow'; row.className='save-row'; row.dir='rtl';
+  const share=navigator.canShare&&navigator.canShare({files:[file]});
+  const url=URL.createObjectURL(file);
+  const bS=document.createElement('button'); bS.className='pill he-pill save-main'; bS.innerHTML='<span class="led"></span>'+(share?'שמירת הקובץ':'הורדת הקובץ');
+  const bD=document.createElement('a'); bD.className='pill he-pill'; bD.href=url; bD.download=file.name; bD.textContent='פתיחה';
+  bS.onclick=async()=>{ if(share){ try{ await navigator.share({files:[file],title:file.name}); txt('הקובץ נשמר: '+file.name); row.remove(); }catch(e){ if(e&&e.name==='AbortError') return; bD.click(); } }
+    else { bD.click(); txt('הקובץ ירד ('+mb+' MB): '+file.name); } };
+  row.append(bS); if(share) row.append(bD);
+  (after||document.getElementById('renderTxt')).after(row);
+  txt('הקובץ מוכן ('+mb+' MB). לחץ על "'+(share?'שמירת הקובץ':'הורדת הקובץ')+'" ובחר "שמור בקבצים".');
+}
 
 /* ---------- render: record the processed song in real time and save it as WAV ---------- */
 const RENDER={active:false,ch:[],frames:0,startT:0,stopping:false};
@@ -2483,6 +2499,7 @@ function keepAwake(on){ try{ if(NATIVE&&NATIVE.keepAwake) NATIVE.keepAwake(on); 
 $('renderBtn').onclick=async()=>{
   if(cur<0){ toast('בחר שיר מהספרייה כדי לרנדר אותו'); return; }
   if(window.OfflineAudioContext&&fxWorklet&&!RENDER.active){
+    { const o=document.getElementById('saveRow'); if(o) o.remove(); }
     const t=tracks[cur], txt=x=>$('renderTxt').textContent=x; pause(); RENDER.active=true; RENDER.off=true; RENDER.cancel=false; renderUI(); keepAwake(true);
     let w=null;
     try{ txt('קורא את השיר…'); const buf=await decodeTrack(t), st=getState(), tail=FX.rev.on?Math.min(7,FX.rev.decay*1.2)+.3:.3, sr=ctx.sampleRate, to=buf.duration+tail;
@@ -2493,7 +2510,7 @@ $('renderBtn').onclick=async()=>{
         const el=(performance.now()-t0)/1000, left=f>.03? el/f-el : null; txt(what+'… '+Math.round(f*100)+'%'+(left!=null?' · עוד כ-'+fmtT(left):'')); }});
       txt('שומר את הקובץ…'); const res=await w.end(); w=null;
       const lu=nm? ' · '+nm.from.toFixed(1)+' → '+(nm.from+nm.gain).toFixed(1)+' LUFS'+(nm.capped?' (תקרת הלימיטר עצרה. כדי להגיע ל-\u2066'+OUT.target+'\u2069 מעלים GAIN בלימיטר)':'') : '';
-      if(res.where){ txt('נשמר בתיקייה '+res.where+lu); toast('הקובץ נשמר'); } else await deliverFile(res.file,x=>txt(x+lu));
+      if(res.where){ txt('נשמר בתיקייה '+res.where+lu); toast('הקובץ נשמר'); } else await deliverFile(res.file,x=>txt(x+lu),$('renderTxt'));
     }catch(e){ if(w&&w.abort) w.abort(); txt(errText(e)); }
     RENDER.active=false; RENDER.off=false; keepAwake(false); renderUI(); return; }
   if(!recNode){ toast('הרינדור לא נתמך בדפדפן הזה'); return; }
@@ -3746,7 +3763,7 @@ async function renderSession(){
     }
     ui(1,'שומר את הקובץ…'); const res=await wr.end(); const wname=wr.name; wr=null;
     if(res.where){ $('sesTxt').textContent='נשמר: '+wname+' בתיקייה '+res.where; toast('הסשן נשמר'); }
-    else if(res.file) await deliverFile(res.file,x=>$('sesTxt').textContent=x);
+    else if(res.file) await deliverFile(res.file,x=>$('sesTxt').textContent=x,$('sesTxt'));
     else $('sesTxt').textContent='השמירה נכשלה';
   }catch(e){ if(wr&&wr.abort) wr.abort(); $('sesTxt').textContent=errText(e); }
   SES.busy=false; keepAwake(false); $('sesRender').disabled=false; $('sesCancel').hidden=true;
